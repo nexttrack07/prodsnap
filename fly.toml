@@ -1,4 +1,4 @@
-app = "prodsnap-eda6"
+app = "prodsnap"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = [ ]
