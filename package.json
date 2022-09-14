@@ -34,12 +34,14 @@
     "/postgres-data"
   ],
   "dependencies": {
+    "@headlessui/react": "^1.7.1",
     "@prisma/client": "^4.2.1",
     "@remix-run/express": "^1.7.0",
     "@remix-run/node": "^1.7.0",
     "@remix-run/react": "^1.7.0",
     "@remix-run/server-runtime": "^1.7.0",
     "bcryptjs": "^2.4.3",
+    "clsx": "^1.2.1",
     "compression": "^1.7.4",
     "cross-env": "^7.0.3",
     "express": "^4.18.1",
