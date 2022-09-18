@@ -20,14 +20,12 @@
     "@mantine/notifications": "^5.3.3",
     "dayjs": "^1.11.5",
     "embla-carousel-react": "^7.0.3",
-    "fabric": "^5.2.4",
     "jotai": "^1.8.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "tabler-icons-react": "^1.55.0"
   },
   "devDependencies": {
-    "@types/fabric": "^4.5.12",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@typescript-eslint/eslint-plugin": "^5.37.0",
