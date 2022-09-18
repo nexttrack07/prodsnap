@@ -18,6 +18,8 @@
     "@mantine/hooks": "^5.3.3",
     "@mantine/modals": "^5.3.3",
     "@mantine/notifications": "^5.3.3",
+    "@supabase/auth-ui-react": "^0.2.0",
+    "@supabase/supabase-js": "^2.0.0-rc.10",
     "dayjs": "^1.11.5",
     "embla-carousel-react": "^7.0.3",
     "jotai": "^1.8.3",
