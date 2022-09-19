@@ -51,4 +51,4 @@ const defaultEl: DefaultFn = () => atom<SVGType>({
   }],
 });
 
-export const elementsAtom = atom<ElementType[]>([defaultEl(), defaultEl()]);
+export const elementsAtom = atom<ElementType[]>([]);
