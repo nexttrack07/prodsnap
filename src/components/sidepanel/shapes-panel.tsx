@@ -6,7 +6,7 @@ import { getShapes } from "../../api";
 import { renderElement } from "../../components/canvas";
 import { elementsAtom, SVGType } from "../../components/canvas/store";
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles(() => ({
   shape: {
     cursor: 'pointer',
     '&:hover': {
@@ -25,6 +25,8 @@ export function ShapesPanel() {
   const handleAddElement = (newEl: SVGType) => {
     setElements((items) => [...items, atom(newEl)]);
   };
+
+  console.log('query: ', query)
 
   return (
     <>

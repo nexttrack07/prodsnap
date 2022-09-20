@@ -28,7 +28,7 @@ function getRandomInt(min: number = 100, max: number = 500) {
 
 type DefaultFn = () => ElementType;
 
-const defaultEl: DefaultFn = () => atom<SVGType>({
+export const defaultEl: DefaultFn = () => atom<SVGType>({
   name: 'svg',
   type: 'element',
   value: '',
@@ -52,3 +52,4 @@ const defaultEl: DefaultFn = () => atom<SVGType>({
 });
 
 export const elementsAtom = atom<ElementType[]>([]);
+export const selectedElementsAtom = atom<number[]>([]);
