@@ -1,19 +1,17 @@
-import React, { SetStateAction, useCallback, useEffect, useState } from "react";
-import { Box, Center, Image, Loader, useMantineTheme } from "@mantine/core";
+import React, { useCallback } from "react";
+import { Box, useMantineTheme } from "@mantine/core";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { atomFamily } from "jotai/utils";
 import { createElement, ReactNode } from "react";
 import {
-  CanvasElement,
   elementsAtom,
   ElementType,
-  ImageType,
-  MoveableElement,
   selectedElementsAtom,
   SVGType,
 } from "./store";
 import { Moveable, MoveableItem } from "../moveable";
-import { getImageDimensions } from "../../utils";
+import { RenderImage } from "./render-image";
+import { RenderSvg } from "./render-svg";
 
 const unSelectAllAtom = atom(
   null,
@@ -115,13 +113,7 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
       onClick={handleElementSelect}
     >
       {element.type === "svg" && (
-        <svg
-          preserveAspectRatio="xMaxYMax"
-          width={width * 0.9}
-          height={height * 0.9}
-        >
-          {element.elements?.map(renderElement)}
-        </svg>
+        <RenderSvg element={element} />
       )}
       {element.type === "image" && (
         <RenderImage element={element} setElement={setElement} />
@@ -165,41 +157,5 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
         </Moveable>
       )}
     </span>
-  );
-}
-
-function RenderImage({
-  element,
-  setElement,
-}: {
-  element: MoveableElement & ImageType;
-  setElement: (update: SetStateAction<CanvasElement>) => void;
-}) {
-  const [loading, setLoading] = useState(true);
-  const { width, height, x, y } = element;
-
-  useEffect(() => {
-    async function setImageDimensions(src: string) {
-      const { width, height } = await getImageDimensions(src);
-      setElement((el) => ({
-        ...el,
-        width,
-        height,
-      }));
-      setLoading(false);
-    }
-    if (element.type === "image") {
-      setImageDimensions(element.url);
-    }
-  }, [element.type]);
-
-  return (
-    <Center sx={{ width, height, left: x, top: y, border: "1px solid blue" }}>
-      {loading ? (
-        <Loader />
-      ) : (
-        <Image width={width} height={height} src={element.url} />
-      )}
-    </Center>
   );
 }

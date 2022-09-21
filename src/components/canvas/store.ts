@@ -34,7 +34,5 @@ function getRandomInt(min: number = 100, max: number = 500) {
   return Math.floor(Math.random() * (x - n + 1)) + n;
 }
 
-type DefaultFn = () => ElementType;
-
 export const elementsAtom = atom<ElementType[]>([]);
 export const selectedElementsAtom = atom<number[]>([]);
