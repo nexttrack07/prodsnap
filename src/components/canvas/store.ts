@@ -1,24 +1,32 @@
 import { atom, WritableAtom } from 'jotai';
-import { SetStateAction } from 'react';
+import { SetStateAction, SVGAttributes } from 'react';
 
 type Action<T> = SetStateAction<T>;
 
-export type SVGAttributes = {
+export type MoveableElement = {
   width: number;
   height: number;
-  left: number;
-  top: number;
+  x: number;
+  y: number;
 }
 
 export type SVGType = {
-  name: string;
-  type: string;
-  value: string,
-  attributes: SVGAttributes,
-  children?: SVGType[]
+  type: "svg";
+  elements: Array<{
+    tag: string;
+    props: SVGAttributes<SVGCircleElement | SVGRectElement | SVGEllipseElement | SVGPolygonElement>
+  }>
 }
 
-export type ElementType = WritableAtom<SVGType, Action<SVGType>>
+export type ImageType = {
+  type: "image";
+  url: string;
+  thumbnail?: string;
+}
+
+export type CanvasElement = MoveableElement & (SVGType | ImageType)
+
+export type ElementType = WritableAtom<CanvasElement, Action<CanvasElement>>
 
 function getRandomInt(min: number = 100, max: number = 500) {
   const n = Math.ceil(min);
@@ -27,29 +35,6 @@ function getRandomInt(min: number = 100, max: number = 500) {
 }
 
 type DefaultFn = () => ElementType;
-
-export const defaultEl: DefaultFn = () => atom<SVGType>({
-  name: 'svg',
-  type: 'element',
-  value: '',
-  attributes: {
-    width: 100,
-    height: 100,
-    left: getRandomInt(),
-    top: getRandomInt(),
-  },
-  children: [{
-    type: 'element',
-    name: 'rect',
-    value: '',
-    attributes: {
-      top: 0,
-      left: 0,
-      width: 100,
-      height: 100,
-    },
-  }],
-});
 
 export const elementsAtom = atom<ElementType[]>([]);
 export const selectedElementsAtom = atom<number[]>([]);

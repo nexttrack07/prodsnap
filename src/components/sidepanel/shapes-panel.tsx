@@ -4,7 +4,7 @@ import { atom, useSetAtom } from "jotai";
 import { useQuery } from "@tanstack/react-query";
 import { getShapes } from "../../api";
 import { renderElement } from "../../components/canvas";
-import { elementsAtom, SVGType } from "../../components/canvas/store";
+import { elementsAtom, CanvasElement } from "../../components/canvas/store";
 
 const useStyles = createStyles(() => ({
   shape: {
@@ -22,7 +22,7 @@ export function ShapesPanel() {
   const setElements = useSetAtom(elementsAtom);
   const { classes } = useStyles();
 
-  const handleAddElement = (newEl: SVGType) => {
+  const handleAddElement = (newEl: CanvasElement) => {
     setElements((items) => [...items, atom(newEl)]);
   };
 
@@ -42,10 +42,10 @@ export function ShapesPanel() {
             width={75}
             onClick={() => handleAddElement(item.data)}
             height={
-              (item.data.attributes.height * 75) / item.data.attributes.width
+              (item.data.height * 75) / item.data.width
             }
           >
-            {item.data.children.map(renderElement)}
+            {item.data.elements.map(renderElement)}
           </svg>
         ))}
       </SimpleGrid>

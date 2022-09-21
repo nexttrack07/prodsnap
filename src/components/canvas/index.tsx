@@ -31,13 +31,13 @@ export function Canvas() {
   );
 }
 
-export function renderElement(item: SVGType, i: number): ReactNode {
-  const { name: tag, attributes: props, children } = item;
+export function renderElement(item: SVGType["elements"][number], i: number): ReactNode {
+  const { tag, props } = item;
 
   return createElement(
     tag,
     { ...props, key: i },
-    children?.map((c, i) => renderElement(c, i))
+    null
   );
 }
 
@@ -67,11 +67,8 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
     (d: { x: number; y: number }) => {
       setElement((el) => ({
         ...el,
-        attributes: {
-          ...el.attributes,
-          left: d.x + el.attributes.left,
-          top: d.y + el.attributes.top,
-        },
+        x: d.x + el.x,
+        y: d.y + el.y
       }));
     },
     [setElement]
@@ -81,24 +78,21 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
     (d: { x: number; y: number }) => {
       setElement((el) => ({
         ...el,
-        attributes: {
-          ...el.attributes,
-          width: d.x + el.attributes.width,
-          height: d.y + el.attributes.height,
-        },
+        width: d.x + el.width,
+        height: d.y + el.height
       }));
     },
     [setElement]
   );
 
-  const { width, height, left, top } = element.attributes;
+  const { width, height, x, y } = element;
 
   return (
     <span
       style={{
         position: "absolute",
-        left,
-        top,
+        left: x,
+        top: y,
         width,
         height,
         display: "flex",
@@ -107,7 +101,12 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
       }}
       onClick={handleElementSelect}
     >
-      <svg width={width * .95} height={height * .95}>{element.children?.map(renderElement)}</svg>
+      {element.type === "svg" && (
+        <svg preserveAspectRatio="xMaxYMax" width={width * .90} height={height * .90}>{element.elements?.map(renderElement)}</svg>
+      )}
+      {element.type === "image" && (
+        <img src={element.url} />
+      )}
       {isSelected && (
         <Moveable>
           <MoveableItem onMove={handleMoveElement}>
@@ -118,7 +117,8 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
                 left: 0,
                 bottom: 0,
                 right: 0,
-                border: "1px dashed",
+                borderWidth: 2,
+                borderStyle: "dashed",
                 borderColor: theme.colors.blue[6],
               }}
               className="border border-dashed border-blue-500"
