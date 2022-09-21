@@ -15,8 +15,16 @@ import {
 import { Moveable, MoveableItem } from "../moveable";
 import { getImageDimensions } from "../../utils";
 
+const unSelectAllAtom = atom(
+  null,
+  (_get, set) => {
+    set(selectedElementsAtom, [])
+  }
+)
+
 export function Canvas() {
   const elements = useAtomValue(elementsAtom);
+  const unSelectAllElements = useSetAtom(unSelectAllAtom)
 
   return (
     <Box
@@ -27,6 +35,7 @@ export function Canvas() {
         boxShadow: "0px 0px 2px rgba(0,0,0,0.3)",
         position: "relative",
       })}
+      onClick={unSelectAllElements}
     >
       {elements.map((elAtom, i) => (
         <Element i={i} key={i} elementAtom={elAtom} />
@@ -57,7 +66,8 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
   const isSelected = useAtomValue(isSelectedAtom(i));
   const theme = useMantineTheme();
 
-  const handleElementSelect = () => {
+  const handleElementSelect = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setSelectedElements((items) => {
       if (items.includes(i)) {
         return items;
