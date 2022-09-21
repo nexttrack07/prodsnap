@@ -1,7 +1,7 @@
 import { atom, WritableAtom } from 'jotai';
 import { SetStateAction, SVGAttributes } from 'react';
 
-type Action<T> = SetStateAction<T>;
+export type Action<T> = SetStateAction<T>;
 
 export type MoveableElement = {
   width: number;

@@ -3,7 +3,7 @@ import { Stack, Button, Box } from '@mantine/core';
 import {
   Template,
   Camera,
-  PhotoEdit,
+  Photo,
   TextCaption,
   Line,
   Shape,
@@ -11,6 +11,7 @@ import {
   Icon,
 } from "tabler-icons-react";
 import { ShapesPanel } from './shapes-panel';
+import { PhotosPanel } from './photos-panel';
 
 export const SIDEBAR_SIZE = 60;
 export const SIDEPANEL_SIZE = 300 + SIDEBAR_SIZE;
@@ -20,7 +21,7 @@ type NavState = "templates" | "upload" | "photos" | "text" | "curves" | "shapes"
 const navItems: { icon: Icon; label: string; id: NavState }[] = [
   { icon: Template, label: "Template", id: "templates" },
   { icon: Camera, label: "Upload", id: "upload" },
-  { icon: PhotoEdit, label: "Photos", id: "photos" },
+  { icon: Photo, label: "Photos", id: "photos" },
   { icon: TextCaption, label: "Text", id: "text" },
   { icon: Line, label: "Curves", id: "curves" },
   { icon: Shape, label: "Shapes", id: "shapes" },
@@ -30,7 +31,7 @@ const navItems: { icon: Icon; label: string; id: NavState }[] = [
 const panelMap: Record<NavState, JSX.Element> = {
   templates: <div>Templates</div>,
   upload: <div>Upload</div>,
-  photos: <div>Photos</div>,
+  photos: <PhotosPanel />,
   text: <div>Text</div>,
   curves: <div>Curves</div>,
   shapes: <ShapesPanel />,

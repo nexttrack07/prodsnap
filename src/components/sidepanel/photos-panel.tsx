@@ -1,10 +1,10 @@
 import React from "react";
-import { Text, Space, createStyles, SimpleGrid } from "@mantine/core";
+import { Text, Space, createStyles, SimpleGrid, Image } from "@mantine/core";
 import { atom, useSetAtom } from "jotai";
 import { useQuery } from "@tanstack/react-query";
 import { getShapes } from "../../api";
 import { renderElement } from "../../components/canvas";
-import { elementsAtom, CanvasElement } from "../../components/canvas/store";
+import { elementsAtom, CanvasElement, MoveableElement, ImageType } from "../../components/canvas/store";
 
 const useStyles = createStyles(() => ({
   shape: {
@@ -17,8 +17,21 @@ const useStyles = createStyles(() => ({
   },
 }));
 
-export function ShapesPanel() {
-  const query = useQuery(["shapes"], getShapes);
+const data: { id: number; data: MoveableElement & ImageType }[] = [
+  {
+    id: 0,
+    data: {
+      type: "image",
+      x: 200,
+      y: 200,
+      width: 300,
+      height: 200,
+      url: "https://media.kohlsimg.com/is/image/kohls/4637183_Navy_Blue?wid=600&hei=600&op_sharpen=1"
+    }
+  }
+]
+
+export function PhotosPanel() {
   const setElements = useSetAtom(elementsAtom);
   const { classes } = useStyles();
 
@@ -29,12 +42,12 @@ export function ShapesPanel() {
   return (
     <>
       <Text sx={{ opacity: 0.7 }} size="lg">
-        Shapes
+        Photos
       </Text>
       <Space h="xl" />
       <SimpleGrid cols={3}>
-        {query.data?.data?.map((item) => (
-          <svg
+        {data.map((item) => (
+          <Image
             key={item.id}
             className={classes.shape}
             width={75}
@@ -42,9 +55,8 @@ export function ShapesPanel() {
             height={
               (item.data.height * 75) / item.data.width
             }
-          >
-            {item.data.elements.map(renderElement)}
-          </svg>
+            src={item.data.url}
+          />
         ))}
       </SimpleGrid>
     </>
