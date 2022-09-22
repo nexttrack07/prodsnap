@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { SetStateAction } from "jotai";
 import { CanvasElement, ImageType, MoveableElement } from "./store";
-import { getImageDimensions } from 'utils';
+import { getImageDimensions } from '../../utils';
 import { Center, Loader, Image } from '@mantine/core';
 
 export function RenderImage({

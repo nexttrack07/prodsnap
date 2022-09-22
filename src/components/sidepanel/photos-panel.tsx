@@ -1,9 +1,6 @@
 import React from "react";
 import { Text, Space, createStyles, SimpleGrid, Image } from "@mantine/core";
 import { atom, useSetAtom } from "jotai";
-import { useQuery } from "@tanstack/react-query";
-import { getShapes } from "../../api";
-import { renderElement } from "../../components/canvas";
 import { elementsAtom, CanvasElement, MoveableElement, ImageType } from "../../components/canvas/store";
 
 const useStyles = createStyles((theme) => ({
@@ -11,7 +8,6 @@ const useStyles = createStyles((theme) => ({
     cursor: 'pointer',
     border: `1px solid ${theme.colors.gray[2]}`,
     boxShadow: "0 0 1px rgba(0,0,0,0.3)",
-    borderRadius: 5,
     padding: 8,
     '&:hover': {
       opacity: 0.7,
@@ -53,6 +49,7 @@ export function PhotosPanel() {
         {data.map((item) => (
           <Image
             key={item.id}
+            radius="md"
             className={classes.shape}
             width={75}
             onClick={() => handleAddElement(item.data)}

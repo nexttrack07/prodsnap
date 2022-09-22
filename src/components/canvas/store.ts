@@ -1,5 +1,5 @@
 import { atom, WritableAtom } from 'jotai';
-import { SetStateAction, SVGAttributes } from 'react';
+import React, { SetStateAction, SVGAttributes } from 'react';
 
 export type Action<T> = SetStateAction<T>;
 
@@ -18,21 +18,21 @@ export type SVGType = {
   }>
 }
 
+export type TextType = {
+  type: "text";
+  content: string;
+  props: React.CSSProperties
+}
+
 export type ImageType = {
   type: "image";
   url: string;
   thumbnail?: string;
 }
 
-export type CanvasElement = MoveableElement & (SVGType | ImageType)
+export type CanvasElement = MoveableElement & (SVGType | ImageType | TextType)
 
 export type ElementType = WritableAtom<CanvasElement, Action<CanvasElement>>
-
-function getRandomInt(min: number = 100, max: number = 500) {
-  const n = Math.ceil(min);
-  const x = Math.floor(max);
-  return Math.floor(Math.random() * (x - n + 1)) + n;
-}
 
 export const elementsAtom = atom<ElementType[]>([]);
 export const selectedElementsAtom = atom<number[]>([]);

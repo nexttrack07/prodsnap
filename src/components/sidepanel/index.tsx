@@ -12,6 +12,7 @@ import {
 } from "tabler-icons-react";
 import { ShapesPanel } from './shapes-panel';
 import { PhotosPanel } from './photos-panel';
+import { TextPanel } from './text-panel';
 
 export const SIDEBAR_SIZE = 60;
 export const SIDEPANEL_SIZE = 300 + SIDEBAR_SIZE;
@@ -32,7 +33,7 @@ const panelMap: Record<NavState, JSX.Element> = {
   templates: <div>Templates</div>,
   upload: <div>Upload</div>,
   photos: <PhotosPanel />,
-  text: <div>Text</div>,
+  text: <TextPanel />,
   curves: <div>Curves</div>,
   shapes: <ShapesPanel />,
   graphics: <div>Graphics</div>,

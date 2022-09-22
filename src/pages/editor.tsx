@@ -157,8 +157,9 @@ export function Editor() {
       }
       header={<HeaderComponent />}
       footer={<FooterComponent />}
+      padding={0}
     >
-      <Center sx={{ width: "100%", height: "100%" }}>
+      <Center sx={{ backgroundColor: "red", width: "100%", height: "100%" }}>
         <Canvas />
       </Center>
     </AppShell>

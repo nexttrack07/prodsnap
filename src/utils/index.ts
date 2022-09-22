@@ -14,3 +14,10 @@ export const getImageDimensions = (src: string) => {
     image.src = src;
   });
 };
+
+
+export function getRandomInt(min: number = 100, max: number = 500) {
+  const n = Math.ceil(min);
+  const x = Math.floor(max);
+  return Math.floor(Math.random() * (x - n + 1)) + n;
+}

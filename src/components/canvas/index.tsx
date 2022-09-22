@@ -12,6 +12,7 @@ import {
 import { Moveable, MoveableItem } from "../moveable";
 import { RenderImage } from "./render-image";
 import { RenderSvg } from "./render-svg";
+import { RenderText } from "./render-text";
 
 const unSelectAllAtom = atom(
   null,
@@ -117,6 +118,9 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
       )}
       {element.type === "image" && (
         <RenderImage element={element} setElement={setElement} />
+      )}
+      {element.type === "text" && (
+        <RenderText element={element} />
       )}
       {isSelected && (
         <Moveable>
