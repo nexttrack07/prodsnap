@@ -14,9 +14,7 @@ import {
   Text,
   Navbar,
 } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import { getShapes } from "../api";
-import React, { useState } from "react";
+import React from "react";
 import {
   Edit,
   ArrowBack,
@@ -28,7 +26,7 @@ import {
   ArrowsLeftRight,
   Trash,
 } from "tabler-icons-react";
-import { Canvas, Logo, Sidepanel, SIDEPANEL_SIZE } from "../components";
+import { Canvas, Toolbar, Logo, Sidepanel, SIDEPANEL_SIZE } from "../components";
 
 export const HEADER_SIZE = 60;
 export const FOOTER_SIZE = 60;
@@ -159,9 +157,21 @@ export function Editor() {
       footer={<FooterComponent />}
       padding={0}
     >
-      <Center sx={{ backgroundColor: "red", width: "100%", height: "100%" }}>
-        <Canvas />
-      </Center>
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <div style={{ height: HEADER_SIZE, backgroundColor: "blue" }}>
+          <Toolbar />
+        </div>
+        <Center sx={{ backgroundColor: "red", flex: 1 }}>
+          <Canvas />
+        </Center>
+      </div>
     </AppShell>
   );
 }
