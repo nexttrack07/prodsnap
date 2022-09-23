@@ -51,11 +51,7 @@ export function PhotosPanel() {
             key={item.id}
             radius="md"
             className={classes.shape}
-            width={75}
             onClick={() => handleAddElement(item.data)}
-            height={
-              (item.data.height * 75) / item.data.width
-            }
             src={item.data.url}
           />
         ))}

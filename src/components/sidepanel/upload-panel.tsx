@@ -42,7 +42,6 @@ export function UploadPanel() {
         <Image
           radius="md"
           className={classes.shape}
-          width={75}
           src={imageUrl}
         />
       </SimpleGrid>
