@@ -1,16 +1,16 @@
 import * as functions from "firebase-functions";
 import { v2 as cloudinary } from "cloudinary";
 
-// Set Cloudinary config
-cloudinary.config({
-  cloud_name: `${functions.config().cloudinary.cloudname}`,
-  api_key: `${functions.config().cloudinary.apikey}`,
-  api_secret: `${functions.config().cloudinary.apisecret}`,
-});
 
-export const removeBackground =
+export const uploadImage =
   functions.https.onCall(async (data) => {
     try {
+      // Set Cloudinary config
+      cloudinary.config({
+        cloud_name: `${functions.config().cloudinary.cloudname}`,
+        api_key: `${functions.config().cloudinary.apikey}`,
+        api_secret: `${functions.config().cloudinary.apisecret}`,
+      });
       const {dataUrl} = JSON.parse(data);
       const datetime = new Date();
       const timeStamp = datetime.toJSON();

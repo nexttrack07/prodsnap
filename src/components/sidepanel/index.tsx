@@ -13,6 +13,7 @@ import {
 import { ShapesPanel } from './shapes-panel';
 import { PhotosPanel } from './photos-panel';
 import { TextPanel } from './text-panel';
+import { UploadPanel } from './upload-panel';
 
 export const SIDEBAR_SIZE = 60;
 export const SIDEPANEL_SIZE = 300 + SIDEBAR_SIZE;
@@ -31,7 +32,7 @@ const navItems: { icon: Icon; label: string; id: NavState }[] = [
 
 const panelMap: Record<NavState, JSX.Element> = {
   templates: <div>Templates</div>,
-  upload: <div>Upload</div>,
+  upload: <UploadPanel />,
   photos: <PhotosPanel />,
   text: <TextPanel />,
   curves: <div>Curves</div>,
