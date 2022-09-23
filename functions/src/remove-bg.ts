@@ -19,7 +19,7 @@ export const removeBackground =
       const day = timeStamp.substring(0, 10);
       const promise = await cloudinary.uploader.upload(dataUrl, {
         public_id: `${day}/sample-${timeStamp}`,
-        tags: "react-firebase", // tag
+        tags: "uploaded-photos", // tag
       });
       return JSON.stringify(promise);
     } catch (err) {
