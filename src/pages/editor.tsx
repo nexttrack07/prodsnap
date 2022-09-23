@@ -39,10 +39,20 @@ export function Editor() {
           flexDirection: "column",
         }}
       >
-        <div style={{ height: HEADER_SIZE, backgroundColor: "blue" }}>
+        <div
+          style={{
+            height: HEADER_SIZE,
+            borderTop: 0,
+            borderLeft: 0,
+            borderRight: 0,
+            borderBottom: 1,
+            borderColor: "rgba(0,0,0,0.2)",
+            borderStyle: "solid",
+          }}
+        >
           <Toolbar />
         </div>
-        <Center sx={{ backgroundColor: "red", flex: 1 }}>
+        <Center sx={{ flex: 1 }}>
           <Canvas />
         </Center>
       </div>
