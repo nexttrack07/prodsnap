@@ -70,12 +70,9 @@ export function UploadPanel() {
     const collectionRef = collection(firestore, 'images');
     const uploadTask = uploadBytesResumable(storageRef, file);
 
-    console.log('Hello uploading image: ', file)
-
     uploadTask.on('state_changed',
       (snapshot) => {
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('progress: ', progress)
         setProgress(progress);
       },
       (error) => {
@@ -93,16 +90,6 @@ export function UploadPanel() {
       }
     );
   }
-
-  // const handleUploadImage = async (file: File) => {
-  //   let reader = new FileReader();
-  //   reader.readAsDataURL(file);
-  //   reader.onloadend = async function () {
-  //     setFilename(file.name);
-  //     const secureUrl = await uploadImage(reader.result as string);
-  //     setImageUrl(secureUrl);
-  //   }
-  // }
 
   return (
     <>
