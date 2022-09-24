@@ -20,6 +20,7 @@ export const uploadImage =
       const promise = await cloudinary.uploader.upload(dataUrl, {
         public_id: `${day}/sample-${timeStamp}`,
         tags: "uploaded-photos", // tag
+        background_removal: "cloudinary_ai",
       });
       return JSON.stringify(promise);
     } catch (err) {
