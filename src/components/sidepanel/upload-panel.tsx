@@ -6,6 +6,8 @@ import { CanvasElement, elementsAtom, getDefaultMoveable } from "../canvas/store
 import { firestore, storage } from "../../utils/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { addDoc, collection, doc } from "firebase/firestore";
+import { showNotification, updateNotification } from "@mantine/notifications";
+import { Check, X } from "tabler-icons-react";
 
 const useStyles = createStyles((theme) => ({
   shape: {
@@ -21,43 +23,9 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export const useStorage = (file: File) => {
-  const [progress, setProgress] = useState(0);
-  const [error, setError] = useState<Error | null>(null);
-  const [url, setUrl] = useState("");
-
-  useEffect(() => {
-    const storageRef = ref(storage, `images/${file.name}`);
-    const collectionRef = collection(firestore, 'images');
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    uploadTask.on('state_changed',
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setProgress(progress);
-      },
-      (error) => {
-        // Handle unsuccessful uploads
-        setError(error);
-      },
-      () => {
-        // Handle successful uploads on complete
-        // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-        getDownloadURL(uploadTask.snapshot.ref).then(async (url) => {
-          await addDoc(collectionRef, { filename: file.name, url, })
-          setUrl(url);
-        });
-      }
-    );
-  })
-
-  return { progress, url, error };
-}
-
 export function UploadPanel() {
   const setElements = useSetAtom(elementsAtom);
   const { classes } = useStyles();
-  const [progress, setProgress] = useState(0);
   const [error, setError] = useState<Error | null>(null);
   const [imageUrl, setUrl] = useState("");
 
@@ -71,14 +39,30 @@ export function UploadPanel() {
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on('state_changed',
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setProgress(progress);
+      () => {
+        // const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        // setProgress(progress);
+        showNotification({
+          id: 'upload-photo',
+          loading: true,
+          title: 'Uploading your photo',
+          message: 'Your photo is being uploaded...',
+          autoClose: false,
+          disallowClose: true,
+        })
       },
-      (error) => {
+      (err) => {
         // Handle unsuccessful uploads
-        console.error(error);
-        setError(error);
+        console.error(err);
+        setError(err);
+        updateNotification({
+          id: 'upload-photo',
+          color: 'red',
+          title: 'Upload failed!',
+          message: error!.message,
+          icon: <X size={16} />,
+          autoClose: 2000,
+        })
       },
       () => {
         // Handle successful uploads on complete
@@ -87,6 +71,14 @@ export function UploadPanel() {
           await addDoc(collectionRef, { filename: file.name, url, })
           setUrl(url);
         });
+        updateNotification({
+          id: 'upload-photo',
+          color: 'teal',
+          title: 'Photo Uploaded Successfully',
+          message: 'Your photo has been uploaded successfully',
+          icon: <Check size={16} />,
+          autoClose: 2000,
+        })
       }
     );
   }
@@ -113,7 +105,6 @@ export function UploadPanel() {
           }}
         />
       </SimpleGrid>
-      <Progress value={progress} />
     </>
   )
 }

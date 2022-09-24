@@ -1,4 +1,5 @@
 import { Global, MantineProvider } from "@mantine/core";
+import { NotificationsProvider } from "@mantine/notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
 import React from "react";
@@ -43,11 +44,13 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
           }
         })}
       />
-      <QueryClientProvider client={queryClient}>
-        <Router>
-          <App />
-        </Router>
-      </QueryClientProvider>
+      <NotificationsProvider>
+        <QueryClientProvider client={queryClient}>
+          <Router>
+            <App />
+          </Router>
+        </QueryClientProvider>
+      </NotificationsProvider>
     </MantineProvider>
   </React.StrictMode>
 );

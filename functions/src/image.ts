@@ -1,6 +1,31 @@
 import * as functions from "firebase-functions";
 import { v2 as cloudinary } from "cloudinary";
+import * as FormData from "form-data";
+import * as fs from "fs";
+import axios from "axios";
 
+export const removeBackground = functions.https.onCall(async (data) => {
+  try {
+    const formData = new FormData();
+    formData.append("image_file", fs.createReadStream(data.url));
+
+    const config = {
+      method: "post",
+      url: "https://api.removal.ai/3.0/remove",
+      headers: {
+        "Rm-Token": `${functions.config().removal_ai.api_key}`,
+        ...formData.getHeaders(),
+      },
+      data: formData,
+    };
+
+    const response= await axios(config);
+    console.log(response.data);
+    return JSON.stringify({ message: "Success!" });
+  } catch (err) {
+    return JSON.stringify(err);
+  }
+});
 
 export const uploadImage =
   functions.https.onCall(async (data) => {

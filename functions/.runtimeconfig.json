@@ -1,7 +1,10 @@
 {
   "cloudinary": {
-    "apisecret": "fHjMpacue_i-ST1jfZ7WCoS6WMs",
     "apikey": "626713951791351",
+    "apisecret": "fHjMpacue_i-ST1jfZ7WCoS6WMs",
     "cloudname": "nexttrack1791"
+  },
+  "removal_ai": {
+    "api_key": "632f683ec7e116.52920052"
   }
 }
