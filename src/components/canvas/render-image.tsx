@@ -16,7 +16,7 @@ export function RenderImage({
 
   useEffect(() => {
     async function setImageDimensions(src: string) {
-      const { width, height } = await getImageDimensions(src);
+      const { width, height } = await getImageDimensions(src, 400, 400);
       setElement((el) => ({
         ...el,
         width,

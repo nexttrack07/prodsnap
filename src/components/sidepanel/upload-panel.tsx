@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { FileButton, createStyles, Button, Space, SimpleGrid, Image } from "@mantine/core";
 import { uploadImage } from "../../api/image-upload";
+import { atom, useSetAtom } from "jotai";
+import { CanvasElement, elementsAtom, getDefaultMoveable } from "../canvas/store";
 
 const useStyles = createStyles((theme) => ({
   shape: {
@@ -17,9 +19,14 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export function UploadPanel() {
+  const setElements = useSetAtom(elementsAtom);
   const [filename, setFilename] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const { classes } = useStyles();
+
+  const handleAddElement = (newEl: CanvasElement) => {
+    setElements((items) => [...items, atom(newEl)]);
+  };
 
   const handleUploadImage = async (file: File) => {
     let reader = new FileReader();
@@ -29,7 +36,6 @@ export function UploadPanel() {
       const secureUrl = await uploadImage(reader.result as string);
       setImageUrl(secureUrl);
     }
-
   }
 
   return (
@@ -43,6 +49,15 @@ export function UploadPanel() {
           radius="md"
           className={classes.shape}
           src={imageUrl}
+          onClick={() => {
+            const el: CanvasElement = {
+              type: "image",
+              url: imageUrl,
+              ...getDefaultMoveable()
+            }
+
+            handleAddElement(el);
+          }}
         />
       </SimpleGrid>
     </>

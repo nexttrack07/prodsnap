@@ -2,11 +2,11 @@ export * from "./use-shiftkey";
 export { default as useEventListener } from "./use-event";
 export * from "./use-click-outside"
 
-export const getImageDimensions = (src: string) => {
+export const getImageDimensions = (src: string, w: number = Infinity, h: number = Infinity) => {
   return new Promise<{ width: number; height: number }>((resolve, reject) => {
     const image = new Image();
     image.onload = () => {
-      resolve({ width: image.width, height: image.height });
+      resolve({ width: Math.min(image.width, w), height: Math.min(image.height, h) });
     };
     image.onerror = (error) => {
       reject(error);

@@ -36,3 +36,13 @@ export type ElementType = WritableAtom<CanvasElement, Action<CanvasElement>>
 
 export const elementsAtom = atom<ElementType[]>([]);
 export const selectedElementsAtom = atom<number[]>([]);
+
+export function getDefaultMoveable(props?: Partial<MoveableElement>) {
+  return {
+    width: 200,
+    height: 200,
+    x: 100,
+    y: 200,
+    ...props
+  }
+}
