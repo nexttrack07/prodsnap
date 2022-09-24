@@ -1,13 +1,14 @@
 import * as functions from "firebase-functions";
 import { v2 as cloudinary } from "cloudinary";
 import * as FormData from "form-data";
-import * as fs from "fs";
 import axios from "axios";
 
 export const removeBackground = functions.https.onCall(async (data) => {
   try {
+    console.log("data image: ", data);
     const formData = new FormData();
-    formData.append("image_file", fs.createReadStream(data.url));
+    formData.append("size", "auto");
+    formData.append("image_url", data.url);
 
     const config = {
       method: "post",
