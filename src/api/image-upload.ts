@@ -8,10 +8,10 @@ export const uploadImage = async (dataUrl: string) => {
 
   return upload(JSON.stringify(data))
     .then(response => {
+      console.log('image data: ', response.data)
       if (response.data && typeof response.data === "string") {
         const data = JSON.parse(response.data)
 
-        console.log('image data: ', data)
         // Return the cloudinary image url
         return data.secure_url ?? "";
       }

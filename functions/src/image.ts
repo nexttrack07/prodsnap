@@ -15,14 +15,23 @@ export const uploadImage =
       const datetime = new Date();
       const timeStamp = datetime.toJSON();
 
+      const createImageTag = (publicId: string) => {
+        const url = cloudinary.url(publicId, {
+          effect: "background_removal",
+        });
+
+        return url;
+      };
+
       // Set folder for uploads
       const day = timeStamp.substring(0, 10);
-      const promise = await cloudinary.uploader.upload(dataUrl, {
-        public_id: `${day}/sample-${timeStamp}`,
+      const publicId = `${day}/sample-${timeStamp}`;
+      await cloudinary.uploader.upload(dataUrl, {
+        public_id: publicId,
         tags: "uploaded-photos", // tag
-        background_removal: "cloudinary_ai",
       });
-      return JSON.stringify(promise);
+      const url = await createImageTag(publicId);
+      return JSON.stringify({ secure_url: url });
     } catch (err) {
       return JSON.stringify(err);
     }
