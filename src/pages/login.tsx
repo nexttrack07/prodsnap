@@ -16,14 +16,22 @@ import {
   Stack,
 } from '@mantine/core';
 import { BrandGoogle } from 'tabler-icons-react';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
 import { auth } from '../utils/firebase';
+import { atom, useSetAtom } from 'jotai';
+import { useNavigate } from 'react-router-dom';
 
 export function GoogleButton(props: ButtonProps) {
   return <Button leftIcon={<BrandGoogle color='red' />} variant="default" color="gray" {...props} />;
 }
 
+export const userAtom = atom<{ user: null | UserCredential["user"] }>({
+  user: null,
+})
+
 export function Login(props: PaperProps) {
+  const setUser = useSetAtom(userAtom);
+  const navigate = useNavigate();
   const [type, toggle] = useToggle(['login', 'register']);
   const form = useForm({
     initialValues: {
@@ -41,9 +49,17 @@ export function Login(props: PaperProps) {
 
   const handleFormSubmit = () => {
     if (type === 'login') {
-      signInWithEmailAndPassword(auth, form.values.email, form.values.password);
+      signInWithEmailAndPassword(auth, form.values.email, form.values.password)
+        .then(userCredential => {
+          setUser({ user: userCredential.user })
+          navigate('/editor');
+        })
     } else {
       createUserWithEmailAndPassword(auth, form.values.email, form.values.password)
+        .then(userCredential => {
+          setUser({ user: userCredential.user })
+          navigate('/editor');
+        })
     }
   }
 

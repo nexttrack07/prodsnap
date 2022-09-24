@@ -1,29 +1,35 @@
 import { Global, MantineProvider } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useAtomValue } from "jotai";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import {
-  createBrowserRouter,
-  RouterProvider,
+  Route,
+  Routes,
+  BrowserRouter as Router,
 } from "react-router-dom";
-import { Editor, Home, Login } from "./pages";
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Home />,
-  },
-  {
-    path: "/editor",
-    element: <Editor />,
-  },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-]);
+import { Editor, Login, ProtectedRoute, userAtom } from "./pages";
 
 const queryClient = new QueryClient();
+
+function App() {
+  const { user } = useAtomValue(userAtom);
+
+  return (
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="/editor"
+        element={
+          <ProtectedRoute user={user}>
+            <Editor />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  )
+}
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
@@ -38,7 +44,9 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         })}
       />
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <Router>
+          <App />
+        </Router>
       </QueryClientProvider>
     </MantineProvider>
   </React.StrictMode>
