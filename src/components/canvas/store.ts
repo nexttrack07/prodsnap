@@ -27,6 +27,7 @@ export type TextType = {
 export type ImageType = {
   type: "image";
   url: string;
+  loading?: boolean;
   thumbnail?: string;
 }
 

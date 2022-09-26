@@ -2,6 +2,9 @@ import * as functions from "firebase-functions";
 import { v2 as cloudinary } from "cloudinary";
 import * as FormData from "form-data";
 import axios from "axios";
+import * as admin from "firebase-admin";
+
+admin.initializeApp();
 
 export const removeBackground = functions.https.onCall(async (data) => {
   try {
@@ -21,8 +24,21 @@ export const removeBackground = functions.https.onCall(async (data) => {
     };
 
     const response= await axios(config);
-    console.log(response.data);
-    return JSON.stringify({ message: "Success!" });
+    const imageBucket = "images/";
+    const bucket = admin.storage().bucket();
+    const destination = `${imageBucket}new`;
+
+    const uploadRes = await bucket.upload(response.data.low_resolution, {
+      destination: destination,
+      gzip: true,
+      metadata: {
+        cacheControl: "public, max-age=31536000",
+      },
+    });
+
+    console.log("Uploaded Response: ", uploadRes);
+
+    return JSON.stringify(response.data);
   } catch (err) {
     return JSON.stringify(err);
   }

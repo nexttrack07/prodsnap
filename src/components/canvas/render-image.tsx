@@ -11,18 +11,18 @@ export function RenderImage({
   element: MoveableElement & ImageType;
   setElement: (update: SetStateAction<CanvasElement>) => void;
 }) {
-  const [loading, setLoading] = useState(true);
   const { width, height, x, y } = element;
 
   useEffect(() => {
     async function setImageDimensions(src: string) {
+      setElement(el => ({ ...el, loading: true }));
       const { width, height } = await getImageDimensions(src, 400, 400);
       setElement((el) => ({
         ...el,
         width,
         height,
       }));
-      setLoading(false);
+      setElement(el => ({ ...el, loading: false }));
     }
     if (element.type === "image") {
       setImageDimensions(element.url);
@@ -30,8 +30,8 @@ export function RenderImage({
   }, [element.type]);
 
   return (
-    <Center sx={{ width, height, left: x, top: y, border: "1px solid blue" }}>
-      {loading ? (
+    <Center sx={{ width, height, left: x, top: y }}>
+      {element.loading ? (
         <Loader />
       ) : (
         <Image width={width} height={height} src={element.url} />
