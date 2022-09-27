@@ -21,14 +21,14 @@ export function RenderImage({
 
   useEffect(() => {
     async function setImageDimensions(src: string) {
-      setElement(el => ({ ...el, loading: true }));
+      setElement(el => ({ ...el, state: ImageState.Loading }));
       const { width, height } = await getImageDimensions(src, 400, 400);
       setElement((el) => ({
         ...el,
         width,
         height,
       }));
-      setElement(el => ({ ...el, loading: false }));
+      setElement(el => ({ ...el, state: ImageState.Normal }));
     }
     if (element.type === "image") {
       setImageDimensions(element.url);
