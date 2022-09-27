@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { FileButton, createStyles, Button, Space, SimpleGrid, Image, Notification, Progress } from "@mantine/core";
-import { uploadImage } from "../../api/image-upload";
+import { FileButton, createStyles, Button, Space, SimpleGrid, Image } from "@mantine/core";
 import { atom, useSetAtom } from "jotai";
 import { CanvasElement, elementsAtom, getDefaultMoveable } from "../canvas/store";
 import { firestore, storage } from "../../utils/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { addDoc, collection, doc } from "firebase/firestore";
+import { addDoc, collection, getDocs } from "firebase/firestore";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { Check, X } from "tabler-icons-react";
 
 const useStyles = createStyles((theme) => ({
   shape: {
     cursor: 'pointer',
-    border: `1px solid ${theme.colors.gray[2]}`,
-    boxShadow: "0 0 1px rgba(0,0,0,0.3)",
-    padding: 8,
+    // border: `1px solid ${theme.colors.gray[2]}`,
+    // boxShadow: "0 0 1px rgba(0,0,0,0.3)",
+    // padding: 1,
     '&:hover': {
       opacity: 0.7,
       transform: "scale(1.1)",
@@ -23,11 +22,30 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
+type ImageFile = {
+  filname: string;
+  url: string;
+}
+
 export function UploadPanel() {
   const setElements = useSetAtom(elementsAtom);
   const { classes } = useStyles();
   const [error, setError] = useState<Error | null>(null);
-  const [imageUrl, setUrl] = useState("");
+  const [images, setImages] = useState<ImageFile[]>([]);
+
+  useEffect(() => {
+    const docRef = collection(firestore, "images");
+
+    getDocs(docRef)
+      .then(snap => {
+        let newImages: ImageFile[] = []
+        snap.forEach(doc => {
+          console.log(doc.id + "=>" + JSON.stringify(doc.data()))
+          newImages.push(doc.data() as ImageFile);
+        })
+        setImages(newImages);
+      })
+  }, [])
 
   const handleAddElement = (newEl: CanvasElement) => {
     setElements((items) => [...items, atom(newEl)]);
@@ -69,7 +87,6 @@ export function UploadPanel() {
         // For instance, get the download URL: https://firebasestorage.googleapis.com/...
         getDownloadURL(uploadTask.snapshot.ref).then(async (url) => {
           await addDoc(collectionRef, { filename: file.name, url, })
-          setUrl(url);
         });
         updateNotification({
           id: 'upload-photo',
@@ -90,20 +107,25 @@ export function UploadPanel() {
       </FileButton>
       <Space h="xl" />
       <SimpleGrid cols={3}>
-        <Image
-          radius="md"
-          className={classes.shape}
-          src={imageUrl}
-          onClick={() => {
-            const el: CanvasElement = {
-              type: "image",
-              url: imageUrl,
-              ...getDefaultMoveable()
-            }
+        {images.length > 0 ?
+          images.map(image => (
+            <Image
+              key={image.url}
+              radius="md"
+              className={classes.shape}
+              src={image.url}
+              onClick={() => {
+                const el: CanvasElement = {
+                  type: "image",
+                  url: image.url,
+                  ...getDefaultMoveable()
+                }
 
-            handleAddElement(el);
-          }}
-        />
+                handleAddElement(el);
+              }}
+            />
+          ))
+          : null}
       </SimpleGrid>
     </>
   )

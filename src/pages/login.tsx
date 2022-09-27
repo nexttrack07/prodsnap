@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useToggle, upperFirst } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import {
@@ -18,19 +18,20 @@ import {
 import { BrandGoogle } from 'tabler-icons-react';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
 import { auth } from '../utils/firebase';
-import { atom, useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
 import { useNavigate } from 'react-router-dom';
 
 export function GoogleButton(props: ButtonProps) {
   return <Button leftIcon={<BrandGoogle color='red' />} variant="default" color="gray" {...props} />;
 }
 
-export const userAtom = atom<{ user: null | UserCredential["user"] }>({
+export const userAtom = atomWithStorage<{ user: null | UserCredential["user"] }>('user', {
   user: null,
 })
 
 export function Login(props: PaperProps) {
-  const setUser = useSetAtom(userAtom);
+  const [user, setUser] = useAtom(userAtom);
   const navigate = useNavigate();
   const [type, toggle] = useToggle(['login', 'register']);
   const form = useForm({
@@ -46,6 +47,12 @@ export function Login(props: PaperProps) {
       password: (val) => (val.length <= 6 ? 'Password should include at least 6 characters' : null),
     },
   });
+
+  useEffect(() => {
+    if (user.user) {
+      navigate('/editor')
+    }
+  }, [])
 
   const handleFormSubmit = () => {
     if (type === 'login') {

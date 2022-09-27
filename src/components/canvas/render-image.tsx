@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { SetStateAction } from "jotai";
 import { CanvasElement, ImageType, MoveableElement } from "./store";
 import { getImageDimensions } from '../../utils';
-import { Center, Loader, Image } from '@mantine/core';
+import { Center, Loader, Image, Box } from '@mantine/core';
 
 export function RenderImage({
   element,
@@ -34,7 +34,15 @@ export function RenderImage({
       {element.loading ? (
         <Loader />
       ) : (
-        <Image width={width} height={height} src={element.url} />
+        <svg width={width} height={height}>
+          <defs>
+            <clipPath id="svgPath">
+              <circle id="circleClip" stroke="#000000" strokeWidth={2} fill="none" cx="50%" cy="50%" r="45%" />
+            </clipPath>
+          </defs>
+          <use xlinkHref="#circleClip" />
+          <image xlinkHref={element.url} height={height} width={width} style={{ clipPath: "url(#svgPath)" }} />
+        </svg>
       )}
     </Center>
   );
