@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, Space, createStyles, SimpleGrid, Image } from "@mantine/core";
 import { atom, useSetAtom } from "jotai";
-import { elementsAtom, CanvasElement, MoveableElement, ImageType } from "../../components/canvas/store";
+import { elementsAtom, CanvasElement, MoveableElement, ImageType, ImageState } from "../../components/canvas/store";
 
 const useStyles = createStyles((theme) => ({
   shape: {
@@ -22,6 +22,7 @@ const data: { id: number; data: MoveableElement & ImageType }[] = [
     id: 0,
     data: {
       type: "image",
+      state: ImageState.Normal,
       x: 200,
       y: 200,
       width: 300,

@@ -24,10 +24,22 @@ export type TextType = {
   props: React.CSSProperties
 }
 
+export enum ImageState {
+  Loading,
+  Normal,
+  Cropping
+}
+
 export type ImageType = {
   type: "image";
+  viewBox?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
   url: string;
-  loading?: boolean;
+  state: ImageState;
   thumbnail?: string;
 }
 
@@ -46,4 +58,14 @@ export function getDefaultMoveable(props?: Partial<MoveableElement>) {
     y: 200,
     ...props
   }
+}
+
+export const defaultImage: ImageType & MoveableElement = {
+  type: "image", 
+  url: "",
+  state: ImageState.Normal,
+  width: 400,
+  height: 400,
+  x: 100,
+  y: 200,
 }

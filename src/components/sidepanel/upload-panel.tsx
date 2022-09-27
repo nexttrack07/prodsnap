@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FileButton, createStyles, Button, Space, SimpleGrid, Image } from "@mantine/core";
 import { atom, useSetAtom } from "jotai";
-import { CanvasElement, elementsAtom, getDefaultMoveable } from "../canvas/store";
+import { CanvasElement, defaultImage, elementsAtom, getDefaultMoveable } from "../canvas/store";
 import { firestore, storage } from "../../utils/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { addDoc, collection, getDocs } from "firebase/firestore";
@@ -116,9 +116,8 @@ export function UploadPanel() {
               src={image.url}
               onClick={() => {
                 const el: CanvasElement = {
-                  type: "image",
-                  url: image.url,
-                  ...getDefaultMoveable()
+                  ...defaultImage,
+                  url: image.url
                 }
 
                 handleAddElement(el);

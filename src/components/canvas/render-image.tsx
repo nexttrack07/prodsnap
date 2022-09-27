@@ -1,16 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { SetStateAction } from "jotai";
 import ReactCrop, { Crop, PixelCrop } from "react-image-crop"
-import { CanvasElement, ImageType, MoveableElement } from "./store";
+import { CanvasElement, ImageState, ImageType, MoveableElement } from "./store";
 import { getImageDimensions } from '../../utils';
 import { Center, Loader, Image, Box } from '@mantine/core';
 
 import 'react-image-crop/dist/ReactCrop.css'
-
-enum ImageState {
-  Cropping,
-  Normal
-}
 
 export function RenderImage({
   element,
@@ -20,7 +15,6 @@ export function RenderImage({
   setElement: (update: SetStateAction<CanvasElement>) => void;
 }) {
   const { width, height, x, y } = element;
-  const [imageState, setImageState] = useState<ImageState>(ImageState.Cropping)
   const imgRef = useRef<HTMLImageElement>(null);
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
@@ -43,9 +37,17 @@ export function RenderImage({
 
   return (
     <Center sx={{ width, height, left: x, top: y }}>
-      {element.loading ? (
-        <Loader />
-      ) : imageState === ImageState.Normal ? (
+      {element.state === ImageState.Loading && <Loader></Loader>}
+      {element.state === ImageState.Cropping && (
+        <ReactCrop
+          crop={crop}
+          onChange={(_, percentCrop) => setCrop(percentCrop)}
+          onComplete={c => setCompletedCrop(c)}
+        >
+          <img onMouseDown={e => e.stopPropagation()} ref={imgRef} src={element.url} />
+        </ReactCrop>
+      )}
+      {element.state === ImageState.Normal && (
         <svg width={width} height={height}>
           <defs>
             <clipPath id="svgPath">
@@ -55,14 +57,6 @@ export function RenderImage({
           <use xlinkHref="#circleClip" />
           <image xlinkHref={element.url} height={height} width={width} style={{ clipPath: "url(#svgPath)" }} />
         </svg>
-      ) : (
-        <ReactCrop
-          crop={crop}
-          onChange={(_, percentCrop) => setCrop(percentCrop)}
-          onComplete={c => setCompletedCrop(c)}
-        >
-          <img onMouseDown={e => e.stopPropagation()} ref={imgRef} src={element.url} />
-        </ReactCrop>
       )}
     </Center>
   );
