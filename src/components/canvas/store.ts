@@ -32,15 +32,10 @@ export enum ImageState {
 
 export type ImageType = {
   type: "image";
-  viewBox?: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
   url: string;
   state: ImageState;
   thumbnail?: string;
+  currentUrl?: string;
 }
 
 export type CanvasElement = MoveableElement & (SVGType | ImageType | TextType)

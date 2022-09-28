@@ -38,7 +38,7 @@ export function RenderImage({
     <Center sx={{ left: x, top: y }}>
       {element.state === ImageState.Loading && <Loader></Loader>}
       {element.state === ImageState.Normal && (
-        <Image width={width} height={height} src={element.url} />
+        <Image width={width} height={height} src={element.currentUrl ?? element.url} />
       )}
       {element.state === ImageState.Cropping && <CropImage element={element} />}
     </Center>
@@ -63,7 +63,6 @@ export function CropImage({
 
   return (
     <Cropper
-      id="image"
       ref={cropperRef}
       style={{ width: element.width, height: element.height }}
       src={element.url}

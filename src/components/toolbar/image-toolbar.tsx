@@ -83,7 +83,7 @@ export function ImageToolbar() {
   const handleCropDone = () => {
     if (cropper) {
       setSelectedImage({
-        url: cropper.getCroppedCanvas().toDataURL(),
+        currentUrl: getRoundedCanvas(cropper.getCroppedCanvas()).toDataURL(),
         state: ImageState.Normal
       })
       return;
@@ -95,9 +95,8 @@ export function ImageToolbar() {
 
   const handleCropCancel = () => {
     setSelectedImage({
-      state: ImageState.Normal, viewBox: {
-        x: 0, y: 0, width, height
-      }
+      state: ImageState.Normal,
+      currentUrl: url
     })
   }
 
@@ -119,4 +118,23 @@ export function ImageToolbar() {
       )}
     </Group>
   )
+}
+
+function getRoundedCanvas(sourceCanvas: HTMLCanvasElement) {
+  let canvas = document.createElement('canvas');
+  let context = canvas.getContext('2d');
+  let width = sourceCanvas.width;
+  let height = sourceCanvas.height;
+
+  canvas.width = width;
+  canvas.height = height;
+  if (context) {
+    context.imageSmoothingEnabled = true;
+    context.drawImage(sourceCanvas, 0, 0, width, height);
+    context.globalCompositeOperation = 'destination-in';
+    context.beginPath();
+    context.arc(width / 2, height / 2, Math.min(width, height) / 2, 0, 2 * Math.PI, true);
+    context.fill();
+  }
+  return canvas;
 }

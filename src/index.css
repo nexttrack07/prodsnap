@@ -68,3 +68,8 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.cropper-view-box,
+.cropper-face {
+  border-radius: 50%;
+}

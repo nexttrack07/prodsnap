@@ -40,7 +40,6 @@ export function UploadPanel() {
       .then(snap => {
         let newImages: ImageFile[] = []
         snap.forEach(doc => {
-          console.log(doc.id + "=>" + JSON.stringify(doc.data()))
           newImages.push(doc.data() as ImageFile);
         })
         setImages(newImages);
