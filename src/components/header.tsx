@@ -2,9 +2,18 @@ import React from 'react';
 import { Header, TextInput, Avatar, Space, Group, Button, Menu, Portal, Text, Divider } from '@mantine/core';
 import { Logo } from './logo';
 import { HEADER_SIZE } from '../pages';
-import { Settings, ArrowForward, ArrowBack, Edit, ArrowsLeftRight, Trash, MessageCircle, Photo, Search } from 'tabler-icons-react';
+import { Settings, ArrowForward, ArrowBack, Edit, ArrowsLeftRight, Trash, MessageCircle, Photo, Search, Download } from 'tabler-icons-react';
+import domToImage from 'dom-to-image-more';
+import { saveAs } from 'file-saver';
 
 export function HeaderComponent() {
+  const handleDownloadClick = () => {
+    domToImage
+      .toBlob(document.getElementById("canvas"))
+      .then(function (blob: any) {
+        saveAs(blob, "my-image.png")
+      })
+  }
   return (
     <Header sx={{ display: "flex" }} height={HEADER_SIZE} p="xs">
       <Logo />
@@ -105,6 +114,7 @@ export function HeaderComponent() {
         <Avatar color="cyan" radius="xl">
           FH
         </Avatar>
+        <Button onClick={handleDownloadClick} variant="outline" leftIcon={<Download />}>Download</Button>
       </Group>
     </Header>
   );

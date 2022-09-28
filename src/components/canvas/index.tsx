@@ -27,12 +27,14 @@ export function Canvas() {
 
   return (
     <Box
+      id="canvas"
       sx={(theme) => ({
         width: 1000,
         height: 800,
         border: `1px solid ${theme.colors.gray[3]}`,
         boxShadow: "0px 0px 2px rgba(0,0,0,0.3)",
         position: "relative",
+        backgroundColor: "white"
       })}
       onClick={unSelectAllElements}
     >

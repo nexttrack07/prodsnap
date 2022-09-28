@@ -4,7 +4,7 @@ import { atom, useAtomValue } from 'jotai';
 import { CanvasElement, elementsAtom, selectedElementsAtom } from '../canvas/store';
 import { ImageToolbar } from './image-toolbar';
 
-const isTextSelectedAtom = atom(
+const getTypeAtom = atom(
   get => {
     const selectedElementIds = get(selectedElementsAtom);
     if (selectedElementIds.length === 0) return (_: CanvasElement["type"]) => false
@@ -15,7 +15,7 @@ const isTextSelectedAtom = atom(
 )
 
 export function Toolbar() {
-  const getType = useAtomValue(isTextSelectedAtom);
+  const getType = useAtomValue(getTypeAtom);
 
   return (
     <Box p="xs">
