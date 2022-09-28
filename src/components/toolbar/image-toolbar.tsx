@@ -1,11 +1,12 @@
-import { Button, Group } from '@mantine/core';
+import { ActionIcon, Button, Group, SegmentedControl } from '@mantine/core';
 import { CanvasElement, elementsAtom, ImageState, ImageType, MoveableElement, selectedElementsAtom } from '../../components/canvas/store';
 import { httpsCallable } from 'firebase/functions';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import React from 'react';
 import { functions } from '../../utils/firebase';
-import { Check, X } from 'tabler-icons-react';
+import { Check, Circle, Rectangle, X } from 'tabler-icons-react';
 import { cropperAtom } from '../../components/canvas/render-image';
+import { useToggle } from '@mantine/hooks';
 
 const removeBackground = httpsCallable(functions, 'removeBackground');
 
@@ -42,7 +43,9 @@ const imageStateAtom = atom(
   }
 )
 
-const imageDimensionsAtom = atom(
+export const circleCropAtom = atom(false)
+
+export const imageDimensionsAtom = atom(
   get => {
     const image = get(selectedImageAtom);
     if (image) {
@@ -60,7 +63,7 @@ export function ImageToolbar() {
   const url = useAtomValue(imageUrlAtom);
   const [_, setSelectedImage] = useAtom(selectedImageAtom);
   const imageState = useAtomValue(imageStateAtom);
-  const { width, height } = useAtomValue(imageDimensionsAtom)
+  const [circleCrop, setCircleCrop] = useAtom(circleCropAtom)
   const cropper = useAtomValue(cropperAtom);
   const handleRemoveBg = () => {
     if (url) {
@@ -83,7 +86,7 @@ export function ImageToolbar() {
   const handleCropDone = () => {
     if (cropper) {
       setSelectedImage({
-        currentUrl: getRoundedCanvas(cropper.getCroppedCanvas()).toDataURL(),
+        currentUrl: circleCrop ? getRoundedCanvas(cropper.getCroppedCanvas()).toDataURL() : cropper.getCroppedCanvas().toDataURL(),
         state: ImageState.Normal
       })
       return;
@@ -102,18 +105,34 @@ export function ImageToolbar() {
 
   return (
     <Group>
-      <Button variant='outline' onClick={handleRemoveBg}>
-        Remove Background
-      </Button>
       {imageState === ImageState.Normal && (
-        <Button variant='outline' onClick={handleCropImage}>
-          Crop
-        </Button>
+        <>
+          <Button variant='outline' onClick={handleRemoveBg}>
+            Remove Background
+          </Button>
+          <Button variant='outline' onClick={handleCropImage}>
+            Crop
+          </Button>
+        </>
       )}
       {imageState === ImageState.Cropping && (
         <>
-          <Button leftIcon={<X />} onClick={handleCropCancel} variant='outline'>Cancel</Button>
-          <Button leftIcon={<Check />} onClick={handleCropDone} variant='light'>Done</Button>
+          <SegmentedControl
+            color="indigo"
+            size='xs'
+            defaultValue={circleCrop ? 'circle' : 'rectangle'}
+            onChange={val => setCircleCrop(val === 'circle')}
+            data={[
+              { label: <Circle />, value: 'circle' },
+              { label: <Rectangle />, value: 'rectangle', },
+            ]}
+          />
+          <ActionIcon onClick={handleCropCancel} color="red">
+            <X />
+          </ActionIcon>
+          <ActionIcon onClick={handleCropDone} color="green">
+            <Check />
+          </ActionIcon>
         </>
       )}
     </Group>

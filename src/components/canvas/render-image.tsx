@@ -1,11 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
-import { atom, SetStateAction, useAtom, useSetAtom } from "jotai";
+import { atom, SetStateAction, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ImageState, ImageType, MoveableElement } from "./store";
 import { getImageDimensions } from "../../utils";
-import { Center, Image, Loader } from "@mantine/core";
+import { Center, Box, Image, Loader } from "@mantine/core";
 import "react-image-crop/dist/ReactCrop.css";
+import { circleCropAtom } from "../../components/toolbar/image-toolbar";
 
 export const cropperAtom = atom<Cropper | null>(null);
 
@@ -52,6 +53,7 @@ export function CropImage({
 }) {
   const cropperRef = useRef<HTMLImageElement>(null);
   const setCropper = useSetAtom(cropperAtom);
+  const circleCrop = useAtomValue(circleCropAtom);
 
   const handleCrop = () => {
     const imageElement: any = cropperRef?.current;
@@ -62,11 +64,22 @@ export function CropImage({
   };
 
   return (
-    <Cropper
-      ref={cropperRef}
-      style={{ width: element.width, height: element.height }}
-      src={element.url}
-      crop={handleCrop}
-    />
+    <Box sx={() => circleCrop ? ({
+      '& .cropper-view-box': {
+        borderRadius: "50%",
+        outline: 0,
+        boxShadow: '0 0 0 1px #39f'
+      },
+      '& .cropper-face': {
+        borderRadius: "50%"
+      }
+    }) : ({})}>
+      <Cropper
+        ref={cropperRef}
+        style={{ width: element.width, height: element.height }}
+        src={element.url}
+        crop={handleCrop}
+      />
+    </Box>
   );
 }
