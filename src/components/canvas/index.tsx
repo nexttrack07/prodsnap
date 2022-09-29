@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { Box, useMantineTheme } from "@mantine/core";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { atomFamily } from "jotai/utils";
@@ -9,21 +9,17 @@ import {
   selectedElementsAtom,
   SVGType,
 } from "./store";
-import { Moveable, MoveableItem } from "../moveable";
 import { RenderImage } from "./render-image";
 import { RenderSvg } from "./render-svg";
 import { RenderText } from "./render-text";
 
-const unSelectAllAtom = atom(
-  null,
-  (_get, set) => {
-    set(selectedElementsAtom, [])
-  }
-)
+const unSelectAllAtom = atom(null, (_get, set) => {
+  set(selectedElementsAtom, []);
+});
 
 export function Canvas() {
   const elements = useAtomValue(elementsAtom);
-  const unSelectAllElements = useSetAtom(unSelectAllAtom)
+  const unSelectAllElements = useSetAtom(unSelectAllAtom);
 
   return (
     <Box
@@ -34,7 +30,7 @@ export function Canvas() {
         border: `1px solid ${theme.colors.gray[3]}`,
         boxShadow: "0px 0px 2px rgba(0,0,0,0.3)",
         position: "relative",
-        backgroundColor: "white"
+        backgroundColor: "white",
       })}
       onClick={unSelectAllElements}
     >
@@ -65,7 +61,6 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
   const [element, setElement] = useAtom(elementAtom);
   const setSelectedElements = useSetAtom(selectedElementsAtom);
   const isSelected = useAtomValue(isSelectedAtom(i));
-  const theme = useMantineTheme();
 
   const handleElementSelect = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -76,28 +71,6 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
       return items.concat(i);
     });
   };
-
-  const handleMoveElement = useCallback(
-    (d: { x: number; y: number }) => {
-      setElement((el) => ({
-        ...el,
-        x: d.x + el.x,
-        y: d.y + el.y,
-      }));
-    },
-    [setElement]
-  );
-
-  const handleResizeElement = useCallback(
-    (d: { x: number; y: number }) => {
-      setElement((el) => ({
-        ...el,
-        width: d.x + el.width,
-        height: d.y + el.height,
-      }));
-    },
-    [setElement]
-  );
 
   const { width, height, x, y } = element;
 
@@ -115,53 +88,15 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
       }}
       onClick={handleElementSelect}
     >
-      {element.type === "svg" && (
-        <RenderSvg element={element} />
-      )}
+      {element.type === "svg" && <RenderSvg element={element} setElement={setElement} isSelected={isSelected} />}
       {element.type === "image" && (
-        <RenderImage element={element} setElement={setElement} />
+        <RenderImage
+          isSelected={isSelected}
+          element={element}
+          setElement={setElement}
+        />
       )}
-      {element.type === "text" && (
-        <RenderText element={element} />
-      )}
-      {isSelected && (
-        <Moveable>
-          <MoveableItem onMove={handleMoveElement}>
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                bottom: 0,
-                right: 0,
-                borderWidth: 2,
-                borderStyle: "dashed",
-                borderColor: theme.colors.blue[6],
-              }}
-              className="border border-dashed border-blue-500"
-              onClick={(e) => e.stopPropagation()}
-            ></div>
-          </MoveableItem>
-          <MoveableItem onMove={handleResizeElement}>
-            <span
-              style={{
-                height: 10,
-                width: 10,
-                cursor: "se-resize",
-                borderRadius: "100%",
-                transform: "translate(50%, 50%)",
-                position: "absolute",
-                bottom: 0,
-                right: 0,
-                backgroundColor: "white",
-                boxShadow: "0 0 1px rgba(0,0,0,0.4)",
-                border: "1px solid rgba(0,0,0,0.3)",
-              }}
-            // className="h-6 w-6 cursor-se-resize rounded translate-x-1/4 translate-y-1/4 border-8 border-l-0 border-t-0 border-blue-500 absolute bottom-0 right-0"
-            />
-          </MoveableItem>
-        </Moveable>
-      )}
+      {element.type === "text" && <RenderText element={element} setElement={setElement} isSelected={isSelected} />}
     </span>
   );
 }
