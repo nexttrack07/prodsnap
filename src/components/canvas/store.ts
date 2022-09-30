@@ -12,6 +12,7 @@ export type MoveableElement = {
 
 export type SVGType = {
   type: "svg";
+  props?: SVGAttributes<SVGSVGElement>;
   elements: Array<{
     tag: string;
     props: SVGAttributes<SVGCircleElement | SVGRectElement | SVGEllipseElement | SVGPolygonElement>
@@ -56,7 +57,7 @@ export function getDefaultMoveable(props?: Partial<MoveableElement>) {
 }
 
 export const defaultImage: ImageType & MoveableElement = {
-  type: "image", 
+  type: "image",
   url: "",
   state: ImageState.Normal,
   width: 400,

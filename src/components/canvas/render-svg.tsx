@@ -44,6 +44,7 @@ export function RenderSvg({
         preserveAspectRatio="xMaxYMax"
         width={width * 0.9}
         height={height * 0.9}
+        {...element.props}
       >
         {element.elements?.map(renderElement)}
       </svg>

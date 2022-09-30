@@ -5,6 +5,7 @@ import { CanvasElement, elementsAtom, selectedElementsAtom } from '../canvas/sto
 import { ImageToolbar } from './image-toolbar';
 import { Copy, Trash } from 'tabler-icons-react';
 import { TextToolbar } from './text-toolbar';
+import { SvgToolbar } from './svg-toolbar';
 
 const getTypeAtom = atom(
   get => {
@@ -51,7 +52,7 @@ export function Toolbar() {
     <Box p="xs" sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
       {getType("text") && <TextToolbar />}
       {getType("image") && <ImageToolbar />}
-      {getType("svg") && 'graphic is selected'}
+      {getType("svg") && <SvgToolbar />}
       <div style={{ flex: 1 }} />
       <Group>
         <Button variant="light" onClick={handleDeleteClick} disabled={selectedElementsIds.length === 0} color="red">
