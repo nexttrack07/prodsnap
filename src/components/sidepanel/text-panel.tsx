@@ -35,7 +35,7 @@ const data: { id: number; data: MoveableElement & TextType }[] = [
     }
   },
   {
-    id: 0,
+    id: 1,
     data: {
       type: "text",
       x: 200,
@@ -51,7 +51,7 @@ const data: { id: number; data: MoveableElement & TextType }[] = [
     }
   },
   {
-    id: 0,
+    id: 2,
     data: {
       type: "text",
       x: 200,

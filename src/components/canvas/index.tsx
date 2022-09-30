@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, useMantineTheme } from "@mantine/core";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { atomFamily } from "jotai/utils";
@@ -12,6 +12,7 @@ import {
 import { RenderImage } from "./render-image";
 import { RenderSvg } from "./render-svg";
 import { RenderText } from "./render-text";
+import { useKeyPress } from "../../utils/use-key-press";
 
 const unSelectAllAtom = atom(null, (_get, set) => {
   set(selectedElementsAtom, []);
@@ -61,14 +62,16 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
   const [element, setElement] = useAtom(elementAtom);
   const setSelectedElements = useSetAtom(selectedElementsAtom);
   const isSelected = useAtomValue(isSelectedAtom(i));
+  const isShiftPressed = useKeyPress("Shift");
 
   const handleElementSelect = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedElements((items) => {
-      if (items.includes(i)) {
-        return items;
+      if (isShiftPressed) {
+        return items.includes(i) ? items : items.concat(i);
+      } else {
+        return [i];
       }
-      return items.concat(i);
     });
   };
 
