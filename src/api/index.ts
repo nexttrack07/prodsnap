@@ -1,8 +1,10 @@
-const SHAPES = [
+import { MoveableElement, SVGPathType } from "components/canvas/store";
+
+const SHAPES: { id: number; data: MoveableElement & SVGPathType}[] = [
   {
     id: 0,
     data: {
-      type: "svg" as const,
+      type: "svg-path" as const,
       width: 250,
       height: 250,
       x: 100,
@@ -19,7 +21,7 @@ const SHAPES = [
           pointerEvents: "none"
         }
       },
-      elements: [{ tag: "path", props: { d: "M0,0L64,0L64,64L0,64L0,0", fill: "#919191"} }],
+      path: { d: "M0,0L64,0L64,64L0,64L0,0", fill: "#919191"},
     },
   },
 ];

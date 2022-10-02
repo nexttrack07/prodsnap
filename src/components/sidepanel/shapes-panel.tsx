@@ -43,7 +43,7 @@ export function ShapesPanel() {
               (item.data.height * 75) / item.data.width
             }
           >
-            {item.data.elements.map(renderElement)}
+            <path {...item.data.path} />
           </svg>
         ))}
       </SimpleGrid>

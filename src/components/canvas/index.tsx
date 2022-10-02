@@ -13,6 +13,7 @@ import { RenderImage } from "./render-image";
 import { RenderSvg } from "./render-svg";
 import { RenderText } from "./render-text";
 import { useKeyPress } from "../../utils/use-key-press";
+import { RenderPath } from "./render-path";
 
 const unSelectAllAtom = atom(null, (_get, set) => {
   set(selectedElementsAtom, []);
@@ -93,6 +94,7 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
       onClick={handleElementSelect}
     >
       {element.type === "svg" && <RenderSvg element={element} setElement={setElement} isSelected={isSelected} />}
+      {element.type === "svg-path" && <RenderPath element={element} setElement={setElement} isSelected={isSelected} />}
       {element.type === "image" && (
         <RenderImage
           isSelected={isSelected}

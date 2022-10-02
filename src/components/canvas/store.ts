@@ -20,6 +20,12 @@ export type SVGType = {
   }>
 }
 
+export type SVGPathType = {
+  type: "svg-path",
+  props?: SVGAttributes<SVGSVGElement>;
+  path: SVGAttributes<SVGPathElement>;
+}
+
 export type TextType = {
   type: "text";
   content: string;
@@ -40,7 +46,7 @@ export type ImageType = {
   currentUrl?: string;
 }
 
-export type CanvasElement = MoveableElement & (SVGType | ImageType | TextType)
+export type CanvasElement = MoveableElement & (SVGType | ImageType | TextType | SVGPathType)
 
 export type ElementType = WritableAtom<CanvasElement, Action<CanvasElement>>
 
