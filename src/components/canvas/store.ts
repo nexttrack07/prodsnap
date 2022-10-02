@@ -20,16 +20,19 @@ export type SVGType = {
   }>
 }
 
+export type SVGStrokeProps = {
+  clipPathId: string;
+  stroke: string;
+  strokeWidth: number;
+  strokeLinecap: "inherit" | "butt" | "round" | "square" | undefined;
+  strokeDasharray: string;
+};
+
 export type SVGPathType = {
   type: "svg-path",
   props?: SVGAttributes<SVGSVGElement>;
   path: SVGAttributes<SVGPathElement>;
-  strokeProps: {
-    clipPathId: string;
-    stroke: string;
-    strokeWidth: number;
-    strokeLinecap: "inherit" | "butt" | "round" | "square" | undefined;
-  }
+  strokeProps: SVGStrokeProps;
 }
 
 export type TextType = {

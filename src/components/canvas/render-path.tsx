@@ -35,6 +35,8 @@ export function RenderPath({ element, setElement, isSelected }: Props) {
     [setElement]
   );
 
+  console.log('fill: ', element.props.fill, element.props)
+
   return (
     <>
       <svg opacity={element.opacity} {...element.props}>
@@ -49,6 +51,7 @@ export function RenderPath({ element, setElement, isSelected }: Props) {
           stroke={element.strokeProps.stroke}
           strokeWidth={element.strokeProps.strokeWidth}
           strokeLinecap={element.strokeProps.strokeLinecap}
+          strokeDasharray={element.strokeProps.strokeDasharray}
           clipPath={element.strokeProps.clipPathId}
           fill="none"
           vectorEffect="non-scaling-stroke"

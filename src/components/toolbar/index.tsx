@@ -18,6 +18,7 @@ import { ImageToolbar } from "./image-toolbar";
 import { Copy, Eye, Trash } from "tabler-icons-react";
 import { TextToolbar } from "./text-toolbar";
 import { SvgToolbar } from "./svg-toolbar";
+import { SvgPathToolbar } from "./svg-path-toolbar";
 
 const getTypeAtom = atom((get) => {
   const selectedElementIds = get(selectedElementsAtom);
@@ -92,6 +93,7 @@ export function Toolbar() {
       {getType("text") && <TextToolbar />}
       {getType("image") && <ImageToolbar />}
       {getType("svg") && <SvgToolbar />}
+      {getType("svg-path") && <SvgPathToolbar />}
       <div style={{ flex: 1 }} />
       <Group spacing="xs">
         <Menu width={170} position="bottom-end" closeOnItemClick={false}>

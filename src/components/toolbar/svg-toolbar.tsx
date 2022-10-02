@@ -2,7 +2,7 @@ import { SVGAttributes } from 'react';
 import { ActionIcon, ColorPicker, Group, Popover, DEFAULT_THEME, Menu, Slider, SegmentedControl } from "@mantine/core";
 import { elementsAtom, MoveableElement, selectedElementsAtom, SVGType } from "../canvas/store";
 import { atom, useAtom } from "jotai";
-import { BorderAll, BorderNone, BorderOuter, BorderRadius, BorderStyle, BorderStyle2 } from 'tabler-icons-react';
+import { BorderAll, BorderNone, BorderRadius, BorderStyle2 } from 'tabler-icons-react';
 
 const svgPropsAtom = atom(
   (get) => {

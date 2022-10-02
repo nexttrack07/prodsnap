@@ -42,6 +42,7 @@ export function ShapesPanel() {
             height={
               (item.data.height * 75) / item.data.width
             }
+            fill={item.data.props?.fill}
           >
             <path {...item.data.path} />
           </svg>

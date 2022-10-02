@@ -14,6 +14,7 @@ const SHAPES: { id: number; data: MoveableElement & SVGPathType}[] = [
         width: "100%",
         height: "100%",
         viewBox: "0 0 64 64",
+        fill: DEFAULT_THEME.colors.blue[5],
         style: {
           top: 0,
           left: 0,
@@ -22,7 +23,7 @@ const SHAPES: { id: number; data: MoveableElement & SVGPathType}[] = [
           pointerEvents: "none"
         }
       },
-      path: { d: "M0,0L64,0L64,64L0,64L0,0", fill: "#919191"},
+      path: { d: "M0,0L64,0L64,64L0,64L0,0", },
       strokeProps: {
         clipPathId: "001",
         stroke: DEFAULT_THEME.colors.blue[8],
