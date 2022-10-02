@@ -24,6 +24,12 @@ export type SVGPathType = {
   type: "svg-path",
   props?: SVGAttributes<SVGSVGElement>;
   path: SVGAttributes<SVGPathElement>;
+  strokeProps: {
+    clipPathId: string;
+    stroke: string;
+    strokeWidth: number;
+    strokeLinecap: "inherit" | "butt" | "round" | "square" | undefined;
+  }
 }
 
 export type TextType = {

@@ -37,8 +37,22 @@ export function RenderPath({ element, setElement, isSelected }: Props) {
 
   return (
     <>
-      <svg {...element.props}>
+      <svg opacity={element.opacity} {...element.props}>
         <path {...element.path} />
+      </svg>
+      <svg opacity={element.opacity} {...element.props}>
+        <clipPath id={element.strokeProps.clipPathId}>
+          <path d={element.path.d} />
+        </clipPath>
+        <path
+          {...element.path}
+          stroke={element.strokeProps.stroke}
+          strokeWidth={element.strokeProps.strokeWidth}
+          strokeLinecap={element.strokeProps.strokeLinecap}
+          clipPath={element.strokeProps.clipPathId}
+          fill="none"
+          vectorEffect="non-scaling-stroke"
+        />
       </svg>
       {isSelected && (
         <Moveable>

@@ -1,3 +1,4 @@
+import { DEFAULT_THEME } from "@mantine/core";
 import { MoveableElement, SVGPathType } from "components/canvas/store";
 
 const SHAPES: { id: number; data: MoveableElement & SVGPathType}[] = [
@@ -22,6 +23,12 @@ const SHAPES: { id: number; data: MoveableElement & SVGPathType}[] = [
         }
       },
       path: { d: "M0,0L64,0L64,64L0,64L0,0", fill: "#919191"},
+      strokeProps: {
+        clipPathId: "001",
+        stroke: DEFAULT_THEME.colors.blue[8],
+        strokeWidth: 10,
+        strokeLinecap: "butt"
+      }
     },
   },
 ];
