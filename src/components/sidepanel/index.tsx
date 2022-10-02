@@ -14,6 +14,7 @@ import { ShapesPanel } from './shapes-panel';
 import { PhotosPanel } from './photos-panel';
 import { TextPanel } from './text-panel';
 import { UploadPanel } from './upload-panel';
+import { CurvesPanel } from './curves-panel';
 
 export const SIDEBAR_SIZE = 60;
 export const SIDEPANEL_SIZE = 300 + SIDEBAR_SIZE;
@@ -35,7 +36,7 @@ const panelMap: Record<NavState, JSX.Element> = {
   upload: <UploadPanel />,
   photos: <PhotosPanel />,
   text: <TextPanel />,
-  curves: <div>Curves</div>,
+  curves: <CurvesPanel />,
   shapes: <ShapesPanel />,
   graphics: <div>Graphics</div>,
 }

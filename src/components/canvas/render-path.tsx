@@ -35,8 +35,6 @@ export function RenderPath({ element, setElement, isSelected }: Props) {
     [setElement]
   );
 
-  console.log('fill: ', element.props.fill, element.props)
-
   return (
     <>
       <svg opacity={element.opacity} {...element.props}>

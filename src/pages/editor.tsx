@@ -28,7 +28,6 @@ export function Editor() {
         </Navbar>
       }
       header={<HeaderComponent />}
-      footer={<FooterComponent />}
       padding={0}
     >
       <div

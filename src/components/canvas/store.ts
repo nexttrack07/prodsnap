@@ -28,6 +28,14 @@ export type SVGStrokeProps = {
   strokeDasharray: string;
 };
 
+export type SVGLineType = {
+  type: "svg-line",
+  props?: SVGAttributes<SVGSVGElement>;
+  line:  SVGAttributes<SVGLineElement>;
+  startPath?: SVGAttributes<SVGPathElement>;
+  endPath?: SVGAttributes<SVGPathElement>;
+}
+
 export type SVGPathType = {
   type: "svg-path",
   props?: SVGAttributes<SVGSVGElement>;
@@ -55,7 +63,7 @@ export type ImageType = {
   currentUrl?: string;
 }
 
-export type CanvasElement = MoveableElement & (SVGType | ImageType | TextType | SVGPathType)
+export type CanvasElement = MoveableElement & (SVGType | ImageType | TextType | SVGPathType | SVGLineType)
 
 export type ElementType = WritableAtom<CanvasElement, Action<CanvasElement>>
 

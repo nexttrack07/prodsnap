@@ -66,6 +66,13 @@ const data: { id: number; data: MoveableElement & TextType }[] = [
   }
 ]
 
+const templateData = [
+  {
+    id: 0,
+    data: [{}]
+  }
+]
+
 export function TextPanel() {
   const setElements = useSetAtom(elementsAtom);
   const { classes } = useStyles();

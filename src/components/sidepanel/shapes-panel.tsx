@@ -39,10 +39,10 @@ export function ShapesPanel() {
             className={classes.shape}
             width={75}
             onClick={() => handleAddElement(item.data)}
-            height={
-              (item.data.height * 75) / item.data.width
-            }
             fill={item.data.props?.fill}
+            stroke={item.data.strokeProps.stroke}
+            strokeWidth={item.data.strokeProps.strokeWidth}
+            viewBox={item.data.props?.viewBox}
           >
             <path {...item.data.path} />
           </svg>
