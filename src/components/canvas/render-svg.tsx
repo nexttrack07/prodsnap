@@ -1,13 +1,13 @@
-import React, { SetStateAction, useCallback } from 'react';
+import React, { SetStateAction, useCallback } from "react";
 import { CanvasElement, MoveableElement, SVGType } from "./store";
-import { renderElement } from '.';
-import { Moveable, MoveableItem } from '../moveable';
-import { useMantineTheme } from '@mantine/core';
+import { renderElement } from ".";
+import { Moveable, MoveableItem } from "../moveable";
+import { useMantineTheme } from "@mantine/core";
 
 export function RenderSvg({
   element,
   setElement,
-  isSelected
+  isSelected,
 }: {
   element: MoveableElement & SVGType;
   setElement: (update: SetStateAction<CanvasElement>) => void;
@@ -32,7 +32,7 @@ export function RenderSvg({
       setElement((el) => ({
         ...el,
         width: d.x + el.width,
-        height: d.y + el.height,
+        height: (d.x + el.width) * el.height/el.width
       }));
     },
     [setElement]
@@ -40,13 +40,22 @@ export function RenderSvg({
 
   return (
     <>
-      <svg
-        preserveAspectRatio="xMaxYMax"
-        width={width}
-        height={height}
-        {...element.props}
-      >
+      <svg width={width} height={height} {...element.props}>
         {element.elements?.map(renderElement)}
+      </svg>
+      <svg {...element.props}>
+        <clipPath id="sample">
+          <path d="M0,0L64,0L64,64L0,64L0,0" />
+        </clipPath>
+        <path
+          d="M0,0L64,0L64,64L0,64L0,0"
+          stroke="#000"
+          strokeWidth="10"
+          strokeLinecap="butt"
+          clipPath="#sample"
+          fill="none"
+          vectorEffect="non-scaling-stroke"
+        />
       </svg>
       {isSelected && (
         <Moveable>
@@ -83,8 +92,7 @@ export function RenderSvg({
             />
           </MoveableItem>
         </Moveable>
-      )
-      }
+      )}
     </>
   );
 }
