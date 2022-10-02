@@ -3,8 +3,8 @@ const SHAPES = [
     id: 0,
     data: {
       type: "svg" as const,
-      width: 350,
-      height: 350,
+      width: 250,
+      height: 250,
       x: 100,
       y: 10,
       props: {
