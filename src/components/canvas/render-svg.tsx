@@ -42,8 +42,8 @@ export function RenderSvg({
     <>
       <svg
         preserveAspectRatio="xMaxYMax"
-        width={width * 0.9}
-        height={height * 0.9}
+        width={width}
+        height={height}
         {...element.props}
       >
         {element.elements?.map(renderElement)}
@@ -59,10 +59,9 @@ export function RenderSvg({
                 bottom: 0,
                 right: 0,
                 borderWidth: 2,
-                borderStyle: "dashed",
+                borderStyle: "solid",
                 borderColor: theme.colors.blue[6],
               }}
-              className="border border-dashed border-blue-500"
               onClick={(e) => e.stopPropagation()}
             ></div>
           </MoveableItem>

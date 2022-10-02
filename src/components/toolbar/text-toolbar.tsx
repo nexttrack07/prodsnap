@@ -182,7 +182,7 @@ export function TextToolbar() {
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>
-      <Menu>
+      <Menu closeOnItemClick={false}>
         <Menu.Target>
           <ActionIcon variant="default" size={36}>
             <AlignCenter />
@@ -192,7 +192,11 @@ export function TextToolbar() {
           <Menu.Label>Text Align</Menu.Label>
           <Menu.Item>
             <SegmentedControl
-              onChange={textAlign => setTextProps({ textAlign })}
+              onChange={(val) =>
+                setTextProps({
+                  textAlign: val as React.CSSProperties["textAlign"],
+                })
+              }
               data={[
                 { label: <AlignLeft />, value: "left" },
                 { label: <AlignCenter />, value: "center" },
@@ -204,19 +208,19 @@ export function TextToolbar() {
           <Menu.Label>Letter Spacing</Menu.Label>
           <Menu.Item>
             <Slider
-              onChange={val => setTextProps({ letterSpacing: val })}
-              value={textProps.letterSpacing}
+              onChange={(val) => setTextProps({ letterSpacing: val })}
+              value={textProps.letterSpacing as number}
               min={0}
               max={10}
               step={0.1}
-              label={l => l.toFixed(1)}
+              label={(l) => l.toFixed(1)}
             />
           </Menu.Item>
           <Menu.Label>Line Height</Menu.Label>
           <Menu.Item>
             <Slider
-              onChange={val => setTextProps({ lineHeight: val })}
-              value={textProps.lineHeight}
+              onChange={(val) => setTextProps({ lineHeight: val })}
+              value={textProps.lineHeight as number}
             />
           </Menu.Item>
         </Menu.Dropdown>

@@ -88,6 +88,7 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        opacity: element.opacity
       }}
       onClick={handleElementSelect}
     >

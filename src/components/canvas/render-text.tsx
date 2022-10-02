@@ -56,6 +56,7 @@ export function RenderText({
   return (
     <>
       <Center
+        onDoubleClick={handleTextClick}
         sx={(theme) => ({
           width,
           height,
@@ -71,14 +72,13 @@ export function RenderText({
         <Text
           ref={ref}
           style={{ ...element.props }}
-          onDoubleClick={handleTextClick}
           contentEditable={editable}
           sx={{ cursor: "text" }}
         >
           {element.content}
         </Text>
       </Center>
-      {isSelected && (
+      {(isSelected && !editable) && (
         <Moveable>
           <MoveableItem onMove={handleMoveElement}>
             <div
@@ -94,6 +94,7 @@ export function RenderText({
               }}
               className="border border-dashed border-blue-500"
               onClick={(e) => e.stopPropagation()}
+              onDoubleClick={handleTextClick}
             ></div>
           </MoveableItem>
           <MoveableItem onMove={handleResizeElement}>

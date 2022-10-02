@@ -8,6 +8,7 @@ export type MoveableElement = {
   height: number;
   x: number;
   y: number;
+  opacity?: number;
 }
 
 export type SVGType = {
