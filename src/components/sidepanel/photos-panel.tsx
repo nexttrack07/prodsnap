@@ -28,8 +28,21 @@ const data: { id: number; data: MoveableElement & ImageType }[] = [
       width: 300,
       height: 200,
       url: "https://media.kohlsimg.com/is/image/kohls/4637183_Navy_Blue?wid=600&hei=600&op_sharpen=1"
+    },
+  },
+    {
+    id: 0,
+    data: {
+      type: "image",
+      state: ImageState.Normal,
+      x: 200,
+      y: 200,
+      width: 300,
+      height: 200,
+      url: "/winter-hat.png"
     }
   }
+
 ]
 
 export function PhotosPanel() {

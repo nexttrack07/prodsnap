@@ -85,7 +85,7 @@ const SHAPES: { id: number; data: MoveableElement & SVGPathType}[] = [
           pointerEvents: "none"
         }
       },
-      path: { d: "M178.28827127601554,0L0,0L16,29.722148993652496L194.28827127601554,29.722148993652496L178.28827127601554,0", },
+      path: { d: "M 194 0 L 0 0 L 16 30 L 194 29 L 194 0", },
       strokeProps: {
         clipPathId: "001",
         stroke: DEFAULT_THEME.colors.blue[8],
@@ -106,7 +106,7 @@ const SHAPES: { id: number; data: MoveableElement & SVGPathType}[] = [
       props: {
         width: "100%",
         height: "100%",
-        viewBox: "0 0 64 61",
+        viewBox: "0 0 200 195",
         fill: DEFAULT_THEME.colors.blue[5],
         style: {
           top: 0,
@@ -116,11 +116,11 @@ const SHAPES: { id: number; data: MoveableElement & SVGPathType}[] = [
           pointerEvents: "none"
         }
       },
-      path: { d: "M32,0L39.5542,23.2999L64,23.2999L44.2229,37.7001L51.7771,61L32,46.5999L12.2229,61L19.7771,37.7001L0,23.2999L24.4458,23.2999L32,0", },
+      path: { d: "M71 0 0 0 0 193 199 192 71 0", },
       strokeProps: {
         clipPathId: "001",
         stroke: DEFAULT_THEME.colors.blue[8],
-        strokeWidth: 5,
+        strokeWidth: 0,
         strokeDasharray: "none",
         strokeLinecap: "butt"
       }
