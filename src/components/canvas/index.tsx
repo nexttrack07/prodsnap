@@ -1,14 +1,14 @@
-import React, { SetStateAction, useState } from "react";
+import React from "react";
 import { Box, useMantineTheme } from "@mantine/core";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { atomFamily } from "jotai/utils";
 import { createElement, ReactNode } from "react";
 import {
+  CanvasElement,
+  ElementGroupType,
   elementsAtom,
   ElementType,
-  MoveableElement,
   selectedElementsAtom,
-  SVGLineType,
   SVGType,
 } from "./store";
 import { RenderImage } from "./render-image";
@@ -17,15 +17,15 @@ import { RenderText } from "./render-text";
 import { useKeyPress } from "../../utils/use-key-press";
 import { RenderPath } from "./render-path";
 import { RenderLine } from "./render-line";
+import { Moveable, MoveableItem } from "../moveable";
 
 const unSelectAllAtom = atom(null, (_get, set) => {
   set(selectedElementsAtom, []);
 });
 
 export function Canvas() {
-  const elements = useAtomValue(elementsAtom);
+  const elementGroups = useAtomValue(elementsAtom);
   const unSelectAllElements = useSetAtom(unSelectAllAtom);
-
   return (
     <Box
       id="canvas"
@@ -39,8 +39,8 @@ export function Canvas() {
       })}
       onClick={unSelectAllElements}
     >
-      {elements.map((elAtom, i) => (
-        <Element i={i} key={i} elementAtom={elAtom} />
+      {elementGroups.map((elementGroupAtom, i) => (
+        <ElementGroup i={i} key={i} elementGroupAtom={elementGroupAtom} />
       ))}
     </Box>
   );
@@ -62,6 +62,67 @@ const isSelectedAtom = atomFamily((id: number) =>
   })
 );
 
+const elementCompMap: Record<CanvasElement["type"], React.FC<any>> = {
+  svg: RenderSvg,
+  image: RenderImage,
+  text: RenderText,
+  "svg-path": RenderPath,
+  "svg-line": RenderLine,
+};
+
+function ElementGroup({
+  elementGroupAtom,
+  i,
+}: {
+  elementGroupAtom: ElementGroupType;
+  i: number;
+}) {
+  const [elementGroup, setElementGroup] = useAtom(elementGroupAtom);
+  const { x, y } = elementGroup;
+  const theme = useMantineTheme();
+
+  const handleMoveElement = React.useCallback(
+    (d: { x: number; y: number }) => {
+      setElementGroup((el) => ({
+        ...el,
+        x: d.x + el.x,
+        y: d.y + el.y,
+      }));
+    },
+    [setElementGroup]
+  );
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x,
+        top: y,
+        height: "fit-content",
+        width: "fit-content"
+      }}
+    >
+      <Moveable>
+        {elementGroup.elements.map((elementAtom, i) => (
+          <MoveableItem onMove={handleMoveElement}>
+            <div
+              style={{
+                borderWidth: 3,
+                borderStyle: "solid",
+                borderColor: theme.colors.blue[6],
+                userSelect: "none",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Element elementAtom={elementAtom} i={i} />
+            </div>
+          </MoveableItem>
+        ))}
+      </Moveable>
+    </div>
+  );
+}
+
 function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
   const [element, setElement] = useAtom(elementAtom);
   const setSelectedElements = useSetAtom(selectedElementsAtom);
@@ -79,61 +140,18 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
     });
   };
 
-  const { width, height, x, y } = element;
+  const Comp = elementCompMap[element.type];
 
   return (
     <span
       style={{
-        position: "absolute",
-        left: x,
-        top: y,
-        width,
-        height,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
       }}
       onClick={handleElementSelect}
     >
-      {element.type === "svg" && (
-        <RenderSvg
-          element={element}
-          setElement={setElement}
-          isSelected={isSelected}
-        />
-      )}
-      {element.type === "svg-path" && (
-        <RenderPath
-          element={element}
-          setElement={setElement}
-          isSelected={isSelected}
-        />
-      )}
-      {element.type === "svg-line" && (
-        <RenderLine
-          element={element}
-          setElement={
-            setElement as (
-              u: SetStateAction<MoveableElement & SVGLineType>
-            ) => void
-          }
-          isSelected={isSelected}
-        />
-      )}
-      {element.type === "image" && (
-        <RenderImage
-          isSelected={isSelected}
-          element={element}
-          setElement={setElement}
-        />
-      )}
-      {element.type === "text" && (
-        <RenderText
-          element={element}
-          setElement={setElement}
-          isSelected={isSelected}
-        />
-      )}
+      <Comp element={element} setElement={setElement} isSelected={isSelected} />
     </span>
   );
 }

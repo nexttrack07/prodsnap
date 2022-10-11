@@ -1,25 +1,35 @@
-import React, { useState, useCallback, SetStateAction } from "react";
-import { CanvasElement, MoveableElement, TextType } from "./store";
-import { Center, Text, useMantineTheme } from "@mantine/core";
+import React, {
+  useState,
+  useCallback,
+  SetStateAction,
+  useRef,
+  useEffect,
+} from "react";
+import { MoveableElement, TextType } from "./store";
+import { Center } from "@mantine/core";
 import { useClickOutside, useWindowEvent } from "@mantine/hooks";
-import { Moveable, MoveableItem } from "../moveable"
+import { MoveableItem } from "../moveable";
 
 export function RenderText({
   element,
   setElement,
-  isSelected
+  isSelected,
 }: {
-  element: MoveableElement & TextType,
-  setElement: (update: SetStateAction<CanvasElement>) => void;
+  element: MoveableElement & TextType;
+  setElement: (update: SetStateAction<MoveableElement & TextType>) => void;
   isSelected: boolean;
 }) {
   const [editable, setEditable] = useState(false);
-  const ref = useClickOutside(() => setEditable(false));
-  const theme = useMantineTheme();
+  // const ref = useClickOutside(() => setEditable(false));
+  const ref = useRef<HTMLDivElement>(null);
+  const [fontRatio, setFontRatio] = useState(1);
+  const [initialWidth, setInitialWidth] = useState(0);
+  const [moving, setMoving] = useState(false);
+  const initial = useRef({ x: 0, y: 0 });
 
   useWindowEvent("keydown", (e: KeyboardEvent) => {
     if (e.key === "Escape") {
-      setEditable(false)
+      setEditable(false);
     }
   });
 
@@ -28,93 +38,78 @@ export function RenderText({
     setEditable(true);
   };
 
-  const handleMoveElement = useCallback(
-    (d: { x: number; y: number }) => {
-      setElement((el) => ({
-        ...el,
-        x: d.x + el.x,
-        y: d.y + el.y,
-      }));
-    },
-    [setElement]
-  );
+  useEffect(() => {
+    if (ref.current) {
+      setFontRatio(
+        (element.props.fontSize as number) / ref.current.offsetWidth
+      );
+      setInitialWidth(ref.current.offsetWidth);
+    }
+  }, [ref.current]);
 
-  const handleResizeElement = useCallback(
-    (d: { x: number; y: number }) => {
-      setElement((el) => ({
-        ...el,
-        width: d.x + el.width,
-        height: d.y + el.height,
-      }));
-    },
-    [setElement]
-  );
+  useEffect(() => {
+    function handleMouseUp(e: MouseEvent) {
+      e.stopPropagation();
+      initial.current = { x: 0, y: 0 };
+      setMoving(false);
+    }
 
+    function handleMouseMove(e: MouseEvent) {
+      e.stopPropagation();
+      if (moving) {
+        const fontSize = fontRatio * (initialWidth + e.clientX - initial.current.x);
+        setElement((el) => ({
+          ...el,
+          props: {
+            ...el.props,
+            fontSize,
+          },
+        }));
+      }
+    }
 
-  const { height, width } = element;
+    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, [fontRatio, initialWidth, setMoving, setElement, moving]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    console.log("mouse down event");
+    e.stopPropagation();
+    initial.current = { x: e.clientX, y: e.clientY };
+    setMoving(true);
+  };
 
   return (
     <>
       <Center
         onDoubleClick={handleTextClick}
-        sx={(theme) => ({
-          width,
-          height,
-          borderWidth: 0,
-          borderStyle: "dotted",
-          borderColor: theme.colors.blue[4],
-          '&:hover': {
-            borderWidth: 2,
-            cursor: "pointer"
-          }
-        })}
+        ref={ref}
+        style={{ ...element.props }}
       >
-        <Text
-          ref={ref}
-          style={{ ...element.props }}
-          contentEditable={editable}
-          sx={{ cursor: "text" }}
-        >
-          {element.content}
-        </Text>
+        {element.content}
       </Center>
-      {(isSelected && !editable) && (
-        <Moveable>
-          <MoveableItem onMove={handleMoveElement}>
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                bottom: 0,
-                right: 0,
-                borderWidth: 2,
-                borderStyle: "dashed",
-                borderColor: theme.colors.blue[6],
-              }}
-              className="border border-dashed border-blue-500"
-              onClick={(e) => e.stopPropagation()}
-              onDoubleClick={handleTextClick}
-            ></div>
-          </MoveableItem>
-          <MoveableItem onMove={handleResizeElement}>
-            <span
-              style={{
-                height: 10,
-                width: 10,
-                cursor: "se-resize",
-                borderRadius: "100%",
-                transform: "translate(50%, 50%)",
-                position: "absolute",
-                bottom: 0,
-                right: 0,
-                backgroundColor: "white",
-                boxShadow: "0 0 1px rgba(0,0,0,0.4)",
-                border: "1px solid rgba(0,0,0,0.3)",
-              }}
-            />
-          </MoveableItem>
-        </Moveable>
+      {isSelected && (
+        <span
+          onMouseDown={handleMouseDown}
+          style={{
+            height: 12,
+            width: 12,
+            cursor: "se-resize",
+            borderRadius: "100%",
+            transform: "translate(50%, 50%)",
+            position: "absolute",
+            bottom: 0,
+            right: 0,
+            backgroundColor: "white",
+            boxShadow: "0 0 1px rgba(0,0,0,0.4)",
+            border: "1px solid rgba(0,0,0,0.3)",
+          }}
+        />
       )}
     </>
   );
