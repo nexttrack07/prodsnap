@@ -1,6 +1,5 @@
 import React, {
   useState,
-  useCallback,
   SetStateAction,
   useRef,
   useEffect,
@@ -8,7 +7,6 @@ import React, {
 import { MoveableElement, TextType } from "./store";
 import { Center } from "@mantine/core";
 import { useClickOutside, useWindowEvent } from "@mantine/hooks";
-import { MoveableItem } from "../moveable";
 
 export function RenderText({
   element,
@@ -81,6 +79,7 @@ export function RenderText({
     console.log("mouse down event");
     e.stopPropagation();
     initial.current = { x: e.clientX, y: e.clientY };
+    setInitialWidth(ref.current?.offsetWidth as number);
     setMoving(true);
   };
 
