@@ -1,6 +1,7 @@
 import { Global, MantineProvider } from "@mantine/core";
 import { NotificationsProvider } from "@mantine/notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { RecoilRoot } from 'recoil';
 import { useAtomValue } from "jotai";
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -47,7 +48,9 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       <NotificationsProvider>
         <QueryClientProvider client={queryClient}>
           <Router>
+            <RecoilRoot>
             <App />
+            </RecoilRoot>
           </Router>
         </QueryClientProvider>
       </NotificationsProvider>

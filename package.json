@@ -36,6 +36,7 @@
     "react-image-crop": "^10.0.7",
     "react-router-dom": "^6.4.0",
     "react-textfit": "^1.1.1",
+    "recoil": "^0.7.6",
     "tabler-icons-react": "^1.55.0",
     "use-fit-text": "^2.4.0"
   },

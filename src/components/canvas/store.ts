@@ -3,6 +3,8 @@ import React, { SetStateAction, SVGAttributes } from 'react';
 
 export type Action<T> = SetStateAction<T>;
 export type MoveableElement = {
+  x: number;
+  y: number;
   width: number;
   height: number;
   opacity?: number;
@@ -54,11 +56,7 @@ export type ImageType = {
 }
 export type CanvasElement = MoveableElement & (SVGType | ImageType | TextType | SVGPathType | SVGLineType)
 export type ElementType = WritableAtom<CanvasElement, Action<CanvasElement>>
-export type ElementGroup = {
-  x: number;
-  y: number;
-  elements: ElementType[];
-}
+export type ElementGroup = ElementType[];
 export type ElementGroupType = WritableAtom<ElementGroup, Action<ElementGroup>>;
 export const elementsAtom = atom<ElementGroupType[]>([]);
 export const selectedElementsAtom = atom<number[]>([]);

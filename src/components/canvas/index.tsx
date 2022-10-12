@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, useMantineTheme } from "@mantine/core";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { atomFamily } from "jotai/utils";
+import { atomFamily, useAtomCallback } from "jotai/utils";
 import { createElement, ReactNode } from "react";
 import {
   CanvasElement,
@@ -70,6 +70,23 @@ const elementCompMap: Record<CanvasElement["type"], React.FC<any>> = {
   "svg-line": RenderLine,
 };
 
+
+const groupedAtom = atomFamily((i: number) => atom(
+  null,
+  (get, set, update: { x: number; y: number }) => {
+    const elementGroups = get(elementsAtom);
+    const elementGroup = elementGroups[i];
+    set(elementGroup, items => items.map(item => {
+      set(item, item => ({
+        ...item,
+        x: item.x + update.x,
+        y: item.y + update.y
+      }))
+      return item;
+    }))
+  }
+))
+
 function ElementGroup({
   elementGroupAtom,
   i,
@@ -77,33 +94,24 @@ function ElementGroup({
   elementGroupAtom: ElementGroupType;
   i: number;
 }) {
-  const [elementGroup, setElementGroup] = useAtom(elementGroupAtom);
-  const { x, y } = elementGroup;
   const theme = useMantineTheme();
 
-  const handleMoveElement = React.useCallback(
-    (d: { x: number; y: number }) => {
-      setElementGroup((el) => ({
+  const handleMoveElement = useAtomCallback(
+    React.useCallback(
+    (get, set, d: { x: number; y: number }) => {
+      set(groupedAtom(i), (els) => els.map(el => ({
         ...el,
         x: d.x + el.x,
         y: d.y + el.y,
-      }));
+      })));
     },
     [setElementGroup]
-  );
+  ))
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        left: x,
-        top: y,
-        height: "fit-content",
-        width: "fit-content"
-      }}
-    >
+    <div>
       <Moveable>
-        {elementGroup.elements.map((elementAtom, i) => (
+        {elementGroup.map((elementAtom, i) => (
           <MoveableItem onMove={handleMoveElement}>
             <div
               style={{
