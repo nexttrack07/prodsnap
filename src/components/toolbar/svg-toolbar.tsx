@@ -1,32 +1,33 @@
-import { SVGAttributes } from 'react';
+import React from 'react';
 import { ActionIcon, ColorPicker, Group, Popover, DEFAULT_THEME, Menu, Slider, SegmentedControl } from "@mantine/core";
-import { elementsAtom, MoveableElement, selectedElementsAtom, SVGType } from "../canvas/store";
-import { atom, useAtom } from "jotai";
 import { BorderAll, BorderNone, BorderRadius, BorderStyle2 } from 'tabler-icons-react';
+import { DefaultValue, selector, useRecoilState } from 'recoil';
+import { activeElementState, elementState, selectedElementIdsState, ShapeType } from '../canvas/element.store';
 
-const svgPropsAtom = atom(
-  (get) => {
-    const selectedElementId = get(selectedElementsAtom);
-    const selectedElementAtom = get(elementsAtom)[selectedElementId[0]];
-    const selectedElement = get(selectedElementAtom);
+const svgPropsAtom = selector({
+  key: "svg-props-atom",
+  get: ({ get }) => {
+    const activeElement = get(activeElementState);
+    const selectedElement = get(elementState(activeElement));
 
-    return (selectedElement as MoveableElement & SVGType).props;
+    return (selectedElement as ShapeType).props;
   },
-  (get, set, update: SVGAttributes<SVGSVGElement>) => {
-    const selectedElementId = get(selectedElementsAtom);
-    const selectedElementAtom = get(elementsAtom)[selectedElementId[0]];
-    set(selectedElementAtom, (el) => {
-      if (el.type === "svg") {
-        return { ...el, props: { ...el.props, ...update } };
+  set: ({ set, get }, newVal) => {
+    if (newVal instanceof DefaultValue) return;
+    const elementId = get(activeElementState)
+    set(elementState(elementId), el => {
+      if (el.type === "shape") {
+        return { ...el, props: { ...el.props, ...newVal }};
       }
+
       return el;
-    });
+    })
   }
-);
+})
 
 
 export function SvgToolbar() {
-  const [props, setProps] = useAtom(svgPropsAtom);
+  const [props, setProps] = useRecoilState(svgPropsAtom);
 
   return (
     <Group>

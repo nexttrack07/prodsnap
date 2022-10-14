@@ -1,5 +1,10 @@
 import { Center, AppShell, Footer, Text, Navbar } from "@mantine/core";
+import {
+  activeElementState,
+  selectedElementIdsState,
+} from "../components/canvas/element.store";
 import React from "react";
+import { useRecoilCallback } from "recoil";
 import {
   Canvas,
   Toolbar,
@@ -20,6 +25,15 @@ function FooterComponent() {
 }
 
 export function Editor() {
+  const handleEditorClick = useRecoilCallback(
+    ({ set }) =>
+      () => {
+        set(selectedElementIdsState, []);
+        set(activeElementState, -1);
+      },
+    []
+  );
+
   return (
     <AppShell
       navbar={
@@ -51,7 +65,7 @@ export function Editor() {
         >
           <Toolbar />
         </div>
-        <Center sx={{ flex: 1 }}>
+        <Center onClick={handleEditorClick} sx={{ flex: 1 }}>
           <Canvas />
         </Center>
       </div>

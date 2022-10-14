@@ -1,10 +1,9 @@
 import React from "react";
 import { Text, Space, createStyles, SimpleGrid } from "@mantine/core";
-import { atom, useSetAtom } from "jotai";
 import { useQuery } from "@tanstack/react-query";
 import { getShapes } from "../../api";
-import { renderElement } from "../../components/canvas";
-import { elementsAtom, CanvasElement } from "../../components/canvas/store";
+import { elementsState, Element, elementState } from "../../components/canvas/element.store";
+import { useRecoilCallback, useRecoilState } from "recoil";
 
 const useStyles = createStyles(() => ({
   shape: {
@@ -19,12 +18,16 @@ const useStyles = createStyles(() => ({
 
 export function ShapesPanel() {
   const query = useQuery(["shapes"], getShapes);
-  const setElements = useSetAtom(elementsAtom);
+  const [elements, setElements] = useRecoilState(elementsState);
   const { classes } = useStyles();
 
-  const handleAddElement = (newEl: CanvasElement) => {
-    setElements((items) => [...items, atom(newEl)]);
-  };
+  const handleAddElement = useRecoilCallback( 
+    ({ set }) =>
+  (newEl: Element) => {
+    const newId = elements.length;
+    setElements((items) => [...items, newId]);
+    set(elementState(newId), newEl)
+  });
 
   return (
     <>

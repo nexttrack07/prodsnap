@@ -11,12 +11,12 @@ import {
   Slider,
 } from "@mantine/core";
 import {
-  elementsAtom,
-  MoveableElement,
+  elementState,
   selectedElementsAtom,
+  selectedElementIdsState,
   TextType,
-} from "../canvas/store";
-import { atom, useAtom } from "jotai";
+  activeElementState,
+} from "../canvas/element.store";
 import React, { useRef } from "react";
 import {
   AlignCenter,
@@ -28,6 +28,7 @@ import {
   TextSize,
   Underline,
 } from "tabler-icons-react";
+import { DefaultValue, selector, useRecoilState } from "recoil";
 
 const fonts = [
   "Roboto",
@@ -39,29 +40,31 @@ const fonts = [
   "Comic sans",
 ];
 
-const textPropsAtom = atom(
-  (get) => {
-    const selectedElementId = get(selectedElementsAtom);
-    const selectedElementAtom = get(elementsAtom)[selectedElementId[0]];
-    const selectedElement = get(selectedElementAtom);
-
-    return (selectedElement as MoveableElement & TextType).props;
+const textPropsSelector = selector({
+  key: "text-props",
+  get: ({ get }) => {
+    const selectedElementId = get(activeElementState);
+    if (selectedElementId === -1) return null;
+    const selectedElement = get(elementState(selectedElementId));
+    return (selectedElement as TextType).props;
   },
-  (get, set, update: React.CSSProperties) => {
-    const selectedElementId = get(selectedElementsAtom);
-    const selectedElementAtom = get(elementsAtom)[selectedElementId[0]];
-    set(selectedElementAtom, (el) => {
+  set: ({ set, get }, newVal) => {
+    if (newVal instanceof DefaultValue) return;
+    const selectedElementId = get(activeElementState);
+    set(elementState(selectedElementId), (el) => {
       if (el.type === "text") {
-        return { ...el, props: { ...el.props, ...update } };
+        return { ...el, props: { ...el.props, ...newVal } };
       }
       return el;
     });
-  }
-);
+  },
+});
 
 export function TextToolbar() {
-  const [textProps, setTextProps] = useAtom(textPropsAtom);
+  const [textProps, setTextProps] = useRecoilState(textPropsSelector);
   const handlers = useRef<NumberInputHandlers>();
+
+  if (!textProps) return null;
 
   return (
     <Group>

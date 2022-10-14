@@ -1,31 +1,33 @@
-import React from "react";
-import { Box, useMantineTheme } from "@mantine/core";
-import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { atomFamily, useAtomCallback } from "jotai/utils";
+import React, { useState } from "react";
+import { Box, DEFAULT_THEME } from "@mantine/core";
 import { createElement, ReactNode } from "react";
-import {
-  CanvasElement,
-  ElementGroupType,
-  elementsAtom,
-  ElementType,
-  selectedElementsAtom,
-  SVGType,
-} from "./store";
+import { SVGType } from "./store";
 import { RenderImage } from "./render-image";
-import { RenderSvg } from "./render-svg";
 import { RenderText } from "./render-text";
 import { useKeyPress } from "../../utils/use-key-press";
+import {
+  selector,
+  selectorFamily,
+  useRecoilState,
+  useRecoilValue,
+  useSetRecoilState,
+} from "recoil";
+import {
+  Element,
+  elementsState,
+  elementGroupsState,
+  elementState,
+  isElementSelectedState,
+  selectedElementIdsState,
+  activeElementState,
+} from "./element.store";
+import { SelectHandler } from "./select-handler";
 import { RenderPath } from "./render-path";
-import { RenderLine } from "./render-line";
-import { Moveable, MoveableItem } from "../moveable";
-
-const unSelectAllAtom = atom(null, (_get, set) => {
-  set(selectedElementsAtom, []);
-});
 
 export function Canvas() {
-  const elementGroups = useAtomValue(elementsAtom);
-  const unSelectAllElements = useSetAtom(unSelectAllAtom);
+  const elements = useRecoilValue(elementsState);
+  const [elementGroups, setElementGroups] = useRecoilState(elementGroupsState);
+
   return (
     <Box
       id="canvas"
@@ -37,11 +39,14 @@ export function Canvas() {
         position: "relative",
         backgroundColor: "white",
       })}
-      onClick={unSelectAllElements}
     >
-      {elementGroups.map((elementGroupAtom, i) => (
-        <ElementGroup i={i} key={i} elementGroupAtom={elementGroupAtom} />
+      {elements.map((i) => (
+        <ElementComponent i={i} key={i} />
       ))}
+      {elementGroups.map((group, i) => (
+        <ElementGroup key={i} elementGroup={group} />
+      ))}
+      <SelectHandler />
     </Box>
   );
 }
@@ -55,86 +60,106 @@ export function renderElement(
   return createElement(tag, { ...props, key: i }, null);
 }
 
-const isSelectedAtom = atomFamily((id: number) =>
-  atom((get) => {
-    const selectedElements = get(selectedElementsAtom);
-    return selectedElements.includes(id);
-  })
-);
+const selectedElementSpecs = selectorFamily({
+  key: "element-group-specs",
+  get:
+    (elementGroup: number[]) =>
+    ({ get }) => {
+      const { minX, minY, maxX, maxY } = elementGroup.reduce(
+        (acc, id) => {
+          const element: Element = get(elementState(id));
 
-const elementCompMap: Record<CanvasElement["type"], React.FC<any>> = {
-  svg: RenderSvg,
+          return {
+            minX: Math.min(acc.minX, element.x),
+            minY: Math.min(acc.minY, element.y),
+            maxX: Math.max(acc.maxX, element.x + element.width),
+            maxY: Math.max(acc.maxY, element.y + element.height),
+          };
+        },
+        { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity }
+      );
+
+      return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+    },
+});
+
+const elementCompMap: Record<Element["type"], React.FC<any>> = {
   image: RenderImage,
   text: RenderText,
-  "svg-path": RenderPath,
-  "svg-line": RenderLine,
+  shape: RenderPath,
 };
 
-
-const groupedAtom = atomFamily((i: number) => atom(
-  null,
-  (get, set, update: { x: number; y: number }) => {
-    const elementGroups = get(elementsAtom);
-    const elementGroup = elementGroups[i];
-    set(elementGroup, items => items.map(item => {
-      set(item, item => ({
-        ...item,
-        x: item.x + update.x,
-        y: item.y + update.y
-      }))
-      return item;
-    }))
-  }
-))
-
-function ElementGroup({
-  elementGroupAtom,
-  i,
-}: {
-  elementGroupAtom: ElementGroupType;
-  i: number;
-}) {
-  const theme = useMantineTheme();
-
-  const handleMoveElement = useAtomCallback(
-    React.useCallback(
-    (get, set, d: { x: number; y: number }) => {
-      set(groupedAtom(i), (els) => els.map(el => ({
-        ...el,
-        x: d.x + el.x,
-        y: d.y + el.y,
-      })));
+const elementsFromGroupAtom = selectorFamily({
+  key: "elements-from-group",
+  get:
+    (ids: number[]) =>
+    ({ get }) => {
+      return ids.map((id) => get(elementState(id)));
     },
-    [setElementGroup]
-  ))
+});
+
+function ElementGroup({ elementGroup }: { elementGroup: number[] }) {
+  const { x, y, width, height } = useRecoilValue(
+    selectedElementSpecs(elementGroup)
+  );
+  const isShiftPressed = useKeyPress("Shift");
+  const setSelectedElements = useSetRecoilState(selectedElementIdsState);
+  const elements = useRecoilValue(elementsFromGroupAtom(elementGroup));
+  const [activeElement,setActiveElement] = useRecoilState(activeElementState);
+
+  const handleSelectGroup = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedElements((items) => {
+      if (isShiftPressed) {
+        return items
+          .filter((i) => !elementGroup.includes(i))
+          .concat(elementGroup);
+      } else {
+        return elementGroup;
+      }
+    });
+  };
 
   return (
-    <div>
-      <Moveable>
-        {elementGroup.map((elementAtom, i) => (
-          <MoveableItem onMove={handleMoveElement}>
-            <div
-              style={{
-                borderWidth: 3,
-                borderStyle: "solid",
-                borderColor: theme.colors.blue[6],
-                userSelect: "none",
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Element elementAtom={elementAtom} i={i} />
-            </div>
-          </MoveableItem>
-        ))}
-      </Moveable>
+    <div
+      style={{
+        userSelect: "none",
+        left: x,
+        top: y,
+        width,
+        height,
+        position: "absolute",
+      }}
+      onClick={handleSelectGroup}
+    >
+      {elements.map((el,i) => (
+        <Box
+          key={i}
+          onClick={() => setActiveElement(elementGroup[i])}
+          sx={{
+            left: el.x - x,
+            top: el.y - y,
+            position: "absolute",
+            width: el.width,
+            height: el.height,
+            borderStyle: "solid",
+            borderColor: DEFAULT_THEME.colors.blue[7],
+            borderWidth: activeElement === elementGroup[i] ? 3 : 0,
+            "&:hover": {
+              borderWidth: 3
+            }
+          }}
+        />
+      ))}
     </div>
   );
 }
 
-function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
-  const [element, setElement] = useAtom(elementAtom);
-  const setSelectedElements = useSetAtom(selectedElementsAtom);
-  const isSelected = useAtomValue(isSelectedAtom(i));
+function ElementComponent({ i }: { i: number }) {
+  const [element, setElement] = useRecoilState(elementState(i));
+  const setSelectedElements = useSetRecoilState(selectedElementIdsState);
+  const setActiveElement = useSetRecoilState(activeElementState);
+  const isSelected = useRecoilValue(isElementSelectedState(i));
   const isShiftPressed = useKeyPress("Shift");
 
   const handleElementSelect = (e: React.MouseEvent) => {
@@ -146,6 +171,7 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
         return [i];
       }
     });
+    setActiveElement(i);
   };
 
   const Comp = elementCompMap[element.type];
@@ -153,9 +179,13 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
   return (
     <span
       style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        position: "absolute",
+        left: element.x,
+        top: element.y,
+        width: element.width,
+        height: element.height,
+        userSelect: "none",
+        cursor: "pointer",
       }}
       onClick={handleElementSelect}
     >

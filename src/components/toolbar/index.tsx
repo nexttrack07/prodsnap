@@ -1,84 +1,112 @@
-import React, { useEffect } from "react";
+import React from "react";
+import { Box, Group, ActionIcon, Menu, Slider, Button } from "@mantine/core";
 import {
-  Box,
-  Group,
-  Button,
-  CopyButton,
-  ActionIcon,
-  Menu,
-  Slider,
-} from "@mantine/core";
-import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+  DefaultValue,
+  selector,
+  useRecoilCallback,
+  useRecoilValue,
+  useRecoilState,
+} from "recoil";
 import {
-  CanvasElement,
-  elementsAtom,
+  activeElementState,
+  Element,
+  elementGroupsState,
+  elementsState,
   selectedElementsAtom,
-} from "../canvas/store";
-import { ImageToolbar } from "./image-toolbar";
-import { Copy, Eye, Trash } from "tabler-icons-react";
+} from "../canvas/element.store";
+import { Eye, Trash } from "tabler-icons-react";
 import { TextToolbar } from "./text-toolbar";
+import { elementState, selectedElementIdsState } from "../canvas/element.store";
+import difference from "lodash/difference";
+import sortBy from "lodash/sortBy"
 import { SvgToolbar } from "./svg-toolbar";
-import { SvgPathToolbar } from "./svg-path-toolbar";
 
-const getTypeAtom = atom((get) => {
-  const selectedElementIds = get(selectedElementsAtom);
-  if (selectedElementIds.length === 0)
-    return (_: CanvasElement["type"]) => false;
-  const selectedElements = selectedElementIds.map((i) => get(elementsAtom)[i]);
 
-  return (type: CanvasElement["type"]) =>
-    selectedElements.every((el) => get(el).type === type);
-});
-
-const deleteSelectedAtom = atom(null, (get, set) => {
-  const selectedElementsIds = get(selectedElementsAtom);
-  set(elementsAtom, (items) =>
-    items.filter((_, i) => !selectedElementsIds.includes(i))
-  );
-  set(selectedElementsAtom, []);
-});
-
-const selectedElementOpacityAtom = atom(
-  (get) => {
-    const selectedElementsIds = get(selectedElementsAtom);
-    if (selectedElementsIds.length === 1) {
-      const element = get(get(elementsAtom)[selectedElementsIds[0]]);
-      return element.opacity;
-    }
+const selectedOpacityAtom = selector({
+  key: "selected-opacity-atom",
+  get: ({ get }) => {
+    const selectedElements = get(selectedElementsAtom);
+    if (selectedElements.length === 1) return selectedElements[0].opacity;
     return 0;
   },
-  (get, set, update: number) => {
-    const selectedElementsIds = get(selectedElementsAtom);
-    if (selectedElementsIds.length === 1) {
-      const elementAtom = get(elementsAtom)[selectedElementsIds[0]];
-      set(elementAtom, (el) => ({ ...el, opacity: update }));
-    }
+  set: ({ get, set }, newVal) => {
+    if (newVal instanceof DefaultValue) return;
+
+    const selectedElementIds = get(selectedElementIdsState);
+    selectedElementIds.forEach((id) => {
+      set(elementState(id), (el) => ({
+        ...el,
+        opacity: newVal,
+      }));
+    });
+  },
+});
+
+const isGroupAtom = selector({
+  key: "is-group",
+  get: ({ get }) => {
+    const selectedIds = get(selectedElementIdsState);
+    const groups = get(elementGroupsState);
+
+    let isGroup = false;
+    groups.forEach((group) => {
+      const diff = difference(group, selectedIds);
+      if (diff.length === 0) {
+        isGroup = true;
+      }
+    });
+    return isGroup;
+  },
+});
+
+export const activeElementTypeAtom = selector({
+  key: "active-element-atom",
+  get: ({ get }) => {
+    const activeElementId = get(activeElementState);
+    if (activeElementId === -1) return null;
+
+    return get(elementState(activeElementId))["type"];
   }
-);
+})
 
 export function Toolbar() {
-  const getType = useAtomValue(getTypeAtom);
-  const deletedSelectedElements = useSetAtom(deleteSelectedAtom);
-  const selectedElementsIds = useAtomValue(selectedElementsAtom);
-  const [selectedElementOpacity, setSelectedElementOpacity] = useAtom(
-    selectedElementOpacityAtom
+  const selectedElementsIds = useRecoilValue(selectedElementIdsState);
+  const activeElement = useRecoilValue(activeElementTypeAtom);
+  const [selectedElementOpacity, setSelectedElementOpacity] =
+    useRecoilState(selectedOpacityAtom);
+  const isGroup = useRecoilValue(isGroupAtom);
+
+  const getType = (type: Element["type"]) => activeElement && activeElement === type
+  const handleDeleteClick = useRecoilCallback(
+    ({ set }) =>
+      () => {
+        set(elementsState, (ids) =>
+          ids.filter((id) => !selectedElementsIds.includes(id))
+        );
+      },
+    [selectedElementsIds]
   );
 
-  const handleDeleteClick = () => {
-    deletedSelectedElements();
-  };
+  const handleUngroup = useRecoilCallback(
+    ({ set }) => () => {
+      set(elementGroupsState, groups => {
+        return difference(groups, [selectedElementsIds])
+      })
+    }
+  )
 
-  const handleDeletePress = (e: KeyboardEvent) => {
-    if (e.key === "Backspace") deletedSelectedElements();
-  };
+  const handleGroup = useRecoilCallback(
+    ({ set }) => () => {
+      set(elementGroupsState, groups => {
+        let newGroups: number[][] = [];
+        selectedElementsIds.forEach(i => {
+          newGroups = groups.filter(group => group.includes(i))
+        })
+        return newGroups.concat([sortBy(selectedElementsIds)])
+      })
+    }
+  )
 
-  useEffect(() => {
-    window.addEventListener("keydown", handleDeletePress);
-
-    return () => {
-      window.removeEventListener("keydown", handleDeletePress);
-    };
-  }, []);
 
   return (
     <Box
@@ -91,11 +119,14 @@ export function Toolbar() {
       }}
     >
       {getType("text") && <TextToolbar />}
-      {getType("image") && <ImageToolbar />}
-      {getType("svg") && <SvgToolbar />}
-      {getType("svg-path") && <SvgPathToolbar />}
+      {getType("shape") && <SvgToolbar />}
       <div style={{ flex: 1 }} />
       <Group spacing="xs">
+        {isGroup ? (
+          <Button onClick={handleUngroup} variant="outline">Ungroup</Button>
+        ) : (
+          <Button onClick={handleGroup} variant="outline">Group</Button>
+        )}
         <Menu width={170} position="bottom-end" closeOnItemClick={false}>
           <Menu.Target>
             <ActionIcon
