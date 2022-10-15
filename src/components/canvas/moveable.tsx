@@ -221,6 +221,6 @@ const resizeHandleStyles = {
   borderStyle: "solid",
   borderWidth: 1,
   boxShadow: "0px 0px 1px rgba(0,0,0,0.3)",
-  width: 13,
-  height: 13,
+  width: 15,
+  height: 15,
 };

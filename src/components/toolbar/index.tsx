@@ -18,9 +18,8 @@ import { Eye, Trash } from "tabler-icons-react";
 import { TextToolbar } from "./text-toolbar";
 import { elementState, selectedElementIdsState } from "../canvas/element.store";
 import difference from "lodash/difference";
-import sortBy from "lodash/sortBy"
+import sortBy from "lodash/sortBy";
 import { SvgToolbar } from "./svg-toolbar";
-
 
 const selectedOpacityAtom = selector({
   key: "selected-opacity-atom",
@@ -66,8 +65,8 @@ export const activeElementTypeAtom = selector({
     if (activeElementId === -1) return null;
 
     return get(elementState(activeElementId))["type"];
-  }
-})
+  },
+});
 
 export function Toolbar() {
   const selectedElementsIds = useRecoilValue(selectedElementIdsState);
@@ -76,37 +75,38 @@ export function Toolbar() {
     useRecoilState(selectedOpacityAtom);
   const isGroup = useRecoilValue(isGroupAtom);
 
-  const getType = (type: Element["type"]) => activeElement && activeElement === type
+  const getType = (type: Element["type"]) =>
+    activeElement && activeElement === type;
   const handleDeleteClick = useRecoilCallback(
     ({ set }) =>
       () => {
         set(elementsState, (ids) =>
           ids.filter((id) => !selectedElementsIds.includes(id))
         );
+        set(elementGroupsState, (groups) =>
+          groups.filter(
+            (group) => difference(group, selectedElementsIds).length !== 0
+          )
+        );
       },
     [selectedElementsIds]
   );
 
-  const handleUngroup = useRecoilCallback(
-    ({ set }) => () => {
-      set(elementGroupsState, groups => {
-        return difference(groups, [selectedElementsIds])
-      })
-    }
-  )
+  const handleUngroup = useRecoilCallback(({ set }) => () => {
+    set(elementGroupsState, (groups) => {
+      return difference(groups, [selectedElementsIds]);
+    });
+  });
 
-  const handleGroup = useRecoilCallback(
-    ({ set }) => () => {
-      set(elementGroupsState, groups => {
-        let newGroups: number[][] = [];
-        selectedElementsIds.forEach(i => {
-          newGroups = groups.filter(group => group.includes(i))
-        })
-        return newGroups.concat([sortBy(selectedElementsIds)])
-      })
-    }
-  )
-
+  const handleGroup = useRecoilCallback(({ set }) => () => {
+    set(elementGroupsState, (groups) => {
+      let newGroups: number[][] = [];
+      selectedElementsIds.forEach((i) => {
+        newGroups = groups.filter((group) => group.includes(i));
+      });
+      return newGroups.concat([sortBy(selectedElementsIds)]);
+    });
+  });
 
   return (
     <Box
@@ -123,9 +123,13 @@ export function Toolbar() {
       <div style={{ flex: 1 }} />
       <Group spacing="xs">
         {isGroup ? (
-          <Button onClick={handleUngroup} variant="outline">Ungroup</Button>
+          <Button onClick={handleUngroup} variant="outline">
+            Ungroup
+          </Button>
         ) : (
-          <Button onClick={handleGroup} variant="outline">Group</Button>
+          <Button onClick={handleGroup} variant="outline">
+            Group
+          </Button>
         )}
         <Menu width={170} position="bottom-end" closeOnItemClick={false}>
           <Menu.Target>

@@ -8,7 +8,6 @@ type Props = {
   isSelected: boolean;
 };
 export function RenderPath({ element }: Props) {
-  console.log('element: ', element);
   return (
     <div style={{ width: element.width, height: element.height }}>
       <svg {...element.props}>

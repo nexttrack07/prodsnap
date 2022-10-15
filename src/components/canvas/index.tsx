@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Box, DEFAULT_THEME } from "@mantine/core";
+import React from "react";
+import { Box, DEFAULT_THEME, Center } from "@mantine/core";
 import { createElement, ReactNode } from "react";
 import { SVGType } from "./store";
 import { RenderImage } from "./render-image";
@@ -105,7 +105,7 @@ function ElementGroup({ elementGroup }: { elementGroup: number[] }) {
   const isShiftPressed = useKeyPress("Shift");
   const setSelectedElements = useSetRecoilState(selectedElementIdsState);
   const elements = useRecoilValue(elementsFromGroupAtom(elementGroup));
-  const [activeElement,setActiveElement] = useRecoilState(activeElementState);
+  const [activeElement, setActiveElement] = useRecoilState(activeElementState);
 
   const handleSelectGroup = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -132,25 +132,27 @@ function ElementGroup({ elementGroup }: { elementGroup: number[] }) {
       }}
       onClick={handleSelectGroup}
     >
-      {elements.map((el,i) => (
-        <Box
-          key={i}
-          onClick={() => setActiveElement(elementGroup[i])}
-          sx={{
-            left: el.x - x,
-            top: el.y - y,
-            position: "absolute",
-            width: el.width,
-            height: el.height,
-            borderStyle: "solid",
-            borderColor: DEFAULT_THEME.colors.blue[7],
-            borderWidth: activeElement === elementGroup[i] ? 3 : 0,
-            "&:hover": {
-              borderWidth: 3
-            }
-          }}
-        />
-      ))}
+      {elements.map((el, i) =>
+         (
+          <Box
+            key={i}
+            onClick={() => setActiveElement(elementGroup[i])}
+            sx={{
+              left: el.x - x,
+              top: el.y - y,
+              position: "absolute",
+              width: el.width,
+              height: el.height,
+              borderStyle: "solid",
+              borderColor: DEFAULT_THEME.colors.blue[7],
+              borderWidth: activeElement === elementGroup[i] ? 3 : 0,
+              "&:hover": {
+                borderWidth: 3,
+              },
+            }}
+          />
+        )
+      )}
     </div>
   );
 }
@@ -182,8 +184,6 @@ function ElementComponent({ i }: { i: number }) {
         position: "absolute",
         left: element.x,
         top: element.y,
-        width: element.width,
-        height: element.height,
         userSelect: "none",
         cursor: "pointer",
       }}

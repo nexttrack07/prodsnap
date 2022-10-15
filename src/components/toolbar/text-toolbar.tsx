@@ -9,6 +9,7 @@ import {
   Button,
   SegmentedControl,
   Slider,
+  Textarea,
 } from "@mantine/core";
 import {
   elementState,
@@ -25,6 +26,7 @@ import {
   AlignRight,
   Bold,
   Italic,
+  TextPlus,
   TextSize,
   Underline,
 } from "tabler-icons-react";
@@ -60,9 +62,31 @@ const textPropsSelector = selector({
   },
 });
 
+const textContentAtom = selector({
+  key: "text-content",
+  get: ({ get }) => {
+    const element = get(elementState(get(activeElementState)));
+    return (element as TextType).content;
+  },
+  set: ({ set, get }, newVal) => {
+    if (newVal instanceof DefaultValue) return;
+    set(elementState(get(activeElementState)), el => {
+      if (el.type === 'text') {
+        return {
+          ...el,
+          content: newVal
+        }
+      } 
+      return el;
+    })
+  }
+})
+
+
 export function TextToolbar() {
   const [textProps, setTextProps] = useRecoilState(textPropsSelector);
   const handlers = useRef<NumberInputHandlers>();
+  const [textContent, setTextContent] = useRecoilState(textContentAtom);
 
   if (!textProps) return null;
 
@@ -100,6 +124,19 @@ export function TextToolbar() {
           "#fd7e14",
         ]}
       />
+      <Menu closeOnItemClick={false} shadow="md" width={400}>
+        <Menu.Target>
+          <ActionIcon variant="default" size={36}>
+            <TextPlus />
+          </ActionIcon>
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Label>Content</Menu.Label>
+          <Menu.Item>
+            <Textarea value={textContent} onChange={e => setTextContent(e.target.value)} />
+          </Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
       <Menu closeOnItemClick={false} shadow="md" width={250}>
         <Menu.Target>
           <ActionIcon variant="default" size={36}>

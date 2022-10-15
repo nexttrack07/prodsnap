@@ -67,7 +67,7 @@ export const selectedBoxDimensions = selector<{ width: number; height: number }>
       set(elementState(id), (el) => {
         return {
           ...el,
-          height: (el.height ?? 0) + (newVal.width * el.height / el.width),
+          height: (el.height ?? 0) + newVal.height,
           width: (el.width ?? 0) + newVal.width,
         }
       });

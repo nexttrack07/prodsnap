@@ -32,10 +32,10 @@ const data: Element[] = [
     y: 200,
     type: "text",
     content: "Heading",
-    width: 100,
-    height: 100,
+    width: 200,
+    height: 50,
     props: {
-      fontSize: 50,
+      fontSize: 40,
     },
   },
   {
@@ -43,8 +43,8 @@ const data: Element[] = [
     y: 200,
     type: "text",
     content: "Sub heading",
-    width: 75,
-    height: 100,
+    width: 230,
+    height: 30,
     props: {
       fontSize: 30,
     },
@@ -54,10 +54,10 @@ const data: Element[] = [
     y: 200,
     type: "text",
     content: "Paragraph",
-    width: 50,
-    height: 100,
+    width: 220,
+    height: 30,
     props: {
-      fontSize: 10,
+      fontSize: 20,
     },
   },
 ];
@@ -66,11 +66,11 @@ const templateData: Element[][] = [
   [
     {
       x: 100,
-      y: 300,
+      y: 150,
       type: "text",
       content: "Add another heading",
-      width: 100,
-      height: 100,
+      width: 250,
+      height: 50,
       props: {
         fontSize: 30,
       },
@@ -80,10 +80,10 @@ const templateData: Element[][] = [
       y: 200,
       type: "text",
       content: "Add a heading here",
-      width: 100,
-      height: 100,
+      width: 250,
+      height: 55,
       props: {
-        fontSize: 30,
+        fontSize: 20,
       },
     },
   ],
