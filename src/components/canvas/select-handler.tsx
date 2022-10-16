@@ -1,23 +1,39 @@
 import { Box, DEFAULT_THEME } from "@mantine/core";
-import { atom, useAtomValue } from "jotai";
-import { elementByIdAtom, selectedElementListAtom } from "./store";
+import { Moveable, MoveableItem } from "../moveable";
+import { atom, useAtom, useAtomValue } from "jotai";
+import {
+  elementByIdAtom,
+  selectedElementListAtom,
+  selectedItemsAtom,
+} from "./store";
+import { useCallback } from "react";
 
-const positionAtom = atom((get) => {
-  const selectedElementsAtoms = get(selectedElementListAtom).map(
-    (id) => get(elementByIdAtom)[id]
-  );
-  const selectedElements = selectedElementsAtoms.map((a) => get(a));
-  const x = selectedElements.reduce(
-    (prev, el) => Math.min(prev, el.x),
-    Infinity
-  );
-  const y = selectedElements.reduce(
-    (prev, el) => Math.min(prev, el.y),
-    Infinity
-  );
+const positionAtom = atom(
+  (get) => {
+    const selected = get(selectedItemsAtom);
+    const selectedElements = selected.elements;
+    const x = selectedElements.reduce(
+      (prev, el) => Math.min(prev, el.x),
+      Infinity
+    );
+    const y = selectedElements.reduce(
+      (prev, el) => Math.min(prev, el.y),
+      Infinity
+    );
 
-  return { x, y };
-});
+    return { x, y };
+  },
+  (get, set, update: { x: number; y: number }) => {
+    const selected = get(selectedItemsAtom);
+    selected.atoms.forEach((elementAtom) => {
+      set(elementAtom, (el) => ({
+        ...el,
+        x: update.x + el.x,
+        y: update.y + el.y,
+      }));
+    });
+  }
+);
 
 const dimensionAtom = atom((get) => {
   const selectedElementsAtoms = get(selectedElementListAtom).map(
@@ -38,23 +54,32 @@ const dimensionAtom = atom((get) => {
 });
 
 export function SelectHandler() {
-  const { x, y } = useAtomValue(positionAtom);
+  const [position, setPosition] = useAtom(positionAtom);
   const { width, height } = useAtomValue(dimensionAtom);
+  const { x, y } = position;
+
+  const handleElementsMove = useCallback((d: { x: number; y: number }) => {
+    setPosition(d);
+  }, []);
 
   if (width === 0) return null;
 
   return (
-    <Box
-      sx={{
-        position: "absolute",
-        left: x,
-        top: y,
-        width,
-        height,
-        borderWidth: 2,
-        borderColor: DEFAULT_THEME.colors.blue[6],
-        borderStyle: "solid",
-      }}
-    />
+    <Moveable>
+      <MoveableItem onMove={handleElementsMove}>
+        <Box
+          sx={{
+            position: "absolute",
+            left: x,
+            top: y,
+            width,
+            height,
+            borderWidth: 2,
+            borderColor: DEFAULT_THEME.colors.blue[6],
+            borderStyle: "solid",
+          }}
+        />
+      </MoveableItem>
+    </Moveable>
   );
 }
