@@ -1,5 +1,24 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
+
+// call `f` no more frequently than once a frame
+export const throttle = (f: (...x: any[]) => void) => {
+  let token: number | null = null,
+    lastArgs: any[] = [];
+  const invoke = () => {
+    f(...lastArgs);
+    token = null;
+  };
+  const result = (...args: any[]) => {
+    lastArgs = args;
+    if (!token) {
+      token = requestAnimationFrame(invoke);
+    }
+  };
+  result.cancel = () => token && cancelAnimationFrame(token);
+  return result;
+};
+
 type MoveContextType = {
   moving: boolean;
   delta: { x: number; y: number };
@@ -24,21 +43,24 @@ export function Moveable({ children }: MoveableProps) {
   const [delta, setDelta] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
+    const handleMouseMove = throttle((e: MouseEvent) => {
+      e.stopPropagation();
+      setMoving(true);
+      setDelta({ x: e.movementX, y: e.movementY });
+    })
+
     const handleMouseUp = (e: MouseEvent) => {
+      handleMouseMove(e);
       e.stopPropagation();
       setMoving(false);
     }
 
-    const handleMouseMove = (e: MouseEvent) => {
-      e.stopPropagation();
-      setMoving(true);
-      setDelta({ x: e.movementX, y: e.movementY });
-    }
 
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
+      handleMouseMove.cancel();
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
@@ -78,7 +100,7 @@ export function MoveableItem({ children, onMove, onMouseDown }: MoveableItemProp
   }
 
   return (
-    <span onMouseDown={handleMouseDown}>
+    <span onClick={e => e.stopPropagation()} onMouseDown={handleMouseDown}>
       {children}
     </span>
   )

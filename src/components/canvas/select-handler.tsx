@@ -1,11 +1,7 @@
 import { Box, DEFAULT_THEME } from "@mantine/core";
 import { Moveable, MoveableItem } from "../moveable";
-import { atom, useAtom, useAtomValue } from "jotai";
-import {
-  elementByIdAtom,
-  selectedElementListAtom,
-  selectedItemsAtom,
-} from "./store";
+import { atom, useAtom } from "jotai";
+import { selectedItemsAtom } from "./store";
 import { useCallback } from "react";
 
 const positionAtom = atom(
@@ -75,7 +71,54 @@ export function SelectHandler() {
     setDimension({ width: d.x, height: d.y });
   }, []);
 
+  const handleNWResize = useCallback((d: { x: number; y: number }) => {
+    setDimension({ width: -d.x, height: -d.y });
+    setPosition(d);
+  }, []);
+
+  const handleNEResize = useCallback((d: { x: number; y: number }) => {
+    setDimension({ width: d.x, height: -d.y });
+    setPosition({ x: 0, y: d.y })
+  }, []);
+
+  const handleSWResize = useCallback((d: { x: number; y: number }) => {
+    setDimension({ width: -d.x, height: d.y });
+    setPosition({ x: d.x, y: 0 })
+  }, []);
+
   if (width === 0) return null;
+
+  const RESIZE_HANDLES: {
+    left: number;
+    top: number;
+    cursor: string;
+    handleResize: (x: any) => void;
+  }[] = [
+    {
+      left: x,
+      top: y,
+      cursor: "nw-resize",
+      handleResize: handleNWResize,
+    },
+    {
+      left: x + width,
+      top: y,
+      cursor: "ne-resize",
+      handleResize: handleNEResize,
+    },
+    {
+      left: x,
+      top: y + height,
+      cursor: "sw-resize",
+      handleResize: handleSWResize,
+    },
+    {
+      left: x + width,
+      top: y + height,
+      cursor: "se-resize",
+      handleResize: handleSEResize,
+    },
+  ];
 
   return (
     <Moveable>
@@ -94,24 +137,28 @@ export function SelectHandler() {
           }}
         />
       </MoveableItem>
-      <MoveableItem onMove={handleSEResize}>
-        <Box
-          sx={{
-            position: "absolute",
-            left: x + width,
-            top: y + height,
-            width: 15,
-            height: 15,
-            borderRadius: "100%",
-            backgroundColor: DEFAULT_THEME.colors.gray[1],
-            borderWidth: 1,
-            borderColor: DEFAULT_THEME.colors.gray[5],
-            borderStyle: "solid",
-            transform: "translate(-50%, -50%)",
-            cursor: "se-resize",
-          }}
-        />
-      </MoveableItem>
+      <>
+      {RESIZE_HANDLES.map((handle) => (
+        <MoveableItem key={handle.cursor} onMove={handle.handleResize}>
+          <Box
+            sx={{
+              position: "absolute",
+              left: handle.left,
+              top: handle.top,
+              width: 15,
+              height: 15,
+              borderRadius: "100%",
+              backgroundColor: DEFAULT_THEME.colors.gray[1],
+              borderWidth: 1,
+              borderColor: DEFAULT_THEME.colors.gray[5],
+              borderStyle: "solid",
+              transform: "translate(-50%,-50%)",
+              cursor: handle.cursor
+            }}
+          />
+        </MoveableItem>
+      ))}
+      </>
     </Moveable>
   );
 }
