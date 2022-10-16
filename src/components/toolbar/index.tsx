@@ -14,6 +14,7 @@ import {
   elementByIdAtom,
   elementListAtom,
   selectedElementListAtom,
+  selectedItemsAtom,
 } from "../canvas/store";
 import { ImageToolbar } from "./image-toolbar";
 import { Eye, Trash } from "tabler-icons-react";
@@ -21,13 +22,13 @@ import { TextToolbar } from "./text-toolbar";
 import { SvgPathToolbar } from "./svg-path-toolbar";
 
 const getTypeAtom = atom((get) => {
-  const selectedElementIds = get(selectedElementListAtom);
-  if (selectedElementIds.length === 0)
-    return (_: CanvasElement["type"]) => false;
-  const selectedElements = selectedElementIds.map((i) => get(elementByIdAtom)[i]);
+  const selected = get(selectedItemsAtom);
 
-  return (type: CanvasElement["type"]) =>
-    selectedElements.every((el) => get(el).type === type);
+  if (selected.elements.length === 1) {
+    return selected.elements[0].type;
+  }
+
+  return null;
 });
 
 const deleteSelectedAtom = atom(null, (get, set) => {
@@ -64,7 +65,7 @@ const selectedElementOpacityAtom = atom(
 );
 
 export function Toolbar() {
-  const getType = useAtomValue(getTypeAtom);
+  const type = useAtomValue(getTypeAtom);
   const deletedSelectedElements = useSetAtom(deleteSelectedAtom);
   const selectedElementsIds = useAtomValue(selectedElementListAtom);
   const [selectedElementOpacity, setSelectedElementOpacity] = useAtom(
@@ -78,6 +79,8 @@ export function Toolbar() {
   const handleDeletePress = (e: KeyboardEvent) => {
     if (e.key === "Backspace") deletedSelectedElements();
   };
+
+  const getType = (t: string) => type && type === t;
 
   useEffect(() => {
     window.addEventListener("keydown", handleDeletePress);

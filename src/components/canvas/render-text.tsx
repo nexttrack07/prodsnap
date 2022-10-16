@@ -44,7 +44,7 @@ export function RenderText({
       <Center
         onDoubleClick={handleTextClick}
         ref={ref}
-        style={{ ...element.props }}
+        style={{ ...element.props, userSelect: "none" }}
       >
         {element.content}
       </Center>

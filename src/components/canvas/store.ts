@@ -1,5 +1,4 @@
 import { atom, WritableAtom } from "jotai";
-import { atomFamily } from "jotai/utils";
 import React, { SetStateAction, SVGAttributes } from "react";
 
 export type Action<T> = SetStateAction<T>;

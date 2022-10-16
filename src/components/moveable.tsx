@@ -1,107 +1,214 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import useEventListener from "../utils/use-event";
+import {
+  useRef,
+  useState,
+  MouseEvent as ReactMouseEvent,
+  useCallback,
+  RefObject,
+} from "react";
+import { Rotate } from "tabler-icons-react";
 
-
-// call `f` no more frequently than once a frame
-export const throttle = (f: (...x: any[]) => void) => {
-  let token: number | null = null,
-    lastArgs: any[] = [];
-  const invoke = () => {
-    f(...lastArgs);
-    token = null;
+type Status =
+  | "idle"
+  | "rotating"
+  | "moving"
+  | "resizing-br"
+  | "resizing-tl"
+  | "resizing-bl"
+  | "resizing-tr";
+export type Position = { x: number; y: number };
+export type Dimension = { width: number; height: number };
+type MoveableProps = {
+  onDrag: (p: Position) => void;
+  onRotate: (r: number) => void;
+  onResize: (d: Dimension) => void;
+  styleProps: {
+    height: number;
+    width: number;
+    top: number;
+    left: number;
+    rotation: number;
   };
-  const result = (...args: any[]) => {
-    lastArgs = args;
-    if (!token) {
-      token = requestAnimationFrame(invoke);
-    }
-  };
-  result.cancel = () => token && cancelAnimationFrame(token);
-  return result;
 };
 
-type MoveContextType = {
-  moving: boolean;
-  delta: { x: number; y: number };
-}
+export function Moveable({
+  onDrag,
+  onResize,
+  onRotate,
+  styleProps: { rotation, ...styles },
+}: MoveableProps) {
+  const documentRef = useRef<Document>(document);
+  const ref = useRef<HTMLDivElement>(null);
+  const [status, setStatus] = useState<Status>("idle");
 
-const MoveContext = createContext<MoveContextType | null>(null);
-
-const useMoveContext = () => {
-  const context = useContext(MoveContext);
-
-  if (!context) throw new Error('MoveableItem should be used within Moveable!');
-
-  return context;
-}
-
-type MoveableProps = {
-  children: JSX.Element | JSX.Element[];
-}
-
-export function Moveable({ children }: MoveableProps) {
-  const [moving, setMoving] = useState(false);
-  const [delta, setDelta] = useState({ x: 0, y: 0 })
-
-  useEffect(() => {
-    const handleMouseMove = throttle((e: MouseEvent) => {
-      e.stopPropagation();
-      setMoving(true);
-      setDelta({ x: e.movementX, y: e.movementY });
-    })
-
-    const handleMouseUp = (e: MouseEvent) => {
-      handleMouseMove(e);
-      e.stopPropagation();
-      setMoving(false);
-    }
-
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-
-    return () => {
-      handleMouseMove.cancel();
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [])
-
-  return (
-    <MoveContext.Provider value={{ moving, delta }}>
-      {children}
-    </MoveContext.Provider>
-  )
-}
-
-type MoveableItemProps = {
-  children: JSX.Element;
-  onMove: (d: { x: number; y: number }) => void;
-  onMouseDown?: VoidFunction;
-}
-
-export function MoveableItem({ children, onMove, onMouseDown }: MoveableItemProps) {
-  const [pressed, setPressed] = useState(false);
-  const { moving, delta } = useMoveContext();
-
-  useEffect(() => {
-    if (!moving) setPressed(false);
-  }, [moving])
-
-  useEffect(() => {
-    if (moving && pressed) {
-      onMove(delta);
-    }
-  }, [moving, pressed, delta, onMove])
-
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseUp = useCallback((e: MouseEvent) => {
     e.stopPropagation();
-    setPressed(true);
-    onMouseDown && onMouseDown();
+    setStatus("idle");
+  }, []);
+
+  const handleDragMouseDown = useCallback((e: ReactMouseEvent) => {
+    e.stopPropagation();
+    setStatus("moving");
+  }, []);
+
+  const handleRotateMouseDown = useCallback((e: ReactMouseEvent) => {
+    e.stopPropagation();
+    setStatus("rotating");
+  }, []);
+
+  const handleResizeMouseDown = (e: ReactMouseEvent, stat: Status) => {
+    e.stopPropagation();
+    setStatus(stat);
+  };
+
+  function getDegrees(mouseX: number, mouseY: number, ref: RefObject<HTMLDivElement>) {
+    if (!ref.current) return 0;
+
+    const rect = ref.current.getBoundingClientRect();
+    const rectX = rect.left + rect.width / 2;
+    const rectY = rect.top + rect.height / 2;
+    const angle = Math.atan2(mouseY - rectY, mouseX - rectX) + Math.PI / 2;
+    return Math.round((angle * 180) / Math.PI);
   }
+  const handleMouseMove = (e: MouseEvent) => {
+    e.stopPropagation();
+    if (status === "moving") {
+      onDrag({ x: e.movementX, y: e.movementY });
+    } else if (status === "rotating") {
+      const r = getDegrees(e.clientX, e.clientY, ref);
+      onRotate(r);
+    } else if (status === "resizing-br") {
+      const width = e.movementX
+      const height = e.movementY
+
+      onResize({ width, height });
+    } else if (status === "resizing-tl") {
+      const width = -e.movementX
+      const height = -e.movementY
+      const x = e.movementX
+      const y = e.movementY
+
+      onDrag({ x, y });
+      onResize({ width, height });
+    } else if (status === "resizing-bl") {
+      const width = -e.movementX
+      const height = e.movementY
+      const y = 0
+      const x = e.movementX
+
+      onDrag({ x, y });
+      onResize({ width, height });
+    } else if (status === "resizing-tr") {
+      const width = e.movementX
+      const height = -e.movementY
+      const x = 0
+      const y = e.movementY
+
+      onDrag({ x, y });
+      onResize({ width, height });
+    }
+  };
+
+
+  useEventListener("pointerup", handleMouseUp, documentRef);
+  useEventListener("pointermove", handleMouseMove, documentRef, [status]);
 
   return (
-    <span onClick={e => e.stopPropagation()} onMouseDown={handleMouseDown}>
-      {children}
-    </span>
-  )
+    <div
+      style={{
+        position: "absolute",
+        left: styles.left,
+        top: styles.top,
+        height: styles.height,
+        width: styles.width,
+        userSelect: "none",
+      }}
+      id="moveable"
+      onMouseDown={handleDragMouseDown}
+      onClick={e => e.stopPropagation()}
+    >
+      <div
+        style={{
+          position: "absolute",
+          border: "2px dashed #0f65d6",
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 0,
+          transform: "scale(1.05)",
+        }}
+      >
+        <div
+          onMouseDown={handleRotateMouseDown}
+          style={{
+            left: "50%",
+            transform: "translateX(-50%)",
+            top: "-40px",
+            position: "absolute",
+            backgroundColor: "#f7f3f2",
+            color: "#000",
+            borderRadius: "100%",
+            boxShadow: "1px 1px 2px rgba(0,0,0,0.4)",
+            padding: 1,
+          }}
+        >
+          <Rotate size={14} />
+        </div>
+        <span
+          onMouseDown={(e) => handleResizeMouseDown(e, "resizing-tr")}
+          style={{
+            top: 0,
+            position: "absolute",
+            right: 0,
+            cursor: "ne-resize",
+            transform: "translate(50%,-50%)",
+            ...resizeHandleStyles,
+          }}
+        />
+        <span
+          onMouseDown={(e) => handleResizeMouseDown(e, "resizing-bl")}
+          style={{
+            bottom: 0,
+            position: "absolute",
+            cursor: "sw-resize",
+            left: 0,
+            transform: "translate(-50%,50%)",
+            ...resizeHandleStyles,
+          }}
+        />
+        <span
+          onMouseDown={(e) => handleResizeMouseDown(e, "resizing-br")}
+          style={{
+            bottom: 0,
+            position: "absolute",
+            cursor: "se-resize",
+            right: 0,
+            transform: "translate(50%,50%)",
+            ...resizeHandleStyles,
+          }}
+        />
+        <div
+          onMouseDown={(e) => handleResizeMouseDown(e, "resizing-tl")}
+          style={{
+            position: "absolute",
+            cursor: "nw-resize",
+            top: 0,
+            left: 0,
+            transform: "translate(-50%,-50%)",
+            ...resizeHandleStyles,
+          }}
+        />
+      </div>
+    </div>
+  );
 }
+
+const resizeHandleStyles = {
+  backgroundColor: "#f7f3f2",
+  borderRadius: "100%",
+  border: "1px solid gray",
+  boxShadow: "1px 1px 2px rgba(0,0,0,0.4)",
+  width: 15,
+  height: 15,
+};
+
