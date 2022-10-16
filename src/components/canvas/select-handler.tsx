@@ -11,12 +11,11 @@ import { useCallback } from "react";
 const positionAtom = atom(
   (get) => {
     const selected = get(selectedItemsAtom);
-    const selectedElements = selected.elements;
-    const x = selectedElements.reduce(
+    const x = selected.elements.reduce(
       (prev, el) => Math.min(prev, el.x),
       Infinity
     );
-    const y = selectedElements.reduce(
+    const y = selected.elements.reduce(
       (prev, el) => Math.min(prev, el.y),
       Infinity
     );
@@ -35,31 +34,45 @@ const positionAtom = atom(
   }
 );
 
-const dimensionAtom = atom((get) => {
-  const selectedElementsAtoms = get(selectedElementListAtom).map(
-    (id) => get(elementByIdAtom)[id]
-  );
-  const selectedElements = selectedElementsAtoms.map((a) => get(a));
-  const { x, y } = get(positionAtom);
-  const width = selectedElements.reduce(
-    (prev, el) => Math.max(prev, el.x + (el.width ?? 0) - x),
-    0
-  );
-  const height = selectedElements.reduce(
-    (prev, el) => Math.max(prev, el.y + (el.height ?? 0) - y),
-    0
-  );
+const dimensionAtom = atom(
+  (get) => {
+    const selected = get(selectedItemsAtom);
+    const { x, y } = get(positionAtom);
+    const width = selected.elements.reduce(
+      (prev, el) => Math.max(prev, el.x + el.width - x),
+      0
+    );
+    const height = selected.elements.reduce(
+      (prev, el) => Math.max(prev, el.y + el.height - y),
+      0
+    );
 
-  return { width, height };
-});
+    return { width, height };
+  },
+  (get, set, { width, height }: { width: number; height: number }) => {
+    const selected = get(selectedItemsAtom);
+    selected.atoms.forEach((elementAtom) => {
+      set(elementAtom, (el) => {
+        return {
+          ...el,
+          height: el.height + height,
+          width: el.width + width,
+        };
+      });
+    });
+  }
+);
 
 export function SelectHandler() {
-  const [position, setPosition] = useAtom(positionAtom);
-  const { width, height } = useAtomValue(dimensionAtom);
-  const { x, y } = position;
+  const [{ x, y }, setPosition] = useAtom(positionAtom);
+  const [{ width, height }, setDimension] = useAtom(dimensionAtom);
 
   const handleElementsMove = useCallback((d: { x: number; y: number }) => {
     setPosition(d);
+  }, []);
+
+  const handleSEResize = useCallback((d: { x: number; y: number }) => {
+    setDimension({ width: d.x, height: d.y });
   }, []);
 
   if (width === 0) return null;
@@ -77,6 +90,25 @@ export function SelectHandler() {
             borderWidth: 2,
             borderColor: DEFAULT_THEME.colors.blue[6],
             borderStyle: "solid",
+            cursor: "move",
+          }}
+        />
+      </MoveableItem>
+      <MoveableItem onMove={handleSEResize}>
+        <Box
+          sx={{
+            position: "absolute",
+            left: x + width,
+            top: y + height,
+            width: 15,
+            height: 15,
+            borderRadius: "100%",
+            backgroundColor: DEFAULT_THEME.colors.gray[1],
+            borderWidth: 1,
+            borderColor: DEFAULT_THEME.colors.gray[5],
+            borderStyle: "solid",
+            transform: "translate(-50%, -50%)",
+            cursor: "se-resize",
           }}
         />
       </MoveableItem>
