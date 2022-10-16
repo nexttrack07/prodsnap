@@ -1,12 +1,6 @@
-import React from "react";
 import { Text, Space, createStyles, SimpleGrid, Center } from "@mantine/core";
 import { atom, useSetAtom } from "jotai";
-import {
-  elementsAtom,
-  MoveableElement,
-  TextType,
-  ElementType,
-} from "../../components/canvas/store";
+import { addElementAtom, CanvasElement } from "../../components/canvas/store";
 
 const useStyles = createStyles((theme) => ({
   shape: {
@@ -23,49 +17,32 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-type ElementGroupType = {
-  x: number;
-  y: number;
-  elements: (TextType & MoveableElement)[];
-};
-
 const data: {
   id: number;
-  data: ElementGroupType;
+  data: CanvasElement;
 }[] = [
   {
     id: 0,
     data: {
       x: 200,
       y: 100,
-      elements: [
-        {
-          type: "text" as const,
-          width: 300,
-          height: 50,
-          content: "heading",
-          props: {
-            textTransform: "uppercase",
-            fontSize: 50
-          },
-        },
-      ],
+      type: "text" as const,
+      width: 300,
+      height: 50,
+      content: "heading",
+      props: {
+        fontSize: 50,
+      },
     },
   },
 ];
 
 export function TextPanel() {
-  const setElements = useSetAtom(elementsAtom);
+  const addElement = useSetAtom(addElementAtom);
   const { classes } = useStyles();
 
-  const handleAddElement = (newEl: ElementGroupType) => {
-    setElements((items) => [
-      ...items,
-      atom({
-        ...newEl,
-        elements: newEl.elements.map((el) => atom(el)) as ElementType[],
-      }),
-    ]);
+  const handleAddElement = (newEl: CanvasElement) => {
+    addElement(newEl);
   };
 
   return (
@@ -75,23 +52,21 @@ export function TextPanel() {
       </Text>
       <Space h="xl" />
       <SimpleGrid cols={1}>
-        {data.map((el) =>
-          el.data.elements.map((item) => {
-            if (item.type === "text") {
-              return (
-                <Center key={el.id} className={classes.shape}>
-                  <Text
-                    onClick={() => handleAddElement(el.data)}
-                    style={{ ...item.props }}
-                  >
-                    {item.content}
-                  </Text>
-                </Center>
-              );
-            }
-            return null;
-          })
-        )}
+        {data.map((item) => {
+          if (item.data.type === "text") {
+            return (
+              <Center key={item.id} className={classes.shape}>
+                <Text
+                  onClick={() => handleAddElement(item.data)}
+                  style={{ ...item.data.props }}
+                >
+                  {item.data.content}
+                </Text>
+              </Center>
+            );
+          }
+          return null;
+        })}
       </SimpleGrid>
     </>
   );

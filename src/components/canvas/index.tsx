@@ -1,14 +1,14 @@
 import React from "react";
-import { Box, useMantineTheme } from "@mantine/core";
+import { Box } from "@mantine/core";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { atomFamily, useAtomCallback } from "jotai/utils";
+import { atomFamily } from "jotai/utils";
 import { createElement, ReactNode } from "react";
 import {
   CanvasElement,
-  ElementGroupType,
-  elementsAtom,
+  elementByIdAtom,
+  elementListAtom,
   ElementType,
-  selectedElementsAtom,
+  selectedElementListAtom,
   SVGType,
 } from "./store";
 import { RenderImage } from "./render-image";
@@ -17,14 +17,15 @@ import { RenderText } from "./render-text";
 import { useKeyPress } from "../../utils/use-key-press";
 import { RenderPath } from "./render-path";
 import { RenderLine } from "./render-line";
-import { Moveable, MoveableItem } from "../moveable";
+import { SelectHandler } from "./select-handler";
 
 const unSelectAllAtom = atom(null, (_get, set) => {
-  set(selectedElementsAtom, []);
+  set(selectedElementListAtom, []);
 });
 
 export function Canvas() {
-  const elementGroups = useAtomValue(elementsAtom);
+  const elements = useAtomValue(elementListAtom);
+  const elementById = useAtomValue(elementByIdAtom);
   const unSelectAllElements = useSetAtom(unSelectAllAtom);
   return (
     <Box
@@ -39,9 +40,10 @@ export function Canvas() {
       })}
       onClick={unSelectAllElements}
     >
-      {elementGroups.map((elementGroupAtom, i) => (
-        <ElementGroup i={i} key={i} elementGroupAtom={elementGroupAtom} />
+      {elements.map(id => (
+        <Element i={id} key={id} elementAtom={elementById[id]} />
       ))}
+      <SelectHandler />
     </Box>
   );
 }
@@ -57,7 +59,7 @@ export function renderElement(
 
 const isSelectedAtom = atomFamily((id: number) =>
   atom((get) => {
-    const selectedElements = get(selectedElementsAtom);
+    const selectedElements = get(selectedElementListAtom);
     return selectedElements.includes(id);
   })
 );
@@ -70,70 +72,9 @@ const elementCompMap: Record<CanvasElement["type"], React.FC<any>> = {
   "svg-line": RenderLine,
 };
 
-
-const groupedAtom = atomFamily((i: number) => atom(
-  null,
-  (get, set, update: { x: number; y: number }) => {
-    const elementGroups = get(elementsAtom);
-    const elementGroup = elementGroups[i];
-    set(elementGroup, items => items.map(item => {
-      set(item, item => ({
-        ...item,
-        x: item.x + update.x,
-        y: item.y + update.y
-      }))
-      return item;
-    }))
-  }
-))
-
-function ElementGroup({
-  elementGroupAtom,
-  i,
-}: {
-  elementGroupAtom: ElementGroupType;
-  i: number;
-}) {
-  const theme = useMantineTheme();
-
-  const handleMoveElement = useAtomCallback(
-    React.useCallback(
-    (get, set, d: { x: number; y: number }) => {
-      set(groupedAtom(i), (els) => els.map(el => ({
-        ...el,
-        x: d.x + el.x,
-        y: d.y + el.y,
-      })));
-    },
-    [setElementGroup]
-  ))
-
-  return (
-    <div>
-      <Moveable>
-        {elementGroup.map((elementAtom, i) => (
-          <MoveableItem onMove={handleMoveElement}>
-            <div
-              style={{
-                borderWidth: 3,
-                borderStyle: "solid",
-                borderColor: theme.colors.blue[6],
-                userSelect: "none",
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Element elementAtom={elementAtom} i={i} />
-            </div>
-          </MoveableItem>
-        ))}
-      </Moveable>
-    </div>
-  );
-}
-
 function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
   const [element, setElement] = useAtom(elementAtom);
-  const setSelectedElements = useSetAtom(selectedElementsAtom);
+  const setSelectedElements = useSetAtom(selectedElementListAtom);
   const isSelected = useAtomValue(isSelectedAtom(i));
   const isShiftPressed = useKeyPress("Shift");
 
@@ -153,9 +94,11 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
   return (
     <span
       style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        left: element.x,
+        top: element.y,
+        position: "absolute",
+        width: element.width,
+        height: element.height
       }}
       onClick={handleElementSelect}
     >

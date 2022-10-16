@@ -10,12 +10,7 @@ import {
   SegmentedControl,
   Slider,
 } from "@mantine/core";
-import {
-  elementsAtom,
-  MoveableElement,
-  selectedElementsAtom,
-  TextType,
-} from "../canvas/store";
+import { MoveableElement, selectedItemsAtom, TextType } from "../canvas/store";
 import { atom, useAtom } from "jotai";
 import React, { useRef } from "react";
 import {
@@ -41,16 +36,12 @@ const fonts = [
 
 const textPropsAtom = atom(
   (get) => {
-    const selectedElementId = get(selectedElementsAtom);
-    const selectedElementAtom = get(elementsAtom)[selectedElementId[0]];
-    const selectedElement = get(selectedElementAtom);
-
-    return (selectedElement as MoveableElement & TextType).props;
+    const selected = get(selectedItemsAtom);
+    return (selected.elements[0] as MoveableElement & TextType).props;
   },
   (get, set, update: React.CSSProperties) => {
-    const selectedElementId = get(selectedElementsAtom);
-    const selectedElementAtom = get(elementsAtom)[selectedElementId[0]];
-    set(selectedElementAtom, (el) => {
+    const selected = get(selectedItemsAtom);
+    set(selected.atoms[0], (el) => {
       if (el.type === "text") {
         return { ...el, props: { ...el.props, ...update } };
       }

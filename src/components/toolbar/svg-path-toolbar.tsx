@@ -11,9 +11,9 @@ import {
   Box,
 } from "@mantine/core";
 import {
-  elementsAtom,
   MoveableElement,
-  selectedElementsAtom,
+  elementByIdAtom,
+  selectedElementListAtom,
   SVGPathType,
   SVGStrokeProps,
 } from "../canvas/store";
@@ -27,15 +27,15 @@ import {
 
 const svgPropsAtom = atom(
   (get) => {
-    const selectedElementId = get(selectedElementsAtom);
-    const selectedElementAtom = get(elementsAtom)[selectedElementId[0]];
+    const selectedElementId = get(selectedElementListAtom);
+    const selectedElementAtom = get(elementByIdAtom)[selectedElementId[0]];
     const selectedElement = get(selectedElementAtom);
 
     return (selectedElement as MoveableElement & SVGPathType).props;
   },
   (get, set, update: SVGAttributes<SVGSVGElement>) => {
-    const selectedElementId = get(selectedElementsAtom);
-    const selectedElementAtom = get(elementsAtom)[selectedElementId[0]];
+    const selectedElementId = get(selectedElementListAtom);
+    const selectedElementAtom = get(elementByIdAtom)[selectedElementId[0]];
     set(selectedElementAtom, (el) => {
       if (el.type === "svg-path") {
         return { ...el, props: { ...el.props, ...update } };
@@ -47,15 +47,15 @@ const svgPropsAtom = atom(
 
 const svgStrokePropsAtom = atom(
   (get) => {
-    const selectedElementId = get(selectedElementsAtom);
-    const selectedElementAtom = get(elementsAtom)[selectedElementId[0]];
+    const selectedElementId = get(selectedElementListAtom);
+    const selectedElementAtom = get(elementByIdAtom)[selectedElementId[0]];
     const selectedElement = get(selectedElementAtom);
 
     return (selectedElement as MoveableElement & SVGPathType).strokeProps;
   },
   (get, set, update: Partial<SVGStrokeProps>) => {
-    const selectedElementId = get(selectedElementsAtom);
-    const selectedElementAtom = get(elementsAtom)[selectedElementId[0]];
+    const selectedElementId = get(selectedElementListAtom);
+    const selectedElementAtom = get(elementByIdAtom)[selectedElementId[0]];
     set(selectedElementAtom, (el) => {
       if (el.type === "svg-path") {
         return { ...el, strokeProps: { ...el.strokeProps, ...update } };

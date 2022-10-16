@@ -11,46 +11,53 @@ import {
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   CanvasElement,
-  elementsAtom,
-  selectedElementsAtom,
+  elementByIdAtom,
+  elementListAtom,
+  selectedElementListAtom,
 } from "../canvas/store";
 import { ImageToolbar } from "./image-toolbar";
-import { Copy, Eye, Trash } from "tabler-icons-react";
+import { Eye, Trash } from "tabler-icons-react";
 import { TextToolbar } from "./text-toolbar";
-import { SvgToolbar } from "./svg-toolbar";
 import { SvgPathToolbar } from "./svg-path-toolbar";
 
 const getTypeAtom = atom((get) => {
-  const selectedElementIds = get(selectedElementsAtom);
+  const selectedElementIds = get(selectedElementListAtom);
   if (selectedElementIds.length === 0)
     return (_: CanvasElement["type"]) => false;
-  const selectedElements = selectedElementIds.map((i) => get(elementsAtom)[i]);
+  const selectedElements = selectedElementIds.map((i) => get(elementByIdAtom)[i]);
 
   return (type: CanvasElement["type"]) =>
     selectedElements.every((el) => get(el).type === type);
 });
 
 const deleteSelectedAtom = atom(null, (get, set) => {
-  const selectedElementsIds = get(selectedElementsAtom);
-  set(elementsAtom, (items) =>
+  const selectedElementsIds = get(selectedElementListAtom);
+  set(elementListAtom, (items) =>
     items.filter((_, i) => !selectedElementsIds.includes(i))
   );
-  set(selectedElementsAtom, []);
+  set(elementByIdAtom, obj => {
+    selectedElementsIds.forEach(id => {
+      delete obj[id];
+    })
+
+    return obj;
+  })
+  set(selectedElementListAtom, []);
 });
 
 const selectedElementOpacityAtom = atom(
   (get) => {
-    const selectedElementsIds = get(selectedElementsAtom);
+    const selectedElementsIds = get(selectedElementListAtom);
     if (selectedElementsIds.length === 1) {
-      const element = get(get(elementsAtom)[selectedElementsIds[0]]);
+      const element = get(get(elementByIdAtom)[selectedElementsIds[0]]);
       return element.opacity;
     }
     return 0;
   },
   (get, set, update: number) => {
-    const selectedElementsIds = get(selectedElementsAtom);
+    const selectedElementsIds = get(selectedElementListAtom);
     if (selectedElementsIds.length === 1) {
-      const elementAtom = get(elementsAtom)[selectedElementsIds[0]];
+      const elementAtom = get(elementByIdAtom)[selectedElementsIds[0]];
       set(elementAtom, (el) => ({ ...el, opacity: update }));
     }
   }
@@ -59,7 +66,7 @@ const selectedElementOpacityAtom = atom(
 export function Toolbar() {
   const getType = useAtomValue(getTypeAtom);
   const deletedSelectedElements = useSetAtom(deleteSelectedAtom);
-  const selectedElementsIds = useAtomValue(selectedElementsAtom);
+  const selectedElementsIds = useAtomValue(selectedElementListAtom);
   const [selectedElementOpacity, setSelectedElementOpacity] = useAtom(
     selectedElementOpacityAtom
   );
@@ -92,7 +99,6 @@ export function Toolbar() {
     >
       {getType("text") && <TextToolbar />}
       {getType("image") && <ImageToolbar />}
-      {getType("svg") && <SvgToolbar />}
       {getType("svg-path") && <SvgPathToolbar />}
       <div style={{ flex: 1 }} />
       <Group spacing="xs">

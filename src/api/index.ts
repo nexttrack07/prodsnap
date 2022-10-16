@@ -243,7 +243,7 @@ const SHAPES: { id: number; data: MoveableElement & SVGPathType}[] = [
       path: { d: "M32,0L38.2117,8.81778L48,4.28719L48.9706,15.0294L59.7128,16L55.1822,25.7883L64,32L55.1822,38.2117L59.7128,48L48.9706,48.9706L48,59.7128L38.2117,55.1822L32,64L25.7883,55.1822L16,59.7128L15.0294,48.9706L4.28719,48L8.81778,38.2117L0,32L8.81778,25.7883L4.28719,16L15.0294,15.0294L16,4.28719L25.7883,8.81778L32,0", },
       strokeProps: {
         clipPathId: "001",
-        stroke: DEFAULT_THEME.colors.black,
+        stroke: DEFAULT_THEME.colors.gray[4],
         strokeWidth: 2,
         strokeDasharray: "none",
         strokeLinecap: "butt"
