@@ -9,6 +9,8 @@ import {
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { elementAtomsAtom, selectedElementAtomsAtom, activeElementAtomAtom, groupsByIdAtom } from "../canvas/store";
 import { SvgPathToolbar } from "./svg-path-toolbar";
+import { ImageToolbar } from "./image-toolbar";
+import { TextToolbar } from "./text-toolbar";
 import { Eye, Trash } from "tabler-icons-react";
 
 const getTypeAtom = atom((get) => {
@@ -111,8 +113,8 @@ export function Toolbar() {
         justifyContent: "space-between",
       }}
     >
-      {/* {getType("text") && <TextToolbar />} */}
-      {/* {getType("image") && <ImageToolbar />} */}
+      {type === "text" && <TextToolbar />}
+      {type === "image" && <ImageToolbar />}
       {type === "svg-path" && <SvgPathToolbar />}
       <div style={{ flex: 1 }} />
       <Group spacing="xs">

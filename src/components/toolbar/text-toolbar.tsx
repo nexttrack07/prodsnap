@@ -10,7 +10,7 @@ import {
   SegmentedControl,
   Slider,
 } from "@mantine/core";
-import { MoveableElement, selectedItemsAtom, TextType } from "../canvas/store";
+import { activeElementAtomAtom, MoveableElement, selectedItemsAtom, TextType } from "../canvas/store";
 import { atom, useAtom } from "jotai";
 import React, { useRef } from "react";
 import {
@@ -36,12 +36,15 @@ const fonts = [
 
 const textPropsAtom = atom(
   (get) => {
-    const selected = get(selectedItemsAtom);
-    return (selected.elements[0] as MoveableElement & TextType).props;
+    const activeElementAtom = get(activeElementAtomAtom);
+    if (!activeElementAtom) return null;
+    const activeElement = get(activeElementAtom);
+    return (activeElement as MoveableElement & TextType).props;
   },
   (get, set, update: React.CSSProperties) => {
-    const selected = get(selectedItemsAtom);
-    set(selected.atoms[0], (el) => {
+    const activeElementAtom = get(activeElementAtomAtom);
+    if (!activeElementAtom) return;
+    set(activeElementAtom, (el) => {
       if (el.type === "text") {
         return { ...el, props: { ...el.props, ...update } };
       }
@@ -53,6 +56,8 @@ const textPropsAtom = atom(
 export function TextToolbar() {
   const [textProps, setTextProps] = useAtom(textPropsAtom);
   const handlers = useRef<NumberInputHandlers>();
+
+  if (!textProps) return null;
 
   return (
     <Group>
