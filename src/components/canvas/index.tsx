@@ -1,5 +1,5 @@
 import React from "react";
-import { Box } from "@mantine/core";
+import { Box, DEFAULT_THEME } from "@mantine/core";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { createElement, ReactNode } from "react";
 import {
@@ -14,7 +14,6 @@ import {
 import { RenderImage } from "./render-image";
 import { RenderSvg } from "./render-svg";
 import { RenderText } from "./render-text";
-import { useKeyPress } from "../../utils/use-key-press";
 import { RenderPath } from "./render-path";
 import { RenderLine } from "./render-line";
 import { SelectHandler } from "./select-handler";
@@ -23,6 +22,7 @@ import { atomFamily } from "jotai/utils";
 
 const unSelectAllAtom = atom(null, (_get, set) => {
   set(selectedElementAtomsAtom, []);
+  set(activeElementAtomAtom, null)
 });
 
 export function Canvas() {
@@ -75,13 +75,20 @@ const groupFromElementAtom = atomFamily((element: CanvasElement) => atom(
   }
 ))
 
+const isActiveAtom = atomFamily(elementAtom => atom(
+  get => {
+    const activeElementAtom = get(activeElementAtomAtom);
+    return elementAtom === activeElementAtom 
+  }
+))
+
 function Element({ elementAtom }: { elementAtom: ElementType }) {
   const [element, setElement] = useAtom(elementAtom);
   const setSelectedElementAtoms = useSetAtom(selectedElementAtomsAtom);
   const setActiveElementAtom = useSetAtom(activeElementAtomAtom);
   const atomGroup = useAtomValue(groupFromElementAtom(element));
   const isShiftPressed = useShiftKeyPressed();
-  const isSelected = false;
+  const isSelected = useAtomValue(isActiveAtom(elementAtom));
 
   const handleSelectElement = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -98,17 +105,25 @@ function Element({ elementAtom }: { elementAtom: ElementType }) {
   const Comp = elementCompMap[element.type];
 
   return (
-    <span
-      style={{
+    <Box
+      component="span"
+      sx={{
         left: element.x,
         top: element.y,
         position: "absolute",
         width: element.width,
         height: element.height,
+        borderRadius: 3,
+        borderWidth: isSelected ? 1 : 0,
+        borderColor: DEFAULT_THEME.colors.blue[7],
+        borderStyle: "solid",
+        "&:hover": {
+          borderWidth: 1,
+        }
       }}
       onClick={handleSelectElement}
     >
       <Comp element={element} setElement={setElement} isSelected={isSelected} />
-    </span>
+    </Box>
   );
 }
