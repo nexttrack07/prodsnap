@@ -12,8 +12,7 @@ import {
 } from "@mantine/core";
 import {
   MoveableElement,
-  elementByIdAtom,
-  selectedElementListAtom,
+  activeElementAtomAtom,
   SVGPathType,
   SVGStrokeProps,
 } from "../canvas/store";
@@ -27,15 +26,15 @@ import {
 
 const svgPropsAtom = atom(
   (get) => {
-    const selectedElementId = get(selectedElementListAtom);
-    const selectedElementAtom = get(elementByIdAtom)[selectedElementId[0]];
+    const selectedElementAtom = get(activeElementAtomAtom);
+    if (!selectedElementAtom) return null;
     const selectedElement = get(selectedElementAtom);
 
     return (selectedElement as MoveableElement & SVGPathType).props;
   },
   (get, set, update: SVGAttributes<SVGSVGElement>) => {
-    const selectedElementId = get(selectedElementListAtom);
-    const selectedElementAtom = get(elementByIdAtom)[selectedElementId[0]];
+    const selectedElementAtom = get(activeElementAtomAtom);
+    if (!selectedElementAtom) return;
     set(selectedElementAtom, (el) => {
       if (el.type === "svg-path") {
         return { ...el, props: { ...el.props, ...update } };
@@ -47,15 +46,15 @@ const svgPropsAtom = atom(
 
 const svgStrokePropsAtom = atom(
   (get) => {
-    const selectedElementId = get(selectedElementListAtom);
-    const selectedElementAtom = get(elementByIdAtom)[selectedElementId[0]];
+    const selectedElementAtom = get(activeElementAtomAtom);
+    if (!selectedElementAtom) return null;
     const selectedElement = get(selectedElementAtom);
 
     return (selectedElement as MoveableElement & SVGPathType).strokeProps;
   },
   (get, set, update: Partial<SVGStrokeProps>) => {
-    const selectedElementId = get(selectedElementListAtom);
-    const selectedElementAtom = get(elementByIdAtom)[selectedElementId[0]];
+    const selectedElementAtom = get(activeElementAtomAtom);
+    if (!selectedElementAtom) return;
     set(selectedElementAtom, (el) => {
       if (el.type === "svg-path") {
         return { ...el, strokeProps: { ...el.strokeProps, ...update } };
@@ -68,6 +67,8 @@ const svgStrokePropsAtom = atom(
 export function SvgPathToolbar() {
   const [props, setProps] = useAtom(svgPropsAtom);
   const [strokeProps, setStrokeProps] = useAtom(svgStrokePropsAtom);
+
+  if (!props || !strokeProps) return null;
 
   return (
     <Group>
@@ -151,7 +152,7 @@ export function SvgPathToolbar() {
                     setStrokeProps({
                       strokeDasharray: "5,10",
                       strokeWidth:
-                        strokeProps.strokeWidth === 0
+                        strokeProps?.strokeWidth === 0
                           ? 10
                           : strokeProps.strokeWidth,
                     });

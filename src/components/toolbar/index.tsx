@@ -6,8 +6,9 @@ import {
   Menu,
   Button,
 } from "@mantine/core";
-import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { elementAtomsAtom, selectedElementAtomsAtom, activeElementAtomAtom, selectedItemsAtom, groupsByIdAtom } from "../canvas/store";
+import { atom, useAtomValue, useSetAtom } from "jotai";
+import { elementAtomsAtom, selectedElementAtomsAtom, activeElementAtomAtom, groupsByIdAtom } from "../canvas/store";
+import { SvgPathToolbar } from "./svg-path-toolbar";
 import { Eye, Trash } from "tabler-icons-react";
 
 const getTypeAtom = atom((get) => {
@@ -70,7 +71,7 @@ const removeGroupAtom = atom(null,
 )
 
 export function Toolbar() {
-  /* const type = useAtomValue(getTypeAtom); */
+  const type = useAtomValue(getTypeAtom);
   const deletedSelectedElements = useSetAtom(deleteSelectedAtom);
   const selectedElements = useAtomValue(selectedElementAtomsAtom);
   const addGroup = useSetAtom(addGroupAtom);
@@ -112,7 +113,7 @@ export function Toolbar() {
     >
       {/* {getType("text") && <TextToolbar />} */}
       {/* {getType("image") && <ImageToolbar />} */}
-      {/* {getType("svg-path") && <SvgPathToolbar />} */}
+      {type === "svg-path" && <SvgPathToolbar />}
       <div style={{ flex: 1 }} />
       <Group spacing="xs">
         {isGrouped ? (
