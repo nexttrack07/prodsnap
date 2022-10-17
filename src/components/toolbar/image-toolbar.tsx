@@ -7,7 +7,7 @@ import {
   MoveableElement,
 } from "../../components/canvas/store";
 import { httpsCallable } from "firebase/functions";
-import { atom, useAtom, useAtomValue } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { functions } from "../../utils/firebase";
 import { Check, Circle, Rectangle, X } from "tabler-icons-react";
 import { cropperAtom } from "../../components/canvas/render-image";
@@ -60,12 +60,15 @@ export const imageDimensionsAtom = atom((get) => {
   return { width: 0, height: 0 };
 });
 
+export const isCroppingAtom = atom(false);
+
 export function ImageToolbar() {
   const url = useAtomValue(imageUrlAtom);
   const [_, setSelectedImage] = useAtom(selectedImageAtom);
   const imageState = useAtomValue(imageStateAtom);
   const [circleCrop, setCircleCrop] = useAtom(circleCropAtom);
   const cropper = useAtomValue(cropperAtom);
+  const setIsCropping = useSetAtom(isCroppingAtom);
   const handleRemoveBg = () => {
     if (url) {
       setSelectedImage({ state: ImageState.Loading });
@@ -82,6 +85,7 @@ export function ImageToolbar() {
 
   const handleCropImage = () => {
     setSelectedImage({ state: ImageState.Cropping });
+    setIsCropping(true);
   };
 
   const handleCropDone = () => {
@@ -92,11 +96,14 @@ export function ImageToolbar() {
           : cropper.getCroppedCanvas().toDataURL(),
         state: ImageState.Normal,
       });
+      setIsCropping(false);
+
       return;
     }
     setSelectedImage({
       state: ImageState.Normal,
     });
+    setIsCropping(false);
   };
 
   const handleCropCancel = () => {
@@ -104,6 +111,7 @@ export function ImageToolbar() {
       state: ImageState.Normal,
       currentUrl: url,
     });
+    setIsCropping(false);
   };
 
   return (

@@ -1,6 +1,7 @@
-import { atom, useAtom } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
 import { selectedItemsAtom } from "./store";
 import { Moveable } from "../moveable";
+import { isCroppingAtom } from "../toolbar/image-toolbar";
 
 const positionAtom = atom(
   (get) => {
@@ -60,6 +61,9 @@ const dimensionAtom = atom(
 export function SelectHandler() {
   const [{ x, y }, setPosition] = useAtom(positionAtom);
   const [{ width, height }, setDimension] = useAtom(dimensionAtom);
+  const isCropping = useAtomValue(isCroppingAtom);
+
+  if (isCropping) return null;
 
   if (width === 0) return null;
 
