@@ -1,19 +1,14 @@
-import React from "react";
 import {
   Text,
   Space,
   createStyles,
   SimpleGrid,
-  Image,
-  Center,
 } from "@mantine/core";
-import { atom, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import {
-  elementsAtom,
+  addElementAtom,
   CanvasElement,
   MoveableElement,
-  ImageType,
-  TextType,
   SVGLineType,
 } from "../../components/canvas/store";
 
@@ -68,11 +63,11 @@ const templateData = [
 ];
 
 export function CurvesPanel() {
-  const setElements = useSetAtom(elementsAtom);
+  const addElement = useSetAtom(addElementAtom);
   const { classes } = useStyles();
 
   const handleAddElement = (newEl: CanvasElement) => {
-    setElements((items) => [...items, atom(newEl)]);
+    addElement(newEl);
   };
 
   return (

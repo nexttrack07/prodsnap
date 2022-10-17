@@ -1,10 +1,10 @@
 import { ActionIcon, Button, Group, SegmentedControl } from "@mantine/core";
 import {
+  activeElementAtomAtom,
   CanvasElement,
   ImageState,
   ImageType,
   MoveableElement,
-  selectedItemsAtom,
 } from "../../components/canvas/store";
 import { httpsCallable } from "firebase/functions";
 import { atom, useAtom, useAtomValue } from "jotai";
@@ -16,26 +16,23 @@ const removeBackground = httpsCallable(functions, "removeBackground");
 
 const selectedImageAtom = atom(
   (get) => {
-    const selected = get(selectedItemsAtom);
-
-    const el = selected.elements[0];
-    if (selected.elements.length === 1 && el.type === "image") {
-      return el;
+    const activeElementAtom = get(activeElementAtomAtom);
+    if (activeElementAtom) {
+      const activeElement = get(activeElementAtom);
+      return activeElement.type === "image" ? activeElement : null;
     }
   },
   (get, set, update: Partial<MoveableElement & ImageType>) => {
-    const selected = get(selectedItemsAtom);
-    if (
-      selected.elements.length === 1 &&
-      selected.elements[0].type === "image"
-    ) {
-      set(
-        selected.atoms[0],
-        (el) =>
-          ({
-            ...el,
-            ...update,
-          } as CanvasElement)
+    const activeElementAtom = get(activeElementAtomAtom);
+
+    if (activeElementAtom) {
+      set(activeElementAtom, (el) =>
+        el.type === "image"
+          ? ({
+              ...el,
+              ...update,
+            } as CanvasElement)
+          : el
       );
     }
   }

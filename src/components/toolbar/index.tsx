@@ -1,76 +1,81 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import {
   Box,
   Group,
-  Button,
-  CopyButton,
   ActionIcon,
   Menu,
-  Slider,
+  Button,
 } from "@mantine/core";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import {
-  CanvasElement,
-  elementByIdAtom,
-  elementListAtom,
-  selectedElementListAtom,
-  selectedItemsAtom,
-} from "../canvas/store";
-import { ImageToolbar } from "./image-toolbar";
+import { elementAtomsAtom, selectedElementAtomsAtom, activeElementAtomAtom, selectedItemsAtom, groupsByIdAtom } from "../canvas/store";
 import { Eye, Trash } from "tabler-icons-react";
-import { TextToolbar } from "./text-toolbar";
-import { SvgPathToolbar } from "./svg-path-toolbar";
 
 const getTypeAtom = atom((get) => {
-  const selected = get(selectedItemsAtom);
+  const activeElementAtom = get(activeElementAtomAtom);
+  if (!activeElementAtom) return null;
+  const activeElement = get(activeElementAtom);
+  return activeElement.type;
 
-  if (selected.elements.length === 1) {
-    return selected.elements[0].type;
-  }
-
-  return null;
 });
 
 const deleteSelectedAtom = atom(null, (get, set) => {
-  const selectedElementsIds = get(selectedElementListAtom);
-  set(elementListAtom, (items) =>
-    items.filter((_, i) => !selectedElementsIds.includes(i))
-  );
-  set(elementByIdAtom, obj => {
-    selectedElementsIds.forEach(id => {
-      delete obj[id];
-    })
-
-    return obj;
-  })
-  set(selectedElementListAtom, []);
+  const selectedElementAtoms = get(selectedElementAtomsAtom);
+  set(elementAtomsAtom, elementAtoms => elementAtoms.filter(elementAtom => !selectedElementAtoms.includes(elementAtom)))
+  set(selectedElementAtomsAtom, []);
 });
 
-const selectedElementOpacityAtom = atom(
-  (get) => {
-    const selectedElementsIds = get(selectedElementListAtom);
-    if (selectedElementsIds.length === 1) {
-      const element = get(get(elementByIdAtom)[selectedElementsIds[0]]);
-      return element.opacity;
-    }
-    return 0;
-  },
-  (get, set, update: number) => {
-    const selectedElementsIds = get(selectedElementListAtom);
-    if (selectedElementsIds.length === 1) {
-      const elementAtom = get(elementByIdAtom)[selectedElementsIds[0]];
-      set(elementAtom, (el) => ({ ...el, opacity: update }));
-    }
+const isGroupedAtom = atom(
+  get => {
+    const selectedElementAtoms = get(selectedElementAtomsAtom);
+    const selectedElements = selectedElementAtoms.map(elementAtom => get(elementAtom));
+
+    return selectedElements.every(el => el.group);
   }
-);
+)
+
+const addGroupAtom = atom(null,
+  (get, set) => {
+    const selectedElementAtoms = get(selectedElementAtomsAtom);
+    const newId = selectedElementAtoms.reduce((acc, item) => acc + item.toString(), "");
+    set(groupsByIdAtom, obj => ({
+      ...obj,
+      [newId]: [...selectedElementAtoms]
+    }))
+    selectedElementAtoms.forEach(elAtom => {
+      set(elAtom, el => ({
+        ...el,
+        group: newId
+      }))
+    })
+  }
+)
+const removeGroupAtom = atom(null,
+  (get, set) => {
+    const selectedElementAtoms = get(selectedElementAtomsAtom);
+    const selectedElements = selectedElementAtoms.map(a => get(a));
+    const id = selectedElements[0].group;
+    set(groupsByIdAtom, obj => {
+      if (id) {
+        delete obj[id]
+      }
+      return obj;
+    })
+    selectedElementAtoms.forEach(elAtom => {
+      set(elAtom, el => ({
+        ...el,
+        group: undefined
+      }))
+    })
+  }
+)
 
 export function Toolbar() {
-  const type = useAtomValue(getTypeAtom);
+  /* const type = useAtomValue(getTypeAtom); */
   const deletedSelectedElements = useSetAtom(deleteSelectedAtom);
-  const selectedElementsIds = useAtomValue(selectedElementListAtom);
-  const [selectedElementOpacity, setSelectedElementOpacity] = useAtom(
-    selectedElementOpacityAtom
-  );
+  const selectedElements = useAtomValue(selectedElementAtomsAtom);
+  const addGroup = useSetAtom(addGroupAtom);
+  const removeGroup = useSetAtom(removeGroupAtom);
+  const isGrouped = useAtomValue(isGroupedAtom);
 
   const handleDeleteClick = () => {
     deletedSelectedElements();
@@ -80,8 +85,6 @@ export function Toolbar() {
     if (e.key === "Backspace") deletedSelectedElements();
   };
 
-  const getType = (t: string) => type && type === t;
-
   useEffect(() => {
     window.addEventListener("keydown", handleDeletePress);
 
@@ -89,6 +92,13 @@ export function Toolbar() {
       window.removeEventListener("keydown", handleDeletePress);
     };
   }, []);
+
+  const handleUngroupElements = () => {
+    removeGroup();
+  }
+  const handleGroupElements = () => {
+    addGroup();
+  }
 
   return (
     <Box
@@ -100,39 +110,32 @@ export function Toolbar() {
         justifyContent: "space-between",
       }}
     >
-      {getType("text") && <TextToolbar />}
-      {getType("image") && <ImageToolbar />}
-      {getType("svg-path") && <SvgPathToolbar />}
+      {/* {getType("text") && <TextToolbar />} */}
+      {/* {getType("image") && <ImageToolbar />} */}
+      {/* {getType("svg-path") && <SvgPathToolbar />} */}
       <div style={{ flex: 1 }} />
       <Group spacing="xs">
+        {isGrouped ? (
+          <Button onClick={handleUngroupElements}>UnGroup</Button>
+        ): (
+          <Button onClick={handleGroupElements}>Group</Button>
+        )}
         <Menu width={170} position="bottom-end" closeOnItemClick={false}>
           <Menu.Target>
             <ActionIcon
               size={36}
               variant="default"
-              disabled={selectedElementsIds.length !== 1}
+              disabled={selectedElements.length !== 1}
             >
               <Eye />
             </ActionIcon>
           </Menu.Target>
-          <Menu.Dropdown>
-            <Menu.Label>Opacity</Menu.Label>
-            <Menu.Item>
-              <Slider
-                min={0}
-                max={1}
-                step={0.1}
-                value={selectedElementOpacity}
-                onChange={(val) => setSelectedElementOpacity(val)}
-              />
-            </Menu.Item>
-          </Menu.Dropdown>
         </Menu>
         <ActionIcon
           size={36}
           variant="light"
           onClick={handleDeleteClick}
-          disabled={selectedElementsIds.length === 0}
+          disabled={selectedElements.length === 0}
           color="red"
         >
           <Trash />

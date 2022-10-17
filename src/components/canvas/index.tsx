@@ -1,14 +1,13 @@
 import React from "react";
 import { Box } from "@mantine/core";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { atomFamily } from "jotai/utils";
 import { createElement, ReactNode } from "react";
 import {
   CanvasElement,
-  elementByIdAtom,
-  elementListAtom,
+  elementAtomsAtom,
   ElementType,
-  selectedElementListAtom,
+  groupsByIdAtom,
+  selectedElementAtomsAtom,
   SVGType,
 } from "./store";
 import { RenderImage } from "./render-image";
@@ -18,14 +17,15 @@ import { useKeyPress } from "../../utils/use-key-press";
 import { RenderPath } from "./render-path";
 import { RenderLine } from "./render-line";
 import { SelectHandler } from "./select-handler";
+import { useShiftKeyPressed } from "../../utils";
+import { atomFamily } from "jotai/utils";
 
 const unSelectAllAtom = atom(null, (_get, set) => {
-  set(selectedElementListAtom, []);
+  set(selectedElementAtomsAtom, []);
 });
 
 export function Canvas() {
-  const elements = useAtomValue(elementListAtom);
-  const elementById = useAtomValue(elementByIdAtom);
+  const elementAtoms = useAtomValue(elementAtomsAtom);
   const unSelectAllElements = useSetAtom(unSelectAllAtom);
   return (
     <Box
@@ -40,8 +40,8 @@ export function Canvas() {
       })}
       onClick={unSelectAllElements}
     >
-      {elements.map(id => (
-        <Element i={id} key={id} elementAtom={elementById[id]} />
+      {elementAtoms.map((elementAtom) => (
+        <Element key={elementAtom.toString()} elementAtom={elementAtom} />
       ))}
       <SelectHandler />
     </Box>
@@ -57,13 +57,6 @@ export function renderElement(
   return createElement(tag, { ...props, key: i }, null);
 }
 
-const isSelectedAtom = atomFamily((id: number) =>
-  atom((get) => {
-    const selectedElements = get(selectedElementListAtom);
-    return selectedElements.includes(id);
-  })
-);
-
 const elementCompMap: Record<CanvasElement["type"], React.FC<any>> = {
   svg: RenderSvg,
   image: RenderImage,
@@ -72,22 +65,32 @@ const elementCompMap: Record<CanvasElement["type"], React.FC<any>> = {
   "svg-line": RenderLine,
 };
 
-function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
-  const [element, setElement] = useAtom(elementAtom);
-  const setSelectedElements = useSetAtom(selectedElementListAtom);
-  const isSelected = useAtomValue(isSelectedAtom(i));
-  const isShiftPressed = useKeyPress("Shift");
+const groupFromElementAtom = atomFamily((element: CanvasElement) => atom(
+  get => {
+    if (!element.group) return null;
 
-  const handleElementSelect = (e: React.MouseEvent) => {
+    const groupsById = get(groupsByIdAtom);
+    return groupsById[element.group];
+  }
+))
+
+function Element({ elementAtom }: { elementAtom: ElementType }) {
+  const [element, setElement] = useAtom(elementAtom);
+  const setSelectedElementAtoms = useSetAtom(selectedElementAtomsAtom);
+  const atomGroup = useAtomValue(groupFromElementAtom(element));
+  const isShiftPressed = useShiftKeyPressed();
+  const isSelected = false;
+
+  const handleSelectElement = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setSelectedElements((items) => {
-      if (isShiftPressed) {
-        return items.includes(i) ? items : items.concat(i);
-      } else {
-        return [i];
+    setSelectedElementAtoms(selectedItems => {
+      if (selectedItems.includes(elementAtom)) return selectedItems;
+      if (atomGroup) {
+        return isShiftPressed ? selectedItems.concat(atomGroup) : atomGroup;
       }
-    });
-  };
+      return isShiftPressed ? selectedItems.concat(elementAtom) : [elementAtom];
+    })
+  }
 
   const Comp = elementCompMap[element.type];
 
@@ -98,9 +101,9 @@ function Element({ elementAtom, i }: { elementAtom: ElementType; i: number }) {
         top: element.y,
         position: "absolute",
         width: element.width,
-        height: element.height
+        height: element.height,
       }}
-      onClick={handleElementSelect}
+      onClick={handleSelectElement}
     >
       <Comp element={element} setElement={setElement} isSelected={isSelected} />
     </span>

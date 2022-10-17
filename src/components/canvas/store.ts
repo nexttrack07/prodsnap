@@ -5,6 +5,7 @@ export type Action<T> = SetStateAction<T>;
 export type MoveableElement = {
   x: number;
   y: number;
+  group?: string;
   width: number;
   height: number;
   opacity?: number;
@@ -59,9 +60,14 @@ export type ImageType = {
 export type CanvasElement = MoveableElement &
   (SVGType | ImageType | TextType | SVGPathType | SVGLineType);
 export type ElementType = WritableAtom<CanvasElement, Action<CanvasElement>>;
+export type GroupType = WritableAtom<ElementType[], Action<ElementType[]>>;
 
-export const elementsAtom = atom<ElementType[]>([]);
-export const selectedElementsAtom = atom<number[]>([]);
+// [atom([atom(), atom()]), atom([atom(), atom()])]
+export const elementAtomsAtom = atom<ElementType[]>([]);
+export const selectedElementAtomsAtom = atom<ElementType[]>([]);
+export const activeElementAtomAtom = atom<ElementType | null>(null);
+export const groupsByIdAtom = atom<Record<string, ElementType[]>>({});
+
 export function getDefaultMoveable(props?: Partial<MoveableElement>) {
   return {
     width: 200,
@@ -69,6 +75,7 @@ export function getDefaultMoveable(props?: Partial<MoveableElement>) {
     ...props,
   };
 }
+
 export const defaultImage: ImageType & MoveableElement = {
   type: "image",
   url: "",
@@ -79,27 +86,18 @@ export const defaultImage: ImageType & MoveableElement = {
   height: 400,
 };
 
-export const elementByIdAtom = atom<Record<number, ElementType>>({});
-export const elementListAtom = atom<number[]>([]);
-export const selectedElementListAtom = atom<number[]>([]);
-export const elementGroupsAtom = atom<number[][]>([]);
+export const selectedItemsAtom = atom((get) => {
+  const selectedElementAtoms = get(selectedElementAtomsAtom);
+  const selectedElements = selectedElementAtoms.map((elementAtom) =>
+    get(elementAtom)
+  );
 
-export const addElementAtom = atom(null, (get, set, el: CanvasElement) => {
-  const elements = get(elementListAtom);
-  const newId = elements.length;
-
-  set(elementListAtom, (ids) => [...ids, newId]);
-  set(elementByIdAtom, (elMap) => ({
-    ...elMap,
-    [newId]: atom(el),
-  }));
+  return {
+    elements: selectedElements,
+    atoms: selectedElementAtoms,
+  };
 });
 
-export const selectedItemsAtom = atom((get) => {
-  const selectedElementIds = get(selectedElementListAtom);
-  const elementById = get(elementByIdAtom);
-  const selectedElementAtoms = selectedElementIds.map((id) => elementById[id]);
-  const selectedElements = selectedElementAtoms.map((a) => get(a));
-
-  return { atoms: selectedElementAtoms, elements: selectedElements };
+export const addElementAtom = atom(null, (_, set, newEl: CanvasElement) => {
+  set(elementAtomsAtom, (elementAtoms) => [...elementAtoms, atom(newEl)]);
 });
