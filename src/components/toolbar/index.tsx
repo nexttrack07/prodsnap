@@ -36,7 +36,7 @@ const isGroupedAtom = atom(
   }
 )
 
-const addGroupAtom = atom(null,
+export const addGroupAtom = atom(null,
   (get, set) => {
     const selectedElementAtoms = get(selectedElementAtomsAtom);
     const newId = selectedElementAtoms.reduce((acc, item) => acc + item.toString(), "");

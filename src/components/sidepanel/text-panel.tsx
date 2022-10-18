@@ -1,6 +1,23 @@
-import { Text, Space, createStyles, SimpleGrid, Center } from "@mantine/core";
+import {
+  Text,
+  Space,
+  createStyles,
+  SimpleGrid,
+  Center,
+  Divider,
+  Loader,
+  Button,
+} from "@mantine/core";
+import { getTemplates } from "../../api/template";
 import { atom, useSetAtom } from "jotai";
-import { addElementAtom, CanvasElement } from "../../components/canvas/store";
+import { useEffect, useState } from "react";
+import {
+  addElementAtom,
+  CanvasElement,
+  elementAtomsAtom,
+  selectedElementAtomsAtom,
+} from "../../components/canvas/store";
+import { addGroupAtom } from "../toolbar";
 
 const useStyles = createStyles((theme) => ({
   shape: {
@@ -17,7 +34,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const data: {
+const elementData: {
   id: number;
   data: CanvasElement;
 }[] = [
@@ -40,9 +57,37 @@ const data: {
 export function TextPanel() {
   const addElement = useSetAtom(addElementAtom);
   const { classes } = useStyles();
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const setElementAtoms = useSetAtom(elementAtomsAtom);
+  const setSelectedAtoms = useSetAtom(selectedElementAtomsAtom);
+  const addGroup = useSetAtom(addGroupAtom);
+
+  useEffect(() => {
+    async function getTemplateData() {
+      try {
+        setLoading(true);
+        const data = await getTemplates();
+        setData(data);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    getTemplateData();
+  }, []);
 
   const handleAddElement = (newEl: CanvasElement) => {
     addElement(newEl);
+  };
+
+  const handleAddTemplate = (newEls: CanvasElement[]) => {
+    const newElAtoms = newEls.map((el) => atom(el));
+    setElementAtoms((elAtoms) => [...elAtoms, ...newElAtoms]);
+    setSelectedAtoms(newElAtoms);
+    addGroup();
   };
 
   return (
@@ -52,7 +97,7 @@ export function TextPanel() {
       </Text>
       <Space h="xl" />
       <SimpleGrid cols={1}>
-        {data.map((item) => {
+        {elementData.map((item: any) => {
           if (item.data.type === "text") {
             return (
               <Center key={item.id} className={classes.shape}>
@@ -67,6 +112,19 @@ export function TextPanel() {
           }
           return null;
         })}
+      </SimpleGrid>
+      <Divider my="xl" variant="dotted" />
+      <SimpleGrid cols={2}>
+        {loading && <Loader />}
+        {data &&
+          data.map((item: any) => (
+            <Button
+              onClick={() => handleAddTemplate(JSON.parse(item.data.template))}
+              key={item.id}
+            >
+              Add Template
+            </Button>
+          ))}
       </SimpleGrid>
     </>
   );
