@@ -58,7 +58,7 @@ export function renderElement(
   return createElement(tag, { ...props, key: i }, null);
 }
 
-const elementCompMap: Record<CanvasElement["type"], React.FC<any>> = {
+export const elementCompMap: Record<CanvasElement["type"], React.FC<any>> = {
   svg: RenderSvg,
   image: RenderImage,
   text: RenderText,
@@ -82,7 +82,7 @@ const isActiveAtom = atomFamily(elementAtom => atom(
   }
 ))
 
-function Element({ elementAtom }: { elementAtom: ElementType }) {
+export function Element({ elementAtom }: { elementAtom: ElementType }) {
   const [element, setElement] = useAtom(elementAtom);
   const setSelectedElementAtoms = useSetAtom(selectedElementAtomsAtom);
   const setActiveElementAtom = useSetAtom(activeElementAtomAtom);

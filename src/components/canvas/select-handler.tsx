@@ -3,7 +3,7 @@ import { selectedItemsAtom } from "./store";
 import { Moveable } from "../moveable";
 import { isCroppingAtom } from "../toolbar/image-toolbar";
 
-const positionAtom = atom(
+export const positionAtom = atom(
   (get) => {
     const selected = get(selectedItemsAtom);
     const x = selected.elements.reduce(
@@ -29,7 +29,7 @@ const positionAtom = atom(
   }
 );
 
-const dimensionAtom = atom(
+export const dimensionAtom = atom(
   (get) => {
     const selected = get(selectedItemsAtom);
     const { x, y } = get(positionAtom);

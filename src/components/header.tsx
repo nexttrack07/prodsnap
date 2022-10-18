@@ -5,6 +5,7 @@ import { HEADER_SIZE } from '../pages';
 import { Settings, ArrowForward, ArrowBack, Edit, ArrowsLeftRight, Trash, MessageCircle, Photo, Search, Download } from 'tabler-icons-react';
 import domToImage from 'dom-to-image-more';
 import { saveAs } from 'file-saver';
+import { UploadTemplate } from "./upload-template";
 
 export function HeaderComponent() {
   const handleDownloadClick = () => {
@@ -111,6 +112,7 @@ export function HeaderComponent() {
       </Group>
       <div style={{ flex: 1 }} />
       <Group>
+        <UploadTemplate />
         <Avatar color="cyan" radius="xl">
           FH
         </Avatar>
