@@ -10,18 +10,28 @@ type Props = {
 };
 
 export function RenderPath({ element }: Props) {
-
   return (
     <>
-      <svg opacity={element.opacity} {...element.props}>
-        <path {...element.path} />
-      </svg>
-      <svg opacity={element.opacity} {...element.props}>
-        <clipPath id={element.strokeProps.clipPathId}>
-          <path d={element.path.d} />
-        </clipPath>
+      <svg
+        opacity={element.opacity}
+        {...element.props}
+        viewBox={element.getViewBox(element.width, element.height)}
+      >
         <path
           {...element.path}
+          d={element.getPath(element.width, element.height)}
+        />
+      </svg>
+      <svg
+        opacity={element.opacity}
+        {...element.props}
+        viewBox={element.getViewBox(element.width, element.height)}
+      >
+        <clipPath id={element.strokeProps.clipPathId}>
+          <path d={element.getPath(element.width, element.height)} />
+        </clipPath>
+        <path
+          d={element.getPath(element.width, element.height)}
           stroke={element.strokeProps.stroke}
           strokeWidth={element.strokeProps.strokeWidth}
           strokeLinecap={element.strokeProps.strokeLinecap}

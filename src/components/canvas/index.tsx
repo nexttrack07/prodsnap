@@ -113,13 +113,13 @@ export function Element({ elementAtom }: { elementAtom: ElementType }) {
         position: "absolute",
         width: element.width,
         height: element.height,
-        borderRadius: 3,
-        borderWidth: isSelected ? 1 : 0,
-        borderColor: DEFAULT_THEME.colors.blue[7],
-        borderStyle: "solid",
-        "&:hover": {
-          borderWidth: 1,
-        }
+        /* borderRadius: 3, */
+        /* borderWidth: isSelected ? 1 : 0, */
+        /* borderColor: DEFAULT_THEME.colors.blue[7], */
+        /* borderStyle: "solid", */
+        /* "&:hover": { */
+        /*   borderWidth: 1, */
+        /* } */
       }}
       onClick={handleSelectElement}
     >

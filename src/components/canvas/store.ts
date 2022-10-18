@@ -36,6 +36,8 @@ export type SVGLineType = {
 };
 export type SVGPathType = {
   type: "svg-path";
+  getViewBox: (w: number, h: number) => string;
+  getPath: (w: number, h: number) => string;
   props?: SVGAttributes<SVGSVGElement>;
   path: SVGAttributes<SVGPathElement>;
   strokeProps: SVGStrokeProps;
