@@ -16,6 +16,7 @@ import { RenderSvg } from "./render-svg";
 import { RenderText } from "./render-text";
 import { RenderPath } from "./render-path";
 import { RenderLine } from "./render-line";
+import { RenderPointLine } from "./render-point-line";
 import { SelectHandler } from "./select-handler";
 import { useShiftKeyPressed } from "../../utils";
 import { atomFamily } from "jotai/utils";
@@ -64,6 +65,7 @@ export const elementCompMap: Record<CanvasElement["type"], React.FC<any>> = {
   text: RenderText,
   "svg-path": RenderPath,
   "svg-line": RenderLine,
+  "svg-point-line": RenderPointLine,
 };
 
 const groupFromElementAtom = atomFamily((element: CanvasElement) => atom(

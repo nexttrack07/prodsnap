@@ -2,14 +2,20 @@ import { atom, WritableAtom } from "jotai";
 import React, { SetStateAction, SVGAttributes } from "react";
 
 export type Action<T> = SetStateAction<T>;
-export type MoveableElement = {
+export type Draggable = {
   x: number;
   y: number;
-  group?: string;
+}
+
+export type Resizable  = {
   width: number;
   height: number;
+}
+
+export type MoveableElement = Draggable & Resizable & {
+  group?: string;
   opacity?: number;
-};
+}
 export type SVGType = {
   type: "svg";
   props?: SVGAttributes<SVGSVGElement>;
@@ -34,6 +40,16 @@ export type SVGLineType = {
   startPath?: SVGAttributes<SVGPathElement>;
   endPath?: SVGAttributes<SVGPathElement>;
 };
+export type SVGPointType = {
+  type: "svg-point",
+}
+
+export type SVGPointLine = {
+  type: "svg-point-line",
+  p1: SVGPointType & Draggable;
+  p2: SVGPointType & Draggable;
+  stroke: number;
+}
 export type SVGPathType = {
   type: "svg-path";
   getViewBox: (w: number, h: number) => string;
@@ -59,8 +75,9 @@ export type ImageType = {
   thumbnail?: string;
   currentUrl?: string;
 };
+
 export type CanvasElement = MoveableElement &
-  (SVGType | ImageType | TextType | SVGPathType | SVGLineType);
+  (SVGType | ImageType | TextType | SVGPathType | SVGLineType | SVGPointLine);
 export type ElementType = WritableAtom<CanvasElement, Action<CanvasElement>>;
 export type GroupType = WritableAtom<ElementType[], Action<ElementType[]>>;
 
@@ -102,4 +119,9 @@ export const selectedItemsAtom = atom((get) => {
 
 export const addElementAtom = atom(null, (_, set, newEl: CanvasElement) => {
   set(elementAtomsAtom, (elementAtoms) => [...elementAtoms, atom(newEl)]);
+});
+
+
+export const addElementsAtom = atom(null, (_, set, newEls: CanvasElement[]) => {
+  set(elementAtomsAtom, (elementAtoms) => [...elementAtoms, ...newEls.map(newEl => atom(newEl))]);
 });

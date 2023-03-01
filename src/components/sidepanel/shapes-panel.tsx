@@ -1,8 +1,8 @@
-import { Text, Space, createStyles, SimpleGrid } from "@mantine/core";
+import { Text, Space, createStyles, SimpleGrid, Button, DEFAULT_THEME } from "@mantine/core";
 import { useSetAtom } from "jotai";
 import { useQuery } from "@tanstack/react-query";
 import { getShapes } from "../../api";
-import { CanvasElement, addElementAtom } from "../../components/canvas/store";
+import { CanvasElement, addElementAtom, addElementsAtom, MoveableElement, SVGType, SVGPointLine } from "../../components/canvas/store";
 
 const useStyles = createStyles(() => ({
   shape: {
@@ -14,6 +14,25 @@ const useStyles = createStyles(() => ({
     },
   },
 }));
+
+const LINE: SVGPointLine & MoveableElement = {
+  type: "svg-point-line",
+  p1: {
+    type: "svg-point",
+    x: 100,
+    y: 100
+  },
+  p2: {
+    type: "svg-point",
+    x: 400,
+    y: 100
+  },
+  stroke: 4,
+  x: 100,
+  y: 100,
+  width: 100,
+  height: 100,
+}
 
 export function ShapesPanel() {
   const query = useQuery(["shapes"], getShapes);
@@ -45,6 +64,7 @@ export function ShapesPanel() {
             <path {...item.data.path} />
           </svg>
         ))}
+        <Button onClick={() => handleAddElement(LINE)} compact variant="outline">Line</Button>
       </SimpleGrid>
     </>
   );

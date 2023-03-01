@@ -34,7 +34,7 @@ function App() {
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <MantineProvider>
+    <MantineProvider theme={{ colorScheme: 'light', primaryColor: 'indigo', primaryShade: 7, defaultRadius: 0 }}>
       <Global
         styles={(theme) => ({
           '*, *::before, *::after': { boxSizing: 'border-box' },

@@ -78,7 +78,7 @@ export function CurvesPanel() {
       <Space h="xl" />
       <SimpleGrid cols={3}>
         {data.map((item) => (
-          <div>
+          <div key={item.id}>
             <svg
               key={item.id}
               className={classes.shape}
