@@ -1,8 +1,8 @@
 import { Text, Space, createStyles, SimpleGrid, Button, DEFAULT_THEME } from "@mantine/core";
-import { useSetAtom } from "jotai";
+import { atom, useSetAtom } from "jotai";
 import { useQuery } from "@tanstack/react-query";
 import { getShapes } from "../../api";
-import { CanvasElement, addElementAtom, addElementsAtom, MoveableElement, SVGType, SVGPointLine } from "../../components/canvas/store";
+import { CanvasElement, addElementAtom, addElementsAtom, MoveableElement, SVGType, SVGPointLine, SVGPointType, Draggable } from "../../components/canvas/store";
 
 const useStyles = createStyles(() => ({
   shape: {
@@ -14,8 +14,8 @@ const useStyles = createStyles(() => ({
     },
   },
 }));
-
-const LINE: SVGPointLine & MoveableElement = {
+type LineType = Omit<SVGPointLine & MoveableElement, "p1" | "p2"> & { p1: SVGPointType & Draggable; p2: SVGPointType & Draggable };
+const LINE: LineType = {
   type: "svg-point-line",
   p1: {
     type: "svg-point",
@@ -43,6 +43,15 @@ export function ShapesPanel() {
     addElement(newEl);
   };
 
+  const handleAddLine = (lineEl: LineType) => {
+    const { p1, p2, ...rest } = lineEl;
+    addElement({
+      p1: atom(p1),
+      p2: atom(p2),
+      ...rest
+    })
+  }
+
   return (
     <>
       <Text sx={{ opacity: 0.7 }} size="lg">
@@ -64,7 +73,7 @@ export function ShapesPanel() {
             <path {...item.data.path} />
           </svg>
         ))}
-        <Button onClick={() => handleAddElement(LINE)} compact variant="outline">Line</Button>
+        <Button onClick={() => handleAddLine(LINE)} compact variant="outline">Line</Button>
       </SimpleGrid>
     </>
   );

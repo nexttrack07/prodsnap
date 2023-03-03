@@ -7,7 +7,7 @@ export type Draggable = {
   y: number;
 }
 
-export type Resizable  = {
+export type Resizable = {
   width: number;
   height: number;
 }
@@ -46,8 +46,8 @@ export type SVGPointType = {
 
 export type SVGPointLine = {
   type: "svg-point-line",
-  p1: SVGPointType & Draggable;
-  p2: SVGPointType & Draggable;
+  p1: WritableAtom<SVGPointType & Draggable, Action<SVGPointType & Draggable>>;
+  p2: WritableAtom<SVGPointType & Draggable, Action<SVGPointType & Draggable>>;
   stroke: number;
 }
 export type SVGPathType = {

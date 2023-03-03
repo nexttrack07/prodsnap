@@ -80,7 +80,7 @@ const groupFromElementAtom = atomFamily((element: CanvasElement) => atom(
 const isActiveAtom = atomFamily(elementAtom => atom(
   get => {
     const activeElementAtom = get(activeElementAtomAtom);
-    return elementAtom === activeElementAtom 
+    return elementAtom === activeElementAtom
   }
 ))
 
@@ -113,8 +113,6 @@ export function Element({ elementAtom }: { elementAtom: ElementType }) {
         left: element.x,
         top: element.y,
         position: "absolute",
-        width: element.width,
-        height: element.height,
         /* borderRadius: 3, */
         /* borderWidth: isSelected ? 1 : 0, */
         /* borderColor: DEFAULT_THEME.colors.blue[7], */
