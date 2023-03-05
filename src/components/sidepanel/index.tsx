@@ -63,10 +63,10 @@ export function Sidepanel() {
             key={item.label}
             onClick={() => setActive(item.id)}
             variant={active === item.id ? "light" : "subtle"}
-            color={active === item.id ? "blue" : "dark"}
-            sx={{ margin: 6, padding: 4 }}
+            color={active === item.id ? "blue" : "dark.8"}
+            sx={{ margin: 1, padding: 4 }}
           >
-            <item.icon strokeWidth={1.5} />
+            <item.icon strokeWidth={1.2} />
           </Button>
         ))}
       </Stack>

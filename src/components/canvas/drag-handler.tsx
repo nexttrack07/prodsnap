@@ -1,8 +1,9 @@
 import { atom, useAtom, useAtomValue } from "jotai";
 import { selectedItemsAtom } from "./store";
-import { Moveable } from "../moveable";
 import { isCroppingAtom } from "../toolbar/image-toolbar";
-import { Draggable } from "../draggable";
+import { useCallback, useRef, useState } from "react";
+import { useMantineTheme } from "@mantine/core";
+import { useEventListener } from "../../utils";
 
 export const positionAtom = atom(
   (get) => {
@@ -59,28 +60,71 @@ export const dimensionAtom = atom(
   }
 );
 
-export function SelectHandler() {
+export function DragHandler() {
   const [{ x, y }, setPosition] = useAtom(positionAtom);
-  const [{ width, height }, setDimension] = useAtom(dimensionAtom);
+  const [{ width, height }] = useAtom(dimensionAtom);
   const isCropping = useAtomValue(isCroppingAtom);
+  const documentRef = useRef<Document>(document);
+  const theme = useMantineTheme();
+  const [moving, setMoving] = useState(false);
+
+  const handleMouseUp = useCallback((e: MouseEvent) => {
+    e.stopPropagation();
+    setMoving(false);
+  }, []);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setMoving(true);
+  }, []);
+
+  const handleMouseMove = (e: MouseEvent) => {
+    e.stopPropagation();
+    if (moving) {
+      setPosition({ x: e.movementX, y: e.movementY });
+    }
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log('Click event fired')
+  }
+
+
+  useEventListener("pointerup", handleMouseUp, documentRef);
+  useEventListener("pointermove", handleMouseMove, documentRef, [moving]);
 
   if (isCropping) return null;
 
   if (width === 0) return null;
 
-  function handleDrag(pos: { x: number; y: number }) {
-    setPosition(pos);
-  }
-  //
-  // function handleRotate(rotation: number) {
-  //   console.log("rotate: ", rotation);
-  // }
-  //
-  // function handleResize(dimension: { width: number; height: number }) {
-  //   setDimension({ width: dimension.width, height: dimension.height });
-  // }
-
   return (
-    <Draggable onDrag={handleDrag} styleProps={{ width, height, left: x, top: y }} />
+    <div
+      style={{
+        position: "absolute",
+        left: x,
+        top: y,
+        height: height,
+        width: width,
+        userSelect: "none",
+        cursor: 'move',
+      }}
+      id="moveable"
+      onMouseDown={handleMouseDown}
+      onClick={handleClick}
+    >
+      <div
+        style={{
+          position: "absolute",
+          border: `4px solid ${theme.colors.teal[8]}`,
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 0,
+          transform: "scale(1.03)",
+          borderRadius: 3
+        }}>
+      </div>
+    </div>
   );
 }

@@ -27,7 +27,7 @@ const LINE: LineType = {
     x: 400,
     y: 100
   },
-  stroke: 4,
+  stroke: 8,
   x: 100,
   y: 100,
   width: 100,

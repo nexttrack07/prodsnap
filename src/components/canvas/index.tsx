@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, DEFAULT_THEME } from "@mantine/core";
+import { Box } from "@mantine/core";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { createElement, ReactNode } from "react";
 import {
@@ -20,6 +20,7 @@ import { RenderPointLine } from "./render-point-line";
 import { SelectHandler } from "./select-handler";
 import { useShiftKeyPressed } from "../../utils";
 import { atomFamily } from "jotai/utils";
+import { DragHandler } from "./drag-handler";
 
 const unSelectAllAtom = atom(null, (_get, set) => {
   set(selectedElementAtomsAtom, []);
@@ -29,6 +30,10 @@ const unSelectAllAtom = atom(null, (_get, set) => {
 export function Canvas() {
   const elementAtoms = useAtomValue(elementAtomsAtom);
   const unSelectAllElements = useSetAtom(unSelectAllAtom);
+
+  const handleCanvasClick = () => {
+    unSelectAllElements();
+  }
   return (
     <Box
       id="canvas"
@@ -40,12 +45,12 @@ export function Canvas() {
         position: "relative",
         backgroundColor: "white",
       })}
-      onClick={unSelectAllElements}
+      onClick={handleCanvasClick}
     >
       {elementAtoms.map((elementAtom) => (
         <Element key={elementAtom.toString()} elementAtom={elementAtom} />
       ))}
-      <SelectHandler />
+      <DragHandler />
     </Box>
   );
 }
@@ -107,23 +112,6 @@ export function Element({ elementAtom }: { elementAtom: ElementType }) {
   const Comp = elementCompMap[element.type];
 
   return (
-    <Box
-      component="span"
-      sx={{
-        left: element.x,
-        top: element.y,
-        position: "absolute",
-        /* borderRadius: 3, */
-        /* borderWidth: isSelected ? 1 : 0, */
-        /* borderColor: DEFAULT_THEME.colors.blue[7], */
-        /* borderStyle: "solid", */
-        /* "&:hover": { */
-        /*   borderWidth: 1, */
-        /* } */
-      }}
-      onClick={handleSelectElement}
-    >
-      <Comp element={element} setElement={setElement} isSelected={isSelected} />
-    </Box>
+    <Comp onSelect={handleSelectElement} element={element} setElement={setElement} isSelected={isSelected} />
   );
 }

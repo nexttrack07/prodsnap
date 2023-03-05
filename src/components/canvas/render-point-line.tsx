@@ -55,8 +55,8 @@ export function RenderPointLine({ element }: Props) {
       >
         <circle cx="8" cy="8" r="8" />
       </svg>
-      <svg>
-        <line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="black" strokeWidth={element.stroke} />
+      <svg style={{ height: '100%', width: '100%', minHeight: 1, minWidth: 1, overflow: 'visible', }}>
+        <line x1={p1.x + element.stroke} y1={p1.y + (element.stroke + 8) / 2} x2={p2.x} y2={p2.y} stroke="black" strokeWidth={element.stroke} />
       </svg>
       <svg
         opacity={element.opacity}
