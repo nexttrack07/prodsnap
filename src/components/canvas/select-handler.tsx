@@ -63,6 +63,9 @@ export function SelectHandler() {
   const [{ x, y }, setPosition] = useAtom(positionAtom);
   const [{ width, height }, setDimension] = useAtom(dimensionAtom);
   const isCropping = useAtomValue(isCroppingAtom);
+  const [selected] = useAtom(selectedItemsAtom);
+
+  if (selected.elements.length < 2) return null;
 
   if (isCropping) return null;
 

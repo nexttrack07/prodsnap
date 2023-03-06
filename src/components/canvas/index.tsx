@@ -17,7 +17,6 @@ import { RenderText } from "./render-text";
 import { RenderPath } from "./render-path";
 import { RenderLine } from "./render-line";
 import { RenderPointLine } from "./render-point-line";
-import { SelectHandler } from "./select-handler";
 import { useShiftKeyPressed } from "../../utils";
 import { atomFamily } from "jotai/utils";
 import { DragHandler } from "./drag-handler";
@@ -31,7 +30,8 @@ export function Canvas() {
   const elementAtoms = useAtomValue(elementAtomsAtom);
   const unSelectAllElements = useSetAtom(unSelectAllAtom);
 
-  const handleCanvasClick = () => {
+  const handleCanvasClick = (e: React.MouseEvent) => {
+    console.log('canvas clicked: ', e.currentTarget)
     unSelectAllElements();
   }
   return (

@@ -64,6 +64,7 @@ export function DragHandler() {
   const [{ x, y }, setPosition] = useAtom(positionAtom);
   const [{ width, height }] = useAtom(dimensionAtom);
   const isCropping = useAtomValue(isCroppingAtom);
+  const selected = useAtomValue(selectedItemsAtom);
   const documentRef = useRef<Document>(document);
   const theme = useMantineTheme();
   const [moving, setMoving] = useState(false);
@@ -87,7 +88,6 @@ export function DragHandler() {
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('Click event fired')
   }
 
 
@@ -97,6 +97,8 @@ export function DragHandler() {
   if (isCropping) return null;
 
   if (width === 0) return null;
+
+  if (selected.elements.length < 2) return null;
 
   return (
     <div
