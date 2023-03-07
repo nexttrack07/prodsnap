@@ -10,6 +10,7 @@ import {
   SegmentedControl,
   Slider,
   Textarea,
+  DEFAULT_THEME
 } from "@mantine/core";
 import {
   elementState,
@@ -48,6 +49,7 @@ const textPropsSelector = selector({
     const selectedElementId = get(activeElementState);
     if (selectedElementId === -1) return null;
     const selectedElement = get(elementState(selectedElementId));
+    console.log('selectedElement', selectedElement);
     return (selectedElement as TextType).props;
   },
   set: ({ set, get }, newVal) => {
@@ -76,7 +78,7 @@ const textContentAtom = selector({
           ...el,
           content: newVal
         }
-      } 
+      }
       return el;
     })
   }
@@ -103,25 +105,14 @@ export function TextToolbar() {
         }
       />
       <ColorInput
-        format="hex"
-        sx={{ input: { width: 120 } }}
+        format="rgba"
         value={textProps.color}
         onChange={(color) => setTextProps({ color })}
         swatches={[
-          "#25262b",
-          "#868e96",
-          "#fa5252",
-          "#e64980",
-          "#be4bdb",
-          "#7950f2",
-          "#4c6ef5",
-          "#228be6",
-          "#15aabf",
-          "#12b886",
-          "#40c057",
-          "#82c91e",
-          "#fab005",
-          "#fd7e14",
+          ...DEFAULT_THEME.colors.red,
+          ...DEFAULT_THEME.colors.yellow,
+          ...DEFAULT_THEME.colors.green,
+          ...DEFAULT_THEME.colors.blue,
         ]}
       />
       <Menu closeOnItemClick={false} shadow="md" width={400}>

@@ -65,6 +65,6 @@ function ElementComponent({ i }: { i: number }) {
   const Comp = elementCompMap[element.type];
 
   return (
-    <Comp element={element} setElement={setElement} />
+    <Comp element={element} setElement={setElement} id={i} />
   );
 }

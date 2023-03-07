@@ -29,21 +29,13 @@ export function RenderText({
   const isShiftPressed = useKeyPress("Shift");
   const ref = useRef<HTMLDivElement>(null);
 
+  console.log('element', element);
+
   useWindowEvent("keydown", (e: KeyboardEvent) => {
     if (e.key === "Escape") {
       setEditable(false);
     }
   });
-
-  useEffect(() => {
-    if (ref.current) {
-      setElement((prev) => ({
-        ...prev,
-        width: ref.current.offsetWidth,
-        height: ref.current.offsetHeight,
-      }));
-    }
-  }, []);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
@@ -98,9 +90,7 @@ export function RenderText({
       ...prev,
       content: (e.target as HTMLDivElement).innerText,
     }));
-  }
-
-  const { width, height } = element;
+  };
 
   return (
     <Center
@@ -119,7 +109,7 @@ export function RenderText({
       <Text
         ref={ref}
         onDoubleClick={handleTextClick}
-        style={{ ...element.props }}
+        style={element.props}
         contentEditable={editable}
         suppressContentEditableWarning={true}
         onBlur={handleBlur}
