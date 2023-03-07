@@ -1,3 +1,4 @@
+import React from 'react';
 import { Box, createStyles, useMantineTheme } from "@mantine/core";
 import { SetStateAction } from "jotai";
 import { useState, useEffect, useRef } from "react";
@@ -56,10 +57,9 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
     function handleMouseMove(e: MouseEvent) {
       e.stopPropagation();
       if (status === 'moving') {
-        console.log('moving')
         const deltaX = e.clientX - lastPos.current.x + x;
         const deltaY = e.clientY - lastPos.current.y + y;
-        setElement(el => ({ ...el, x: deltaX, y: deltaY }))
+        setElement(el => ({ ...el, x: deltaX, y: deltaY }));
       } else if (status === 'resizing-br') {
         const deltaX = e.clientX - lastPos.current.x + width;
         setElement(el => ({ ...el, width: deltaX, height: el.height / el.width * deltaX }))
