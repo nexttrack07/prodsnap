@@ -1,5 +1,10 @@
 import React, { useState, SetStateAction, useRef, useEffect } from "react";
-import { activeElementState, isElementSelectedState, selectedElementIdsState, TextType } from "./element.store";
+import {
+  activeElementState,
+  isElementSelectedState,
+  selectedElementIdsState,
+  TextType,
+} from "./element.store";
 import { Center, Text, useMantineTheme } from "@mantine/core";
 import { useWindowEvent } from "@mantine/hooks";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -8,7 +13,7 @@ import { useKeyPress } from "../../utils/use-key-press";
 export function RenderText({
   element,
   setElement,
-  id
+  id,
 }: {
   element: TextType;
   setElement: (update: SetStateAction<TextType>) => void;
@@ -22,12 +27,23 @@ export function RenderText({
   const setActiveElement = useSetRecoilState(activeElementState);
   const isSelected = useRecoilValue(isElementSelectedState(id));
   const isShiftPressed = useKeyPress("Shift");
+  const ref = useRef<HTMLDivElement>(null);
 
   useWindowEvent("keydown", (e: KeyboardEvent) => {
     if (e.key === "Escape") {
       setEditable(false);
     }
   });
+
+  useEffect(() => {
+    if (ref.current) {
+      setElement((prev) => ({
+        ...prev,
+        width: ref.current.offsetWidth,
+        height: ref.current.offsetHeight,
+      }));
+    }
+  }, []);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
@@ -49,7 +65,7 @@ export function RenderText({
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
-    }
+    };
   }, [moving]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -76,6 +92,14 @@ export function RenderText({
     setActiveElement(id);
   };
 
+  const handleBlur = (e: React.FocusEvent) => {
+    setEditable(false);
+    setElement((prev) => ({
+      ...prev,
+      content: (e.target as HTMLDivElement).innerText,
+    }));
+  }
+
   const { width, height } = element;
 
   return (
@@ -86,19 +110,19 @@ export function RenderText({
         position: "absolute",
         left: element.x,
         top: element.y,
-        border: isSelected ? `3px solid ${theme.colors.blue[8]}` : "none",
+        border: isSelected ? `2px dotted ${theme.colors.blue[8]}` : "none",
         borderRadius: 3,
-        width,
-        height,
         cursor: isSelected ? "move" : "pointer",
         userSelect: moving ? "none" : "auto",
       }}
     >
       <Text
+        ref={ref}
         onDoubleClick={handleTextClick}
         style={{ ...element.props }}
         contentEditable={editable}
         suppressContentEditableWarning={true}
+        onBlur={handleBlur}
       >
         {element.content}
       </Text>
