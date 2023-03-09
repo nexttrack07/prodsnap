@@ -49,7 +49,6 @@ const textPropsSelector = selector({
     const selectedElementId = get(activeElementState);
     if (selectedElementId === -1) return null;
     const selectedElement = get(elementState(selectedElementId));
-    console.log('selectedElement', selectedElement);
     return (selectedElement as TextType).props;
   },
   set: ({ set, get }, newVal) => {

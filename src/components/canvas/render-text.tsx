@@ -1,14 +1,22 @@
-import React, { useState, SetStateAction, useRef, useEffect } from "react";
+import React, { useState, SetStateAction, useRef, useEffect, useCallback } from "react";
 import {
   activeElementState,
   isElementSelectedState,
   selectedElementIdsState,
   TextType,
 } from "./element.store";
-import { Center, Text, useMantineTheme } from "@mantine/core";
+import { Center, useMantineTheme } from "@mantine/core";
 import { useWindowEvent } from "@mantine/hooks";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useKeyPress } from "../../utils/use-key-press";
+
+type Status =
+  | "resize-br"
+  | "resize-bl"
+  | "resize-tr"
+  | "resize-tl"
+  | "move"
+  | "none";
 
 export function RenderText({
   element,
@@ -22,14 +30,13 @@ export function RenderText({
 }) {
   const [editable, setEditable] = useState(false);
   const theme = useMantineTheme();
-  const [moving, setMoving] = useState(false);
+  const [status, setStatus] = useState<Status>("none");
   const setSelectedElements = useSetRecoilState(selectedElementIdsState);
   const setActiveElement = useSetRecoilState(activeElementState);
   const isSelected = useRecoilValue(isElementSelectedState(id));
   const isShiftPressed = useKeyPress("Shift");
   const ref = useRef<HTMLDivElement>(null);
-
-  console.log('element', element);
+  const lastPos = useRef({ x: 0, y: 0 });
 
   useWindowEvent("keydown", (e: KeyboardEvent) => {
     if (e.key === "Escape") {
@@ -38,18 +45,33 @@ export function RenderText({
   });
 
   useEffect(() => {
+    if (ref.current) {
+      const { width, height } = ref.current.getBoundingClientRect();
+      setElement((el) => ({ ...el, width, height }));
+    }
+  }, []);
+
+  useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
-      if (moving) {
-        setElement((prev) => ({
-          ...prev,
-          x: prev.x + e.movementX,
-          y: prev.y + e.movementY,
+      setEditable(false);
+
+      if (status === "move") {
+        const deltaX = e.clientX - lastPos.current.x + element.x;
+        const deltaY = e.clientY - lastPos.current.y + element.y;
+        setElement((el) => ({ ...el, x: deltaX, y: deltaY }));
+      } else if (status === "resize-br") {
+        const newWidth = e.clientX - lastPos.current.x + element.width;
+        const newFontSize = newWidth / element.width * (element.props.fontSize as number);
+        setElement((el) => ({
+          ...el,
+          props: { ...el.props, fontSize: newFontSize }
         }));
       }
     }
 
-    function handleMouseUp() {
-      setMoving(false);
+    const handleMouseUp = (e: MouseEvent) => {
+      e.stopPropagation();
+      setStatus('none');
     }
 
     document.addEventListener("mousemove", handleMouseMove);
@@ -58,21 +80,21 @@ export function RenderText({
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [moving]);
+  }, [status]);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    console.log("mousedown");
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    setMoving(true);
+    lastPos.current = { x: e.clientX, y: e.clientY };
+    setStatus('move');
+  }, []);
+
+  const handleResizeMouseDown = (e: React.MouseEvent, stat: Status) => {
+    e.stopPropagation();
+    setStatus(stat);
+    lastPos.current = { x: e.clientX, y: e.clientY };
   };
 
-  const handleTextClick = (e: React.MouseEvent) => {
-    if (isSelected) {
-      setEditable(true);
-    }
-  };
-
-  const handleElementSelect = (e: React.MouseEvent) => {
+  const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedElements((items) => {
       if (isShiftPressed) {
@@ -82,6 +104,9 @@ export function RenderText({
       }
     });
     setActiveElement(id);
+    if (isSelected) {
+      setEditable(true);
+    }
   };
 
   const handleBlur = (e: React.FocusEvent) => {
@@ -92,30 +117,46 @@ export function RenderText({
     }));
   };
 
+  const cursor = isSelected && status === "move" ? "move"
+    : isSelected && status === "resize-br" ? "se-resize"
+      : isSelected && editable ? "text" : "pointer";
+
   return (
     <Center
       onMouseDown={handleMouseDown}
-      onClick={handleElementSelect}
+      contentEditable={editable}
+      suppressContentEditableWarning={true}
+      onClick={handleClick}
+      onBlur={handleBlur}
       style={{
         position: "absolute",
         left: element.x,
         top: element.y,
-        border: isSelected ? `2px dotted ${theme.colors.blue[8]}` : "none",
+        border: isSelected ? `2px dashed ${theme.colors.blue[8]}` : "none",
         borderRadius: 3,
-        cursor: isSelected ? "move" : "pointer",
-        userSelect: moving ? "none" : "auto",
+        cursor,
+        userSelect: status === "move" || "resize-br" ? "none" : "auto",
+        ...element.props
       }}
     >
-      <Text
-        ref={ref}
-        onDoubleClick={handleTextClick}
-        style={element.props}
-        contentEditable={editable}
-        suppressContentEditableWarning={true}
-        onBlur={handleBlur}
-      >
-        {element.content}
-      </Text>
+      {element.content}
+      {isSelected && (
+        <span
+          onMouseDown={(e) => handleResizeMouseDown(e, "resize-br")}
+          style={{
+            position: "absolute",
+            bottom: 0,
+            right: 0,
+            borderRadius: "50%",
+            width: 10,
+            height: 10,
+            backgroundColor: theme.colors.blue[8],
+            boxShadow: `0 0 0 2px ${theme.colors.blue[0]}`,
+            transform: "translate(50%, 50%)",
+            cursor: "se-resize",
+          }}
+        ></span>
+      )}
     </Center>
   );
 }
