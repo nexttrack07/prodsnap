@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Group,
@@ -120,7 +120,7 @@ export function Toolbar() {
       <Group spacing="xs">
         {isGrouped ? (
           <Button onClick={handleUngroupElements}>UnGroup</Button>
-        ): (
+        ) : (
           <Button onClick={handleGroupElements}>Group</Button>
         )}
         <Menu width={170} position="bottom-end" closeOnItemClick={false}>

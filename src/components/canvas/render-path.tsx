@@ -85,7 +85,7 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
     <Box
       ref={ref}
       onMouseDown={handleMouseDown}
-      sx={{
+      style={{
         left: x,
         top: y,
         width,
