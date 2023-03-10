@@ -236,8 +236,8 @@ export function TextToolbar() {
               onChange={(val) => setTextProps({ letterSpacing: val })}
               value={textProps.letterSpacing as number}
               min={0}
-              max={10}
-              step={0.1}
+              max={50}
+              step={0.5}
               label={(l) => l.toFixed(1)}
             />
           </Menu.Item>

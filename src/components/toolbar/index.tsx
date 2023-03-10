@@ -20,6 +20,7 @@ import { elementState, selectedElementIdsState } from "../canvas/element.store";
 import difference from "lodash/difference";
 import sortBy from "lodash/sortBy";
 import { SvgToolbar } from "./svg-toolbar";
+import { CanvasToolbar } from "./canvas-toolbar";
 
 const selectedOpacityAtom = selector({
   key: "selected-opacity-atom",
@@ -62,7 +63,7 @@ export const activeElementTypeAtom = selector({
   key: "active-element-atom",
   get: ({ get }) => {
     const activeElementId = get(activeElementState);
-    if (activeElementId === -1) return null;
+    if (activeElementId === -1) return "canvas";
 
     return get(elementState(activeElementId))["type"];
   },
@@ -75,7 +76,7 @@ export function Toolbar() {
     useRecoilState(selectedOpacityAtom);
   const isGroup = useRecoilValue(isGroupAtom);
 
-  const getType = (type: Element["type"]) =>
+  const getType = (type: Element["type"] | "canvas") =>
     activeElement && activeElement === type;
   const handleDeleteClick = useRecoilCallback(
     ({ set }) =>
@@ -120,6 +121,7 @@ export function Toolbar() {
     >
       {getType("text") && <TextToolbar />}
       {getType("shape") && <SvgToolbar />}
+      {getType("canvas") && <CanvasToolbar />}
       <div style={{ flex: 1 }} />
       <Group spacing="xs">
         {isGroup ? (

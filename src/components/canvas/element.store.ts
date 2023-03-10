@@ -110,3 +110,12 @@ export const activeElementState = atom<number>({
   key: "active-element",
   default: -1
 })
+
+export const canvasPropsState = atom({
+  key: "canvas-props",
+  default: {
+    backgroundColor: 'white',
+    width: 900,
+    height: 600,
+  }
+});

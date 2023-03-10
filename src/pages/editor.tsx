@@ -28,7 +28,7 @@ export function Editor() {
   const handleEditorClick = useRecoilCallback(
     ({ set }) =>
       (e: React.MouseEvent) => {
-        console.log('editor clicked...', e.target, e.currentTarget)
+        e.stopPropagation()
         set(selectedElementIdsState, []);
         set(activeElementState, -1);
       },
