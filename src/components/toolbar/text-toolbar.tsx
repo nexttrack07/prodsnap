@@ -99,6 +99,7 @@ export function TextToolbar() {
                 height: "100%",
                 backgroundColor: textProps.color,
                 borderRadius: 3,
+                border: "1px solid #ccc",
               }}
             />
           </ActionIcon>

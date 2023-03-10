@@ -38,9 +38,9 @@ export function Canvas() {
         width: canvasProps.width,
         height: canvasProps.height,
         border: selected
-          ? `2px solid ${theme.colors.blue[8]}`
+          ? `1px solid ${theme.colors.blue[8]}`
           : `1px solid ${theme.colors.gray[3]}`,
-        boxShadow: "0px 0px 2px rgba(0,0,0,0.3)",
+        boxShadow: "0px 0px 1px rgba(0,0,0,0.3)",
         position: "relative",
         backgroundColor: canvasProps.backgroundColor,
       })}
