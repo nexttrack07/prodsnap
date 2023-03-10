@@ -36,6 +36,7 @@ const data: Element[] = [
     height: 50,
     props: {
       fontSize: 40,
+      color: "#000",
     },
   },
   {
@@ -46,6 +47,7 @@ const data: Element[] = [
     width: 230,
     height: 30,
     props: {
+      color: "#000",
       fontSize: 30,
     },
   },
@@ -57,6 +59,7 @@ const data: Element[] = [
     width: 220,
     height: 30,
     props: {
+      color: "#000",
       fontSize: 20,
     },
   },
@@ -72,6 +75,7 @@ const templateData: Element[][] = [
       width: 250,
       height: 50,
       props: {
+        color: "#000",
         fontSize: 30,
       },
     },
@@ -83,6 +87,7 @@ const templateData: Element[][] = [
       width: 250,
       height: 55,
       props: {
+        color: "#000",
         fontSize: 20,
       },
     },

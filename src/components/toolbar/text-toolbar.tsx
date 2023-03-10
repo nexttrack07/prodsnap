@@ -1,10 +1,11 @@
 import {
-  Select,
+  Box,
+  Popover,
   Group,
   ActionIcon,
   NumberInput,
   NumberInputHandlers,
-  ColorInput,
+  ColorPicker,
   Menu,
   Button,
   SegmentedControl,
@@ -33,16 +34,6 @@ import {
 } from "tabler-icons-react";
 import { DefaultValue, selector, useRecoilState } from "recoil";
 import FontPicker from 'font-picker-react';
-
-const fonts = [
-  "Roboto",
-  "Helvetica",
-  "Oswald",
-  "Nunito",
-  "Times New Roman",
-  "Arial",
-  "Comic sans",
-];
 
 const textPropsSelector = selector({
   key: "text-props",
@@ -94,130 +85,111 @@ export function TextToolbar() {
 
   return (
     <Group>
-      <Select
-        data={fonts}
-        placeholder="Font Family"
-        value={textProps.fontFamily}
-        searchable
-        nothingFound="No options"
-        onChange={(fontFamily) =>
-          setTextProps({ fontFamily: fontFamily ?? "" })
-        }
-      />
       <FontPicker
         apiKey={import.meta.env.VITE_GOOGLE_FONTS_API_KEY}
         activeFontFamily={textProps.fontFamily}
         onChange={(font) => setTextProps({ fontFamily: font.family ?? "" })}
       />
-      <ColorInput
-        format="rgba"
-        value={textProps.color}
-        onChange={(color) => setTextProps({ color })}
-        swatches={[
-          ...DEFAULT_THEME.colors.red,
-          ...DEFAULT_THEME.colors.yellow,
-          ...DEFAULT_THEME.colors.green,
-          ...DEFAULT_THEME.colors.blue,
-        ]}
-      />
-      <Menu closeOnItemClick={false} shadow="md" width={400}>
-        <Menu.Target>
-          <ActionIcon variant="default" size={36}>
-            <TextPlus />
+      <Popover>
+        <Popover.Target>
+          <ActionIcon size={36}>
+            <Box
+              sx={{
+                width: "100%",
+                height: "100%",
+                backgroundColor: textProps.color,
+                borderRadius: 3,
+              }}
+            />
           </ActionIcon>
-        </Menu.Target>
-        <Menu.Dropdown>
-          <Menu.Label>Content</Menu.Label>
-          <Menu.Item>
-            <Textarea value={textContent} onChange={e => setTextContent(e.target.value)} />
-          </Menu.Item>
-        </Menu.Dropdown>
-      </Menu>
-      <Menu closeOnItemClick={false} shadow="md" width={250}>
-        <Menu.Target>
-          <ActionIcon variant="default" size={36}>
-            <TextSize />
-          </ActionIcon>
-        </Menu.Target>
-        <Menu.Dropdown>
-          <Menu.Label>Font Size</Menu.Label>
-          <Menu.Item>
-            <Group spacing={5}>
-              <ActionIcon
-                size={36}
-                variant="default"
-                onClick={() => handlers.current?.decrement()}
-              >
-                –
-              </ActionIcon>
+        </Popover.Target>
+        <Popover.Dropdown>
+          <ColorPicker
+            format="rgba"
+            value={textProps.color}
+            onChange={(val) => setTextProps({ color: val })}
+            swatches={[
+              ...DEFAULT_THEME.colors.red,
+              ...DEFAULT_THEME.colors.yellow,
+              ...DEFAULT_THEME.colors.green,
+              ...DEFAULT_THEME.colors.blue,
+            ]}
+          />
+        </Popover.Dropdown>
+      </Popover>
+      <Group spacing={5}>
+        <ActionIcon
+          size={36}
+          variant="default"
+          onClick={() => handlers.current?.decrement()}
+        >
+          –
+        </ActionIcon>
 
-              <NumberInput
-                hideControls
-                value={textProps.fontSize ? +textProps.fontSize : 0}
-                onChange={(val) => setTextProps({ fontSize: val })}
-                handlersRef={handlers}
-                max={200}
-                min={10}
-                step={5}
-                styles={{ input: { width: 54, textAlign: "center" } }}
-              />
+        <NumberInput
+          hideControls
+          value={textProps.fontSize ? +textProps.fontSize : 0}
+          onChange={(val) => setTextProps({ fontSize: val })}
+          handlersRef={handlers}
+          max={200}
+          min={10}
+          step={1}
+          styles={{ input: { width: 54, textAlign: "center" } }}
+        />
 
-              <ActionIcon
-                size={36}
-                variant="default"
-                onClick={() => handlers.current?.increment()}
-              >
-                +
-              </ActionIcon>
-            </Group>
-          </Menu.Item>
-          <Menu.Label>Font Style</Menu.Label>
-          <Menu.Item>
-            <Button.Group>
-              <Button
-                variant="light"
-                color={textProps.fontWeight === "bolder" ? "blue" : "dark"}
-                onClick={() =>
-                  setTextProps({
-                    fontWeight:
-                      textProps.fontWeight === "bolder" ? "normal" : "bolder",
-                  })
-                }
-              >
-                <Bold />
-              </Button>
-              <Button
-                variant="light"
-                color={textProps.fontStyle === "italic" ? "blue" : "dark"}
-                onClick={() =>
-                  setTextProps({
-                    fontStyle:
-                      textProps.fontStyle === "italic" ? "normal" : "italic",
-                  })
-                }
-              >
-                <Italic />
-              </Button>
-              <Button
-                variant="light"
-                color={
-                  textProps.textDecoration === "underline" ? "blue" : "dark"
-                }
-                onClick={() =>
-                  setTextProps({
-                    textDecoration:
-                      textProps.textDecoration === "underline"
-                        ? "none"
-                        : "underline",
-                  })
-                }
-              >
-                <Underline />
-              </Button>
-            </Button.Group>
-          </Menu.Item>
-        </Menu.Dropdown>
-      </Menu>
+        <ActionIcon
+          size={36}
+          variant="default"
+          onClick={() => handlers.current?.increment()}
+        >
+          +
+        </ActionIcon>
+      </Group>
+      <Group spacing='xs'>
+        <ActionIcon
+          size={36}
+          color="dark"
+          variant={textProps.fontWeight === "bolder" ? "light" : "subtle"}
+          onClick={() =>
+            setTextProps({
+              fontWeight:
+                textProps.fontWeight === "bolder" ? "normal" : "bolder",
+            })
+          }
+        >
+          <Bold />
+        </ActionIcon>
+        <ActionIcon
+          size={36}
+          color="dark"
+          variant={textProps.fontStyle === "italic" ? "light" : "subtle"}
+          onClick={() =>
+            setTextProps({
+              fontStyle:
+                textProps.fontStyle === "italic" ? "normal" : "italic",
+            })
+          }
+        >
+          <Italic />
+        </ActionIcon>
+        <ActionIcon
+          size={36}
+          color="dark"
+          variant={
+            textProps.textDecoration === "underline" ? "light" : "subtle"
+          }
+          onClick={() =>
+            setTextProps({
+              textDecoration:
+                textProps.textDecoration === "underline"
+                  ? "none"
+                  : "underline",
+            })
+          }
+        >
+          <Underline />
+        </ActionIcon>
+      </Group>
       <Menu closeOnItemClick={false}>
         <Menu.Target>
           <ActionIcon variant="default" size={36}>
@@ -255,6 +227,7 @@ export function TextToolbar() {
           <Menu.Label>Line Height</Menu.Label>
           <Menu.Item>
             <Slider
+              disabled
               onChange={(val) => setTextProps({ lineHeight: val })}
               value={textProps.lineHeight as number}
             />

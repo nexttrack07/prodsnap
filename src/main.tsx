@@ -1,3 +1,4 @@
+import './index.css';
 import { Global, MantineProvider } from "@mantine/core";
 import { NotificationsProvider } from "@mantine/notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -49,7 +50,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         <QueryClientProvider client={queryClient}>
           <Router>
             <RecoilRoot>
-            <App />
+              <App />
             </RecoilRoot>
           </Router>
         </QueryClientProvider>

@@ -1,2 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Anek+Latin:wght@100&family=Lato:wght@300&family=League+Gothic&family=Open+Sans:ital,wght@0,300;1,300&family=Oswald:wght@200;300&family=Poppins:wght@300&family=Roboto:wght@300&display=swap');
 
+#font-picker {
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: none;
+  border: 1px solid #ccc;
+}
+
+#font-picker .dropdown-button {
+  background-color: white;
+  border-radius: 4px;
+}
+
+#font-picker .font-list {
+  margin: 3px 0 0 0;
+  background-color: white;
+  border-color: #ccc;
+}
