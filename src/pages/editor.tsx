@@ -51,7 +51,7 @@ export function Editor() {
         >
           <Toolbar />
         </div>
-        <Center sx={{ flex: 1 }}>
+        <Center sx={theme => ({ flex: 1, backgroundColor: theme.colors.gray[1] })}>
           <Canvas />
         </Center>
       </div>

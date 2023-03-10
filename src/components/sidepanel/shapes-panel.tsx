@@ -1,3 +1,4 @@
+import React from 'react'
 import { Text, Space, createStyles, SimpleGrid, Button, DEFAULT_THEME } from "@mantine/core";
 import { atom, useSetAtom } from "jotai";
 import { useQuery } from "@tanstack/react-query";

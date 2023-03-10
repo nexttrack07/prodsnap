@@ -16,7 +16,7 @@ export function HeaderComponent() {
       })
   }
   return (
-    <Header sx={{ display: "flex" }} height={HEADER_SIZE} p="xs">
+    <Header sx={theme => ({ display: "flex", borderBottom: `1px solid ${theme.colors.gray[4]}` })} height={HEADER_SIZE} p="xs">
       <Logo />
       <Space w={100} />
       <Group>
