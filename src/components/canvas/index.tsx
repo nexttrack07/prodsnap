@@ -4,19 +4,14 @@ import { createElement, ReactNode } from "react";
 import { SVGType } from "./store";
 import { RenderImage } from "./render-image";
 import { RenderText } from "./render-text";
-import { useKeyPress } from "../../utils/use-key-press";
 import {
   useRecoilState,
   useRecoilValue,
-  useSetRecoilState,
 } from "recoil";
 import {
   Element,
   elementsState,
   elementState,
-  isElementSelectedState,
-  selectedElementIdsState,
-  activeElementState,
 } from "./element.store";
 import { RenderPath } from "./render-path";
 
@@ -27,7 +22,7 @@ export function Canvas() {
     <Box
       id="canvas"
       sx={(theme) => ({
-        width: 1100,
+        width: 900,
         height: 700,
         border: `1px solid ${theme.colors.gray[3]}`,
         boxShadow: "0px 0px 2px rgba(0,0,0,0.3)",

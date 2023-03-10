@@ -35,7 +35,6 @@ export function RenderText({
   const setActiveElement = useSetRecoilState(activeElementState);
   const isSelected = useRecoilValue(isElementSelectedState(id));
   const isShiftPressed = useKeyPress("Shift");
-  const ref = useRef<HTMLDivElement>(null);
   const lastPos = useRef({ x: 0, y: 0 });
 
   useWindowEvent("keydown", (e: KeyboardEvent) => {
@@ -44,12 +43,6 @@ export function RenderText({
     }
   });
 
-  useEffect(() => {
-    if (ref.current) {
-      const { width, height } = ref.current.getBoundingClientRect();
-      setElement((el) => ({ ...el, width, height }));
-    }
-  }, []);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
@@ -62,6 +55,7 @@ export function RenderText({
       } else if (status === "resize-br") {
         const newWidth = e.clientX - lastPos.current.x + element.width;
         const newFontSize = newWidth / element.width * (element.props.fontSize as number);
+
         setElement((el) => ({
           ...el,
           props: { ...el.props, fontSize: newFontSize }

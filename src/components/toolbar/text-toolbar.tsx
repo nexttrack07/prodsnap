@@ -32,6 +32,7 @@ import {
   Underline,
 } from "tabler-icons-react";
 import { DefaultValue, selector, useRecoilState } from "recoil";
+import FontPicker from 'font-picker-react';
 
 const fonts = [
   "Roboto",
@@ -102,6 +103,11 @@ export function TextToolbar() {
         onChange={(fontFamily) =>
           setTextProps({ fontFamily: fontFamily ?? "" })
         }
+      />
+      <FontPicker
+        apiKey={import.meta.env.VITE_GOOGLE_FONTS_API_KEY}
+        activeFontFamily={textProps.fontFamily}
+        onChange={(font) => setTextProps({ fontFamily: font.family ?? "" })}
       />
       <ColorInput
         format="rgba"

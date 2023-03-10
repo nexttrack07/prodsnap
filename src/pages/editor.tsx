@@ -27,7 +27,8 @@ function FooterComponent() {
 export function Editor() {
   const handleEditorClick = useRecoilCallback(
     ({ set }) =>
-      () => {
+      (e: React.MouseEvent) => {
+        console.log('editor clicked...', e.target, e.currentTarget)
         set(selectedElementIdsState, []);
         set(activeElementState, -1);
       },
@@ -65,7 +66,7 @@ export function Editor() {
         >
           <Toolbar />
         </div>
-        <Center onClick={handleEditorClick} sx={{ flex: 1 }}>
+        <Center onMouseDown={handleEditorClick} sx={{ flex: 1 }}>
           <Canvas />
         </Center>
       </div>
