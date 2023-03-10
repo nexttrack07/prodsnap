@@ -189,6 +189,23 @@ export function TextToolbar() {
         >
           <Underline />
         </ActionIcon>
+        <ActionIcon
+          size={36}
+          color="dark"
+          variant={
+            textProps.textTransform === "uppercase" ? "light" : "subtle"
+          }
+          onClick={() =>
+            setTextProps({
+              textTransform:
+                textProps.textTransform === "uppercase"
+                  ? "none"
+                  : "uppercase",
+            })
+          }
+        >
+          <TextSize />
+        </ActionIcon>
       </Group>
       <Menu closeOnItemClick={false}>
         <Menu.Target>
