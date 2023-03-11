@@ -17,7 +17,7 @@ const useStyles = createStyles(() => ({
 }));
 type LineType = Omit<SVGPointLine & MoveableElement, "p1" | "p2"> & { p1: SVGPointType & Draggable; p2: SVGPointType & Draggable };
 const LINE: LineType = {
-  type: "svg-point-line",
+  type: "svg-curve",
   p1: {
     type: "svg-point",
     x: 100,

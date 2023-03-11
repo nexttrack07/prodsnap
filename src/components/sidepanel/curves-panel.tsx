@@ -4,12 +4,13 @@ import {
   createStyles,
   SimpleGrid,
 } from "@mantine/core";
-import { useSetAtom } from "jotai";
+import React from 'react';
+import { atom, useSetAtom } from "jotai";
 import {
   addElementAtom,
   CanvasElement,
   MoveableElement,
-  SVGLineType,
+  SVGPointLine,
 } from "../../components/canvas/store";
 
 const useStyles = createStyles(() => ({
@@ -23,34 +24,29 @@ const useStyles = createStyles(() => ({
   },
 }));
 
-const data: { id: number; data: MoveableElement & SVGLineType }[] = [
+const data: { id: number; prev: string; data: MoveableElement & SVGPointLine }[] = [
   {
     id: 0,
+    prev: "M 0 0 L 50 0",
     data: {
-      type: "svg-line",
+      type: "svg-curve",
       x: 200,
       y: 200,
       width: 100,
       height: 3,
-      props: {
-        stroke: "#000",
-        fill: "#000",
-        style: {
-          minHeight: 1,
-          minWidth: 1,
-          width: "100%",
-          height: "100%",
-          overflow: "visible",
-        },
-      },
-      line: {
-        x1: 0,
-        x2: 100,
-        y1: 0,
-        y2: 0,
-        strokeLinecap: "butt",
-        fill: "none",
-      },
+      stroke: 2,
+      points: [
+        atom({
+          type: "svg-point",
+          x: 100,
+          y: 100
+        }),
+        atom({
+          type: "svg-point",
+          x: 500,
+          y: 100
+        }),
+      ]
     },
   },
 ];
@@ -84,12 +80,11 @@ export function CurvesPanel() {
               className={classes.shape}
               fill="#000"
               stroke="#000"
-              width="100%"
-              height="100%"
+              style={{ height: '100%', width: '100%', minHeight: 1, minWidth: 1, overflow: 'visible' }}
               onClick={() => handleAddElement(item.data)}
             >
               <g transform="scale(1) translate(0, 0.5)">
-                <line {...item.data.line} />
+                <path d={item.prev} />
               </g>
             </svg>
           </div>

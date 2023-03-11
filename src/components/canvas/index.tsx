@@ -73,7 +73,7 @@ export const elementCompMap: Record<CanvasElement["type"], React.FC<any>> = {
   text: RenderText,
   "svg-path": RenderPath,
   "svg-line": RenderLine,
-  "svg-point-line": RenderPointLine,
+  "svg-curve": RenderPointLine,
 };
 
 const groupFromElementAtom = atomFamily((element: CanvasElement) => atom(

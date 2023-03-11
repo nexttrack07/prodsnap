@@ -43,10 +43,11 @@ export type SVGPointType = {
   type: 'svg-point';
 };
 
+export type SVGPointAtom = WritableAtom<SVGPointType & Draggable, Action<SVGPointType & Draggable>>
+
 export type SVGPointLine = {
-  type: 'svg-point-line';
-  p1: WritableAtom<SVGPointType & Draggable, Action<SVGPointType & Draggable>>;
-  p2: WritableAtom<SVGPointType & Draggable, Action<SVGPointType & Draggable>>;
+  type: 'svg-curve';
+  points: SVGPointAtom[];
   stroke: number;
 };
 export type SVGPathType = {
