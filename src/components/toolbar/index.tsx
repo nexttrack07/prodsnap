@@ -1,76 +1,71 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
+import { Box, Group, ActionIcon, Menu, Button } from '@mantine/core';
+import { FaRegObjectGroup, FaRegObjectUngroup } from 'react-icons/fa';
+import { atom, useAtomValue, useSetAtom } from 'jotai';
 import {
-  Box,
-  Group,
-  ActionIcon,
-  Menu,
-  Button,
-} from "@mantine/core";
-import { atom, useAtomValue, useSetAtom } from "jotai";
-import { elementAtomsAtom, selectedElementAtomsAtom, activeElementAtomAtom, groupsByIdAtom } from "../canvas/store";
-import { SvgPathToolbar } from "./svg-path-toolbar";
-import { ImageToolbar } from "./image-toolbar";
-import { TextToolbar } from "./text-toolbar";
-import { Eye, Trash } from "tabler-icons-react";
+  elementAtomsAtom,
+  selectedElementAtomsAtom,
+  activeElementAtomAtom,
+  groupsByIdAtom
+} from '../canvas/store';
+import { SvgPathToolbar } from './svg-path-toolbar';
+import { ImageToolbar } from './image-toolbar';
+import { TextToolbar } from './text-toolbar';
+import { Eye, Trash } from 'tabler-icons-react';
 
 const getTypeAtom = atom((get) => {
   const activeElementAtom = get(activeElementAtomAtom);
   if (!activeElementAtom) return null;
   const activeElement = get(activeElementAtom);
   return activeElement.type;
-
 });
 
 const deleteSelectedAtom = atom(null, (get, set) => {
   const selectedElementAtoms = get(selectedElementAtomsAtom);
-  set(elementAtomsAtom, elementAtoms => elementAtoms.filter(elementAtom => !selectedElementAtoms.includes(elementAtom)))
+  set(elementAtomsAtom, (elementAtoms) =>
+    elementAtoms.filter((elementAtom) => !selectedElementAtoms.includes(elementAtom))
+  );
   set(selectedElementAtomsAtom, []);
 });
 
-const isGroupedAtom = atom(
-  get => {
-    const selectedElementAtoms = get(selectedElementAtomsAtom);
-    const selectedElements = selectedElementAtoms.map(elementAtom => get(elementAtom));
+const isGroupedAtom = atom((get) => {
+  const selectedElementAtoms = get(selectedElementAtomsAtom);
+  const selectedElements = selectedElementAtoms.map((elementAtom) => get(elementAtom));
 
-    return selectedElements.every(el => el.group);
-  }
-)
+  return selectedElements.every((el) => el.group);
+});
 
-export const addGroupAtom = atom(null,
-  (get, set) => {
-    const selectedElementAtoms = get(selectedElementAtomsAtom);
-    const newId = selectedElementAtoms.reduce((acc, item) => acc + item.toString(), "");
-    set(groupsByIdAtom, obj => ({
-      ...obj,
-      [newId]: [...selectedElementAtoms]
-    }))
-    selectedElementAtoms.forEach(elAtom => {
-      set(elAtom, el => ({
-        ...el,
-        group: newId
-      }))
-    })
-  }
-)
-const removeGroupAtom = atom(null,
-  (get, set) => {
-    const selectedElementAtoms = get(selectedElementAtomsAtom);
-    const selectedElements = selectedElementAtoms.map(a => get(a));
-    const id = selectedElements[0].group;
-    set(groupsByIdAtom, obj => {
-      if (id) {
-        delete obj[id]
-      }
-      return obj;
-    })
-    selectedElementAtoms.forEach(elAtom => {
-      set(elAtom, el => ({
-        ...el,
-        group: undefined
-      }))
-    })
-  }
-)
+export const addGroupAtom = atom(null, (get, set) => {
+  const selectedElementAtoms = get(selectedElementAtomsAtom);
+  const newId = selectedElementAtoms.reduce((acc, item) => acc + item.toString(), '');
+  set(groupsByIdAtom, (obj) => ({
+    ...obj,
+    [newId]: [...selectedElementAtoms]
+  }));
+  selectedElementAtoms.forEach((elAtom) => {
+    set(elAtom, (el) => ({
+      ...el,
+      group: newId
+    }));
+  });
+});
+const removeGroupAtom = atom(null, (get, set) => {
+  const selectedElementAtoms = get(selectedElementAtomsAtom);
+  const selectedElements = selectedElementAtoms.map((a) => get(a));
+  const id = selectedElements[0].group;
+  set(groupsByIdAtom, (obj) => {
+    if (id) {
+      delete obj[id];
+    }
+    return obj;
+  });
+  selectedElementAtoms.forEach((elAtom) => {
+    set(elAtom, (el) => ({
+      ...el,
+      group: undefined
+    }));
+  });
+});
 
 export function Toolbar() {
   const type = useAtomValue(getTypeAtom);
@@ -85,51 +80,61 @@ export function Toolbar() {
   };
 
   const handleDeletePress = (e: KeyboardEvent) => {
-    if (e.key === "Backspace") deletedSelectedElements();
+    if (e.key === 'Backspace') deletedSelectedElements();
   };
 
   useEffect(() => {
-    window.addEventListener("keydown", handleDeletePress);
+    window.addEventListener('keydown', handleDeletePress);
 
     return () => {
-      window.removeEventListener("keydown", handleDeletePress);
+      window.removeEventListener('keydown', handleDeletePress);
     };
   }, []);
 
   const handleUngroupElements = () => {
     removeGroup();
-  }
+  };
   const handleGroupElements = () => {
     addGroup();
-  }
+    console.log('selectedElements', selectedElements);
+  };
 
   return (
     <Box
       p="xs"
       sx={{
-        width: "100%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-      }}
-    >
-      {type === "text" && <TextToolbar />}
-      {type === "image" && <ImageToolbar />}
-      {type === "svg-path" && <SvgPathToolbar />}
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}>
+      {type === 'text' && <TextToolbar />}
+      {type === 'image' && <ImageToolbar />}
+      {type === 'svg-path' && <SvgPathToolbar />}
       <div style={{ flex: 1 }} />
       <Group spacing="xs">
-        {isGrouped ? (
-          <Button onClick={handleUngroupElements}>UnGroup</Button>
-        ) : (
-          <Button onClick={handleGroupElements}>Group</Button>
-        )}
+        {!isGrouped && selectedElements.length > 1 ? (
+          <ActionIcon
+            onClick={handleGroupElements}
+            variant="outline"
+            color="dark"
+            style={{ borderRadius: 4, borderColor: '#ccc' }}
+            size={36}>
+            <FaRegObjectUngroup />
+          </ActionIcon>
+        ) : selectedElements.length > 1 ? (
+          <ActionIcon
+            onClick={handleUngroupElements}
+            variant="light"
+            color="dark"
+            style={{ borderRadius: 4, borderColor: '#ccc' }}
+            size={36}>
+            <FaRegObjectUngroup />
+          </ActionIcon>
+        ) : null}
         <Menu width={170} position="bottom-end" closeOnItemClick={false}>
           <Menu.Target>
-            <ActionIcon
-              size={36}
-              variant="default"
-              disabled={selectedElements.length !== 1}
-            >
+            <ActionIcon size={36} variant="default" disabled={selectedElements.length !== 1}>
               <Eye />
             </ActionIcon>
           </Menu.Target>
@@ -139,8 +144,7 @@ export function Toolbar() {
           variant="light"
           onClick={handleDeleteClick}
           disabled={selectedElements.length === 0}
-          color="red"
-        >
+          color="red">
           <Trash />
         </ActionIcon>
       </Group>

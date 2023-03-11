@@ -30,8 +30,7 @@ export function Canvas() {
   const elementAtoms = useAtomValue(elementAtomsAtom);
   const unSelectAllElements = useSetAtom(unSelectAllAtom);
 
-  const handleCanvasClick = (e: React.MouseEvent) => {
-    console.log('canvas clicked: ', e.currentTarget)
+  const handleCanvasMouseDown = () => {
     unSelectAllElements();
   }
   return (
@@ -45,7 +44,7 @@ export function Canvas() {
         position: "relative",
         backgroundColor: "white",
       })}
-      onClick={handleCanvasClick}
+      onMouseDown={handleCanvasMouseDown}
     >
       {elementAtoms.map((elementAtom) => (
         <Element key={elementAtom.toString()} elementAtom={elementAtom} />
