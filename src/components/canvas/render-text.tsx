@@ -1,9 +1,8 @@
-import React, { RefObject, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
-import { activeElementAtomAtom, MoveableElement, selectedElementAtomsAtom, TextType } from './store';
+import React, { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
+import { MoveableElement, TextType } from './store';
 import { Box, Center, useMantineTheme } from '@mantine/core';
 import { useWindowEvent } from '@mantine/hooks';
-import { useSetAtom } from 'jotai';
-import { useKeyPress } from '../../utils/use-key-press';
+
 
 type Status =
   | 'none'
@@ -13,6 +12,16 @@ type Status =
   | 'resize-tl'
   | 'resize-bl'
   | 'resize-tr';
+
+function selectElementContents(el: HTMLElement) {
+  var range = document.createRange();
+  range.selectNodeContents(el);
+  var sel = window.getSelection();
+  if (sel) {
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+}
 
 export function RenderText({
   element,
@@ -30,9 +39,6 @@ export function RenderText({
   const theme = useMantineTheme();
   const [status, setStatus] = useState<Status>('none');
   const lastPos = useRef({ x: 0, y: 0 });
-  const setSelectedElements = useSetAtom(selectedElementAtomsAtom);
-  const setActiveElement = useSetAtom(activeElementAtomAtom);
-  const isShiftPressed = useKeyPress("Shift");
 
   useWindowEvent("keydown", (e: KeyboardEvent) => {
     if (e.key === "Escape") {
@@ -79,9 +85,10 @@ export function RenderText({
     setStatus('move');
     onSelect(e);
     if (isSelected) {
+      selectElementContents(ref.current!)
       setEditable(true);
     }
-  }, []);
+  }, [isSelected]);
 
   const handleResizeMouseDown = (e: React.MouseEvent, stat: Status) => {
     e.stopPropagation();
