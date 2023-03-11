@@ -20,21 +20,6 @@ import {
 } from '../../components/canvas/store';
 import { addGroupAtom } from '../toolbar';
 
-const useStyles = createStyles((theme) => ({
-  shape: {
-    cursor: 'pointer',
-    border: `1px solid ${theme.colors.gray[2]}`,
-    boxShadow: '0 0 1px rgba(0,0,0,0.3)',
-    borderRadius: 5,
-    padding: 8,
-    '&:hover': {
-      opacity: 0.7,
-      transform: 'scale(1.1)',
-      transition: 'transform 0.3s'
-    }
-  }
-}));
-
 const elementData: {
   id: number;
   data: CanvasElement;
@@ -88,7 +73,6 @@ const elementData: {
 
 export function TextPanel() {
   const addElement = useSetAtom(addElementAtom);
-  const { classes } = useStyles();
   const theme = useMantineTheme()
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -138,8 +122,8 @@ export function TextPanel() {
                 onClick={() => handleAddElement(item.data)}
                 style={{
                   ...item.data.props,
-                  border: `1px solid ${theme.colors.gray[1]}}`,
-                  backgroundColor: theme.colors.gray[0],
+                  border: `1px solid ${theme.colors.dark[2]}}`,
+                  backgroundColor: theme.colors.gray[1],
                   padding: '8px 16px',
                   borderRadius: 2,
                   cursor: 'pointer'

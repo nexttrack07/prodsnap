@@ -10,6 +10,7 @@ import {
   BrowserRouter as Router,
 } from "react-router-dom";
 import { Editor, Login, ProtectedRoute, userAtom } from "./pages";
+import './index.css';
 
 const queryClient = new QueryClient();
 
@@ -34,7 +35,7 @@ function App() {
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <MantineProvider theme={{ colorScheme: 'light', primaryColor: 'indigo', primaryShade: 7, defaultRadius: 0 }}>
+    <MantineProvider theme={{ colorScheme: 'light', primaryColor: 'blue', primaryShade: 7, }}>
       <Global
         styles={(theme) => ({
           '*, *::before, *::after': { boxSizing: 'border-box' },

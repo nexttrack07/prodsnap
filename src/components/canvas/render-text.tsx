@@ -36,7 +36,10 @@ export function RenderText({
     setStatus('idle');
     setElement((el) => ({
       ...el,
-      props: { fontSize: (el.props.fontSize as number) * ((el.width + delta.current.x) / el.width) }
+      props: {
+        ...el.props,
+        fontSize: (el.props.fontSize as number) * ((el.width + delta.current.x) / el.width)
+      }
     }));
     delta.current = { x: 0, y: 0 };
   }, []);
@@ -149,7 +152,7 @@ export function RenderText({
         top: element.y,
         userSelect: 'none',
         position: 'absolute',
-        border: isSelected ? `4px solid ${theme.colors.indigo[9]}` : '',
+        border: isSelected ? `2px solid ${theme.colors.blue[7]}` : '',
         borderRadius: 3,
         ...element.props
       }}>
@@ -171,7 +174,7 @@ export function RenderText({
             borderRadius: '50%',
             transform: 'translate(50%,50%)',
             backgroundColor: theme.colors.gray[2],
-            boxShadow: '1px 1px 2px rgba(0,0,0,0.4)',
+            boxShadow: '0 0 1px rgba(0,0,0,0.4)',
             border: '1px solid rgba(0,0,0,0.3)',
             cursor: 'grab'
           }}
