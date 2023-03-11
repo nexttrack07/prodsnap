@@ -121,3 +121,10 @@ export const addElementAtom = atom(null, (_, set, newEl: CanvasElement) => {
 export const addElementsAtom = atom(null, (_, set, newEls: CanvasElement[]) => {
   set(elementAtomsAtom, (elementAtoms) => [...elementAtoms, ...newEls.map((newEl) => atom(newEl))]);
 });
+
+export const canvasAtom = atom({
+  width: 900,
+  height: 750,
+  scale: 1,
+  backgroundColor: 'white'
+})

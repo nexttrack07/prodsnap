@@ -4,6 +4,7 @@ import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { createElement, ReactNode } from "react";
 import {
   activeElementAtomAtom,
+  canvasAtom,
   CanvasElement,
   elementAtomsAtom,
   ElementType,
@@ -29,20 +30,23 @@ const unSelectAllAtom = atom(null, (_get, set) => {
 export function Canvas() {
   const elementAtoms = useAtomValue(elementAtomsAtom);
   const unSelectAllElements = useSetAtom(unSelectAllAtom);
+  const { width, height, backgroundColor } = useAtomValue(canvasAtom);
+  const selected = useAtomValue(selectedElementAtomsAtom).length === 0;
 
   const handleCanvasMouseDown = () => {
     unSelectAllElements();
   }
+
   return (
     <Box
       id="canvas"
       sx={(theme) => ({
-        width: 900,
-        height: 700,
-        border: `1px solid ${theme.colors.gray[4]}`,
+        width,
+        height,
+        border: selected ? `1px solid ${theme.colors.blue[7]}` : `1px solid ${theme.colors.gray[4]}`,
         boxShadow: "0px 0px 0.8px rgba(0,0,0,0.3)",
         position: "relative",
-        backgroundColor: "white",
+        backgroundColor,
       })}
       onMouseDown={handleCanvasMouseDown}
     >

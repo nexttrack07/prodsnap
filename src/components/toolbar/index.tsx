@@ -11,11 +11,12 @@ import {
 import { SvgPathToolbar } from './svg-path-toolbar';
 import { ImageToolbar } from './image-toolbar';
 import { TextToolbar } from './text-toolbar';
+import { CanvasToolbar } from './canvas-toolbar';
 import { Eye, Trash } from 'tabler-icons-react';
 
 const getTypeAtom = atom((get) => {
   const activeElementAtom = get(activeElementAtomAtom);
-  if (!activeElementAtom) return null;
+  if (!activeElementAtom) return "canvas";
   const activeElement = get(activeElementAtom);
   return activeElement.type;
 });
@@ -96,7 +97,6 @@ export function Toolbar() {
   };
   const handleGroupElements = () => {
     addGroup();
-    console.log('selectedElements', selectedElements);
   };
 
   return (
@@ -111,6 +111,7 @@ export function Toolbar() {
       {type === 'text' && <TextToolbar />}
       {type === 'image' && <ImageToolbar />}
       {type === 'svg-path' && <SvgPathToolbar />}
+      {type === 'canvas' && (<CanvasToolbar />)}
       <div style={{ flex: 1 }} />
       <Group spacing="xs">
         {!isGrouped && selectedElements.length > 1 ? (
