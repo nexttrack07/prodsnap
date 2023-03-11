@@ -122,11 +122,14 @@ export function TextPanel() {
                 onClick={() => handleAddElement(item.data)}
                 style={{
                   ...item.data.props,
-                  border: `1px solid ${theme.colors.dark[2]}}`,
                   backgroundColor: theme.colors.gray[1],
                   padding: '8px 16px',
                   borderRadius: 2,
-                  cursor: 'pointer'
+                  borderWidth: 1,
+                  borderStyle: 'solid',
+                  borderColor: theme.colors.gray[4],
+                  cursor: 'pointer',
+                  display: 'block'
                 }}>
                 {item.data.content}
               </Text>
