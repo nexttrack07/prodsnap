@@ -1,3 +1,4 @@
+import React from 'react';
 import { atom, useAtom, useAtomValue } from "jotai";
 import { selectedItemsAtom } from "./store";
 import { isCroppingAtom } from "../toolbar/image-toolbar";
@@ -118,7 +119,7 @@ export function DragHandler() {
       <div
         style={{
           position: "absolute",
-          border: `4px solid ${theme.colors.teal[8]}`,
+          border: `2px dashed ${theme.colors.blue[6]}`,
           top: 0,
           left: 0,
           bottom: 0,
