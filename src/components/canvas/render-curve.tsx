@@ -43,6 +43,14 @@ const useStyles = createStyles((theme) => ({
       cursor: 'pointer',
       stroke: theme.colors.blue[6]
     }
+  },
+  path2: {
+    '&:hover': {
+      cursor: 'pointer',
+    },
+    '&:hover + path': {
+      stroke: theme.colors.blue[6]
+    }
   }
 }));
 
@@ -75,6 +83,8 @@ export function RenderCurve({ element, onSelect, isSelected }: Props) {
         <g>
           <g style={{ userSelect: 'none' }}>
             <path
+              onMouseDown={handleMouseDown}
+              className={classes.path2}
               d={getPathFromPoints(points)}
               strokeWidth="32"
               fill="none"
@@ -146,7 +156,8 @@ function RenderPoint({ pointAtom, width }: { pointAtom: SVGPointAtom; width: num
         borderColor: theme.colors.blue[6],
         borderStyle: 'solid',
         borderWidth: 1,
-        boxShadow: theme.shadows.sm
+        boxShadow: theme.shadows.sm,
+        cursor: isMoving ? 'grabbing' : 'grab'
       }}></div>
   );
 }
