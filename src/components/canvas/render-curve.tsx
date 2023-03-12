@@ -43,7 +43,7 @@ const useStyles = createStyles((theme) => ({
       cursor: 'pointer',
       stroke: theme.colors.blue[6]
     }
-  },
+  }
 }));
 
 export function RenderCurve({ element, onSelect, isSelected }: Props) {
@@ -64,29 +64,38 @@ export function RenderCurve({ element, onSelect, isSelected }: Props) {
         style={{
           minHeight: 1,
           minWidth: 1,
-          overflow: 'visible'
+          overflow: 'visible',
+          display: 'block',
+          height: '100%',
+          width: '100%',
+          position: 'absolute'
         }}
+        stroke={element.stroke}
         vectorEffect="non-scaling-stroke">
-        <defs>
-          <marker
-            id="arrow"
-            viewBox="0 0 10 10"
-            refX="5"
-            refY="5"
-            markerWidth="6"
-            markerHeight="6"
-            orient="auto-start-reverse">
-            <path d="M 0 0 L 10 5 L 0 10 z" />
-          </marker>
-        </defs>
-        <path
-          onMouseDown={handleMouseDown}
-          className={classes.path}
-          d={getPathFromPoints(points)}
-          strokeWidth={element.strokeWidth}
-          stroke={element.stroke}
-          markerEnd="url(#arrow)"
-        />
+        <g>
+          <g style={{ userSelect: 'none' }}>
+            <path
+              d={getPathFromPoints(points)}
+              strokeWidth="32"
+              fill="none"
+              opacity={0}
+              pointerEvents="auto"
+              strokeLinecap="butt"
+              stroke="transparent"
+            />
+            <path
+              onMouseDown={handleMouseDown}
+              className={classes.path}
+              fill="none"
+              strokeLinecap='butt'
+              pointerEvents='auto'
+              d={getPathFromPoints(points)}
+              strokeWidth={element.strokeWidth}
+              stroke={element.stroke}
+              markerEnd="url(#arrow)"
+            />
+          </g>
+        </g>
       </svg>
       {isSelected &&
         element.points.map((pointAtom) => (
