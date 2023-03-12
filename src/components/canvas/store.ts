@@ -45,10 +45,11 @@ export type SVGPointType = {
 
 export type SVGPointAtom = WritableAtom<SVGPointType & Draggable, Action<SVGPointType & Draggable>>
 
-export type SVGPointLine = {
+export type SVGCurveType = {
   type: 'svg-curve';
   points: SVGPointAtom[];
-  stroke: number;
+  stroke: string;
+  strokeWidth: number;
 };
 export type SVGPathType = {
   type: 'svg-path';
@@ -77,7 +78,7 @@ export type ImageType = {
 };
 
 export type CanvasElement = MoveableElement &
-  (SVGType | ImageType | TextType | SVGPathType | SVGLineType | SVGPointLine);
+  (SVGType | ImageType | TextType | SVGPathType | SVGLineType | SVGCurveType);
 export type ElementType = WritableAtom<CanvasElement, Action<CanvasElement>>;
 export type GroupType = WritableAtom<ElementType[], Action<ElementType[]>>;
 

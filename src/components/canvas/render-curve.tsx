@@ -6,13 +6,13 @@ import useEventListener from '../../utils/use-event';
 import {
   CanvasElement,
   MoveableElement,
-  SVGPointLine,
+  SVGCurveType,
   SVGPointAtom,
   SVGPointType,
   Draggable
 } from './store';
 
-type SVGCanvasElement = MoveableElement & SVGPointLine;
+type SVGCanvasElement = MoveableElement & SVGCurveType;
 
 type Props = {
   element: SVGCanvasElement;
@@ -39,14 +39,14 @@ const getPathFromPoints = (points: (SVGPointType & Draggable)[]) => {
 
 const useStyles = createStyles((theme) => ({
   path: {
-    "&:hover": {
+    '&:hover': {
       cursor: 'pointer',
-      stroke: theme.colors.blue[6],
-    },
-  }
+      stroke: theme.colors.blue[6]
+    }
+  },
 }));
 
-export function RenderPointLine({ element, onSelect, isSelected }: Props) {
+export function RenderCurve({ element, onSelect, isSelected }: Props) {
   const points = useAtomValue(getPointsAtom(element.points));
   const { classes } = useStyles();
 
@@ -64,21 +64,39 @@ export function RenderPointLine({ element, onSelect, isSelected }: Props) {
         style={{
           minHeight: 1,
           minWidth: 1,
-          overflow: 'visible',
+          overflow: 'visible'
         }}
-        vectorEffect="non-scaling-stroke"
-      >
-        <path className={classes.path} onMouseDown={handleMouseDown} d={getPathFromPoints(points)} stroke="black" strokeWidth={element.stroke} />
+        vectorEffect="non-scaling-stroke">
+        <defs>
+          <marker
+            id="arrow"
+            viewBox="0 0 10 10"
+            refX="5"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+        </defs>
+        <path
+          onMouseDown={handleMouseDown}
+          className={classes.path}
+          d={getPathFromPoints(points)}
+          strokeWidth={element.strokeWidth}
+          stroke={element.stroke}
+          markerEnd="url(#arrow)"
+        />
       </svg>
       {isSelected &&
         element.points.map((pointAtom) => (
-          <RenderPoint key={`${pointAtom}`} width={element.stroke} pointAtom={pointAtom} />
+          <RenderPoint key={`${pointAtom}`} width={element.strokeWidth} pointAtom={pointAtom} />
         ))}
     </div>
   );
 }
 
-function RenderPoint({ pointAtom, width }: { pointAtom: SVGPointAtom, width: number }) {
+function RenderPoint({ pointAtom, width }: { pointAtom: SVGPointAtom; width: number }) {
   const [point, setPoint] = useAtom(pointAtom);
   const documentRef = useRef<Document>(document);
   const [isMoving, setIsMoving] = useState(false);
@@ -119,8 +137,7 @@ function RenderPoint({ pointAtom, width }: { pointAtom: SVGPointAtom, width: num
         borderColor: theme.colors.blue[6],
         borderStyle: 'solid',
         borderWidth: 1,
-        boxShadow: theme.shadows.sm,
-      }}>
-    </div>
+        boxShadow: theme.shadows.sm
+      }}></div>
   );
 }

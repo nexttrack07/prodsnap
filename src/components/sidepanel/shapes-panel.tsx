@@ -3,7 +3,7 @@ import { Text, Space, createStyles, SimpleGrid, Button, DEFAULT_THEME } from "@m
 import { atom, useSetAtom } from "jotai";
 import { useQuery } from "@tanstack/react-query";
 import { getShapes } from "../../api";
-import { CanvasElement, addElementAtom, addElementsAtom, MoveableElement, SVGType, SVGPointLine, SVGPointType, Draggable } from "../../components/canvas/store";
+import { CanvasElement, addElementAtom, addElementsAtom, MoveableElement, SVGType, SVGCurveType, SVGPointType, Draggable } from "../../components/canvas/store";
 
 const useStyles = createStyles(() => ({
   shape: {
@@ -15,7 +15,7 @@ const useStyles = createStyles(() => ({
     },
   },
 }));
-type LineType = Omit<SVGPointLine & MoveableElement, "p1" | "p2"> & { p1: SVGPointType & Draggable; p2: SVGPointType & Draggable };
+type LineType = Omit<SVGCurveType & MoveableElement, "p1" | "p2"> & { p1: SVGPointType & Draggable; p2: SVGPointType & Draggable };
 const LINE: LineType = {
   type: "svg-curve",
   p1: {

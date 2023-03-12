@@ -13,6 +13,7 @@ import { ImageToolbar } from './image-toolbar';
 import { TextToolbar } from './text-toolbar';
 import { CanvasToolbar } from './canvas-toolbar';
 import { Eye, Trash } from 'tabler-icons-react';
+import { SvgCurveToolbar } from './svg-curve-toolbar';
 
 const getTypeAtom = atom((get) => {
   const activeElementAtom = get(activeElementAtomAtom);
@@ -111,6 +112,7 @@ export function Toolbar() {
       {type === 'text' && <TextToolbar />}
       {type === 'image' && <ImageToolbar />}
       {type === 'svg-path' && <SvgPathToolbar />}
+      {type === 'svg-curve' && <SvgCurveToolbar />}
       {type === 'canvas' && (<CanvasToolbar />)}
       <div style={{ flex: 1 }} />
       <Group spacing="xs">

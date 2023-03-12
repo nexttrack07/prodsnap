@@ -17,7 +17,7 @@ import { RenderSvg } from "./render-svg";
 import { RenderText } from "./render-text";
 import { RenderPath } from "./render-path";
 import { RenderLine } from "./render-line";
-import { RenderPointLine } from "./render-point-line";
+import { RenderCurve } from "./render-curve";
 import { useShiftKeyPressed } from "../../utils";
 import { atomFamily } from "jotai/utils";
 import { DragHandler } from "./drag-handler";
@@ -73,7 +73,7 @@ export const elementCompMap: Record<CanvasElement["type"], React.FC<any>> = {
   text: RenderText,
   "svg-path": RenderPath,
   "svg-line": RenderLine,
-  "svg-curve": RenderPointLine,
+  "svg-curve": RenderCurve,
 };
 
 const groupFromElementAtom = atomFamily((element: CanvasElement) => atom(
