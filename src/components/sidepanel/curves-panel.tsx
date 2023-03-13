@@ -32,6 +32,7 @@ const data: { id: number; prev: string; data: MoveableElement & SVGCurveType }[]
       height: 3,
       strokeWidth: 2,
       stroke: 'black',
+      startMarker: "none",
       // TODO: DONT USE THIS - create atoms inside the component
       points: [
         atom({

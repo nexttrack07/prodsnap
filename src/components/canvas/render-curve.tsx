@@ -12,6 +12,24 @@ import {
 } from './store';
 import { RenderPoint } from './render-point';
 
+const START_MARKERS = {
+  none: null,
+  'outline-arrow': (<path
+    fill="none"
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M 2.5,-1.5,0.5,0,2.5,1.5 "
+  />),
+  'fill-arrow': (<path
+    fill="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M 2.5,-1.5,0.5,0,2.5,1.5 Z"
+  />),
+  'outline-circle': (<circle strokeWidth={1} stroke="currentColor" fill="none" cx={0} cy={0} r="1.2" />)
+} as const;
+
 type SVGCanvasElement = MoveableElement & SVGCurveType;
 
 type Props = {
@@ -27,7 +45,7 @@ const getPointsAtom = atomFamily((atoms: SVGPointAtom[]) =>
   })
 );
 
-const getPathFromPoints = (points: (SVGPointType & Draggable)[]) => {
+const getPathFromPoints = (points: { x: number; y: number }[]) => {
   return points.reduce((acc, point) => {
     if (acc === '') {
       return acc + `M ${point.x} ${point.y}`;
@@ -44,14 +62,6 @@ const useStyles = createStyles((theme) => ({
     }
   }
 }));
-
-// const updatePointsAtom = atomFamily((pointAtoms: SVGPointAtom[]) =>
-//   atom(null, (_, set, update: { x: number; y: number }) => {
-//     pointAtoms.forEach(pointAtom => {
-//       set(pointAtom, prev => ({ ...prev, x: prev.x + update.x, y: prev.y + update.y }));
-//     })
-//   })
-// );
 
 export function RenderCurve({ element, setElement, onSelect, isSelected }: Props) {
   const points = useAtomValue(getPointsAtom(element.points));
@@ -139,7 +149,16 @@ export function RenderCurve({ element, setElement, onSelect, isSelected }: Props
               d={getPathFromPoints(points)}
               strokeWidth={element.strokeWidth}
               stroke={element.stroke}
+              strokeDasharray={element.strokeDasharray}
             />
+          </g>
+          <g
+            // style={{ position: 'absolute', left: points.at(0)!.x, top: points.at(-1)!.y }}
+            // transform="translate(0 3.5) scale(7)"
+            color={element.stroke}
+            transform={`translate(${points.at(0)!.x - 7} ${points.at(0)!.y}) scale(5)`}
+          >
+            {START_MARKERS[element.startMarker]}
           </g>
         </g>
       </svg>

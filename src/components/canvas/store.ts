@@ -47,8 +47,12 @@ export type SVGPointAtom = WritableAtom<SVGPointType & Draggable, Action<SVGPoin
 export type SVGCurveType = {
   type: 'svg-curve';
   points: SVGPointAtom[];
+  clipPathId?: string;
   stroke: string;
   strokeWidth: number;
+  strokeLinecap?: 'inherit' | 'butt' | 'round' | 'square' | undefined;
+  strokeDasharray?: string;
+  startMarker: "none" | "fill-arrow" | "outline-arrow" | "outline-circle";
 };
 export type SVGPathType = {
   type: 'svg-path';
