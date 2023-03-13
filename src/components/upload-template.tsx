@@ -1,7 +1,7 @@
 import { Box, Button, Divider, Group, Modal } from "@mantine/core";
 import { addTemplate } from "../api/template";
 import { atom, useAtomValue } from "jotai";
-import { useState } from "react";
+import React, { useState } from "react";
 import { CloudUpload } from "tabler-icons-react";
 import { elementCompMap } from "./canvas";
 import { dimensionAtom, positionAtom } from "./canvas/select-handler";
@@ -74,7 +74,7 @@ export function UploadTemplate() {
         <Divider my="xl" variant="dotted" />
         <Group>
           <div style={{ flex: 1 }} />
-          <Button onClick={handleTemplateUpload} loading={loading} color="dark">
+          <Button onClick={handleTemplateUpload} loading={loading}>
             Upload
           </Button>
         </Group>
@@ -82,7 +82,6 @@ export function UploadTemplate() {
       <Button
         onClick={() => setOpened(true)}
         leftIcon={<CloudUpload size={18} />}
-        color="dark"
       >
         Upload
       </Button>
@@ -108,7 +107,7 @@ function Element({ elementAtom }: { elementAtom: ElementType }) {
         position: "absolute",
       }}
     >
-      <Comp element={element} setElement={() => {}} isSelected={false} />
+      <Comp element={element} setElement={() => { }} isSelected={false} />
     </Box>
   );
 }
