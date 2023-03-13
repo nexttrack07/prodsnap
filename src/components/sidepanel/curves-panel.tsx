@@ -1,63 +1,59 @@
-import {
-  Text,
-  Space,
-  createStyles,
-  SimpleGrid,
-} from "@mantine/core";
+import { Text, Space, createStyles, SimpleGrid } from '@mantine/core';
 import React from 'react';
-import { atom, useSetAtom } from "jotai";
+import { atom, useSetAtom } from 'jotai';
 import {
   addElementAtom,
   CanvasElement,
   MoveableElement,
-  SVGLineType,
-} from "../../components/canvas/store";
+  SVGCurveType,
+  SVGLineType
+} from '../../components/canvas/store';
 
 const useStyles = createStyles(() => ({
   shape: {
-    cursor: "pointer",
-    "&:hover": {
+    cursor: 'pointer',
+    '&:hover': {
       opacity: 0.7,
-      transform: "scale(1.1)",
-      transition: "transform 0.3s",
-    },
-  },
+      transform: 'scale(1.1)',
+      transition: 'transform 0.3s'
+    }
+  }
 }));
 
-const data: { id: number; prev: string; data: MoveableElement & SVGLineType }[] = [
+const data: { id: number; prev: string; data: MoveableElement & SVGCurveType }[] = [
   {
     id: 0,
-    prev: "M 0 0 L 50 0",
+    prev: 'M 0 0 L 50 0',
     data: {
-      type: "svg-line",
+      type: 'svg-curve',
       x: 200,
       y: 200,
       width: 100,
       height: 3,
-      strokeProps: {
-        strokeWidth: 2,
-        stroke: 'black',
-      },
+      strokeWidth: 2,
+      stroke: 'black',
       // TODO: DONT USE THIS - create atoms inside the component
-      start: atom({
-        type: "svg-point",
-        x: 100,
-        y: 100
-      }),
-      end: atom({
-        type: "svg-point",
-        x: 500,
-        y: 100
-      }),
-    },
-  },
+      points: [
+        atom({
+          type: 'svg-point',
+          x: 100,
+          y: 100
+        }),
+        atom({
+          type: 'svg-point',
+          x: 500,
+          y: 100
+        })
+      ]
+    }
+  }
 ];
 
 const templateData = [
   {
     id: 0,
-    data: [{}],
-  },
+    data: [{}]
+  }
 ];
 
 export function CurvesPanel() {
@@ -82,9 +78,14 @@ export function CurvesPanel() {
               className={classes.shape}
               fill="#000"
               stroke="#000"
-              style={{ height: '100%', width: '100%', minHeight: 1, minWidth: 1, overflow: 'visible' }}
-              onClick={() => handleAddElement(item.data)}
-            >
+              style={{
+                height: '100%',
+                width: '100%',
+                minHeight: 1,
+                minWidth: 1,
+                overflow: 'visible'
+              }}
+              onClick={() => handleAddElement(item.data)}>
               <g transform="scale(1) translate(0, 0.5)">
                 <path d={item.prev} />
               </g>
