@@ -34,10 +34,9 @@ export type SVGStrokeProps = {
 };
 export type SVGLineType = {
   type: 'svg-line';
-  props?: SVGAttributes<SVGSVGElement>;
-  line: SVGAttributes<SVGLineElement>;
-  startPath?: SVGAttributes<SVGPathElement>;
-  endPath?: SVGAttributes<SVGPathElement>;
+  start: SVGPointAtom;
+  end: SVGPointAtom;
+  strokeProps: Partial<SVGStrokeProps>;
 };
 export type SVGPointType = {
   type: 'svg-point';

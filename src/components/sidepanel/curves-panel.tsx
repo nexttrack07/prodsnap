@@ -10,7 +10,7 @@ import {
   addElementAtom,
   CanvasElement,
   MoveableElement,
-  SVGCurveType,
+  SVGLineType,
 } from "../../components/canvas/store";
 
 const useStyles = createStyles(() => ({
@@ -24,32 +24,31 @@ const useStyles = createStyles(() => ({
   },
 }));
 
-const data: { id: number; prev: string; data: MoveableElement & SVGCurveType }[] = [
+const data: { id: number; prev: string; data: MoveableElement & SVGLineType }[] = [
   {
     id: 0,
     prev: "M 0 0 L 50 0",
     data: {
-      type: "svg-curve",
+      type: "svg-line",
       x: 200,
       y: 200,
       width: 100,
       height: 3,
-      strokeWidth: 2,
-      stroke: 'black',
-      points: [
-
-        // TODO: DONT USE THIS - create atoms inside the component
-        atom({
-          type: "svg-point",
-          x: 100,
-          y: 100
-        }),
-        atom({
-          type: "svg-point",
-          x: 500,
-          y: 100
-        }),
-      ]
+      strokeProps: {
+        strokeWidth: 2,
+        stroke: 'black',
+      },
+      // TODO: DONT USE THIS - create atoms inside the component
+      start: atom({
+        type: "svg-point",
+        x: 100,
+        y: 100
+      }),
+      end: atom({
+        type: "svg-point",
+        x: 500,
+        y: 100
+      }),
     },
   },
 ];

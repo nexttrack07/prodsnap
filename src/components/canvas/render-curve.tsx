@@ -1,8 +1,7 @@
 import { createStyles, useMantineTheme } from '@mantine/core';
 import { atom, SetStateAction, useAtom, useAtomValue } from 'jotai';
 import { atomFamily } from 'jotai/utils';
-import React, { useRef, useState, useCallback } from 'react';
-import useEventListener from '../../utils/use-event';
+import React, { useCallback } from 'react';
 import {
   CanvasElement,
   MoveableElement,
@@ -11,6 +10,7 @@ import {
   SVGPointType,
   Draggable
 } from './store';
+import { RenderPoint } from './render-point';
 
 type SVGCanvasElement = MoveableElement & SVGCurveType;
 
@@ -115,49 +115,3 @@ export function RenderCurve({ element, onSelect, isSelected }: Props) {
   );
 }
 
-function RenderPoint({ pointAtom, width }: { pointAtom: SVGPointAtom; width: number }) {
-  const [point, setPoint] = useAtom(pointAtom);
-  const documentRef = useRef<Document>(document);
-  const [isMoving, setIsMoving] = useState(false);
-  const theme = useMantineTheme();
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsMoving(true);
-  };
-
-  const handleMouseUp = (e: MouseEvent) => {
-    e.stopPropagation();
-    setIsMoving(false);
-  };
-
-  const handleMouseMove = (e: MouseEvent) => {
-    e.stopPropagation();
-    if (isMoving) {
-      setPoint((el) => ({ ...el, x: e.movementX + el.x, y: e.movementY + el.y }));
-    }
-  };
-
-  useEventListener('pointerup', handleMouseUp, documentRef);
-  useEventListener('pointermove', handleMouseMove, documentRef, [isMoving]);
-
-  return (
-    <div
-      onMouseDown={handleMouseDown}
-      style={{
-        position: 'absolute',
-        left: point.x,
-        top: point.y,
-        transform: `translate(-${4}px,-${4 + width / 2}px)`,
-        width: 12,
-        height: 12,
-        borderRadius: '50%',
-        backgroundColor: theme.colors.blue[1],
-        borderColor: theme.colors.blue[6],
-        borderStyle: 'solid',
-        borderWidth: 1,
-        boxShadow: theme.shadows.sm,
-        cursor: isMoving ? 'grabbing' : 'grab'
-      }}></div>
-  );
-}
