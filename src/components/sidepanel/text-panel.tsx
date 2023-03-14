@@ -7,7 +7,9 @@ import {
   Divider,
   Loader,
   Button,
-  useMantineTheme
+  useMantineTheme,
+  Image,
+  Box
 } from '@mantine/core';
 import { getTemplates } from '../../api/template';
 import { atom, useSetAtom } from 'jotai';
@@ -141,13 +143,13 @@ export function TextPanel() {
         })}
       </SimpleGrid>
       <Divider my="xl" variant="dotted" />
-      <SimpleGrid cols={2}>
+      <SimpleGrid cols={1}>
         {loading && <Loader />}
         {data &&
           data.map((item: any) => (
-            <Button onClick={() => handleAddTemplate(deserialize(item.data.template))} key={item.id}>
-              Add Template
-            </Button>
+            <Box onClick={() => handleAddTemplate(deserialize(item.data.template))} key={item.id}>
+              <Image width={200} src={item.data.url} />
+            </Box>
           ))}
       </SimpleGrid>
     </>

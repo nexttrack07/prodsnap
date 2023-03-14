@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FileButton,
   createStyles,
@@ -119,21 +119,21 @@ export function UploadPanel() {
       <SimpleGrid cols={3}>
         {images.length > 0
           ? images.map((image) => (
-              <Image
-                key={image.url}
-                radius="md"
-                className={classes.shape}
-                src={image.url}
-                onClick={() => {
-                  const el: CanvasElement = {
-                    ...defaultImage,
-                    url: image.url,
-                  };
+            <Image
+              key={image.url}
+              radius="md"
+              className={classes.shape}
+              src={image.url}
+              onClick={() => {
+                const el: CanvasElement = {
+                  ...defaultImage,
+                  url: image.url,
+                };
 
-                  handleAddElement(el);
-                }}
-              />
-            ))
+                handleAddElement(el);
+              }}
+            />
+          ))
           : null}
       </SimpleGrid>
     </>
