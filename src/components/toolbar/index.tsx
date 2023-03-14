@@ -12,12 +12,12 @@ import { SvgPathToolbar } from './svg-path-toolbar';
 import { ImageToolbar } from './image-toolbar';
 import { TextToolbar } from './text-toolbar';
 import { CanvasToolbar } from './canvas-toolbar';
-import { Eye, Trash } from 'tabler-icons-react';
+import { Copy, Eye, Trash } from 'tabler-icons-react';
 import { SvgCurveToolbar } from './svg-curve-toolbar';
 
 const getTypeAtom = atom((get) => {
   const activeElementAtom = get(activeElementAtomAtom);
-  if (!activeElementAtom) return "canvas";
+  if (!activeElementAtom) return 'canvas';
   const activeElement = get(activeElementAtom);
   return activeElement.type;
 });
@@ -69,6 +69,23 @@ const removeGroupAtom = atom(null, (get, set) => {
   });
 });
 
+const copySelectedAtom = atom(null, (get, set) => {
+  const selectedElementAtoms = get(selectedElementAtomsAtom);
+  const selectedElements = selectedElementAtoms.map((a) => get(a));
+
+  set(elementAtomsAtom, (elementAtoms) => [
+    ...elementAtoms,
+    ...selectedElements.map((el) =>
+      atom({ ...el, x: el.x + getRandomNumber(15, 20), y: el.y + getRandomNumber(40, 45) })
+    )
+  ]);
+  set(selectedElementAtomsAtom, []);
+});
+
+function getRandomNumber(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 export function Toolbar() {
   const type = useAtomValue(getTypeAtom);
   const deletedSelectedElements = useSetAtom(deleteSelectedAtom);
@@ -76,6 +93,7 @@ export function Toolbar() {
   const addGroup = useSetAtom(addGroupAtom);
   const removeGroup = useSetAtom(removeGroupAtom);
   const isGrouped = useAtomValue(isGroupedAtom);
+  const copySelected = useSetAtom(copySelectedAtom);
 
   const handleDeleteClick = () => {
     deletedSelectedElements();
@@ -85,19 +103,24 @@ export function Toolbar() {
     if (e.key === 'Backspace') deletedSelectedElements();
   };
 
-  useEffect(() => {
-    window.addEventListener('keydown', handleDeletePress);
+  // TODO: This is interfering with the Text object. While typing, the delete key is triggering this event instead of backspace.
+  // useEffect(() => {
+  //   window.addEventListener('keydown', handleDeletePress);
 
-    return () => {
-      window.removeEventListener('keydown', handleDeletePress);
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener('keydown', handleDeletePress);
+  //   };
+  // }, []);
 
   const handleUngroupElements = () => {
     removeGroup();
   };
   const handleGroupElements = () => {
     addGroup();
+  };
+
+  const handleCopyClick = () => {
+    copySelected();
   };
 
   return (
@@ -113,7 +136,7 @@ export function Toolbar() {
       {type === 'image' && <ImageToolbar />}
       {type === 'svg-path' && <SvgPathToolbar />}
       {type === 'svg-curve' && <SvgCurveToolbar />}
-      {type === 'canvas' && (<CanvasToolbar />)}
+      {type === 'canvas' && <CanvasToolbar />}
       <div style={{ flex: 1 }} />
       <Group spacing="xs">
         {!isGrouped && selectedElements.length > 1 ? (
@@ -135,6 +158,13 @@ export function Toolbar() {
             <FaRegObjectUngroup />
           </ActionIcon>
         ) : null}
+        <ActionIcon
+          size={36}
+          variant="default"
+          onClick={handleCopyClick}
+          disabled={selectedElements.length === 0}>
+          <Copy />
+        </ActionIcon>
         <Menu width={170} position="bottom-end" closeOnItemClick={false}>
           <Menu.Target>
             <ActionIcon size={36} variant="default" disabled={selectedElements.length !== 1}>

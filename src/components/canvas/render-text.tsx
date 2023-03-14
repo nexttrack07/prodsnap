@@ -3,15 +3,7 @@ import { MoveableElement, TextType } from './store';
 import { Box, Center, useMantineTheme } from '@mantine/core';
 import { useWindowEvent } from '@mantine/hooks';
 
-
-type Status =
-  | 'none'
-  | 'rotate'
-  | 'move'
-  | 'resize-br'
-  | 'resize-tl'
-  | 'resize-bl'
-  | 'resize-tr';
+type Status = 'none' | 'rotate' | 'move' | 'resize-br' | 'resize-tl' | 'resize-bl' | 'resize-tr';
 
 function selectElementContents(el: HTMLElement) {
   var range = document.createRange();
@@ -40,24 +32,23 @@ export function RenderText({
   const [status, setStatus] = useState<Status>('none');
   const lastPos = useRef({ x: 0, y: 0 });
 
-  useWindowEvent("keydown", (e: KeyboardEvent) => {
-    if (e.key === "Escape") {
+  useWindowEvent('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
       setEditable(false);
     }
   });
-
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
       setEditable(false);
 
-      if (status === "move") {
+      if (status === 'move') {
         const deltaX = e.clientX - lastPos.current.x + element.x;
         const deltaY = e.clientY - lastPos.current.y + element.y;
         setElement((el) => ({ ...el, x: deltaX, y: deltaY }));
-      } else if (status === "resize-br") {
+      } else if (status === 'resize-br') {
         const newWidth = e.clientX - lastPos.current.x + element.width;
-        const newFontSize = newWidth / element.width * (element.props.fontSize as number);
+        const newFontSize = (newWidth / element.width) * (element.props.fontSize as number);
 
         setElement((el) => ({
           ...el,
@@ -69,26 +60,29 @@ export function RenderText({
     const handleMouseUp = (e: MouseEvent) => {
       e.stopPropagation();
       setStatus('none');
-    }
+    };
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
     return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [status]);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    lastPos.current = { x: e.clientX, y: e.clientY };
-    setStatus('move');
-    onSelect(e);
-    if (isSelected) {
-      selectElementContents(ref.current!)
-      setEditable(true);
-    }
-  }, [isSelected]);
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      lastPos.current = { x: e.clientX, y: e.clientY };
+      setStatus('move');
+      onSelect(e);
+      if (isSelected) {
+        selectElementContents(ref.current!);
+        setEditable(true);
+      }
+    },
+    [isSelected]
+  );
 
   const handleResizeMouseDown = (e: React.MouseEvent, stat: Status) => {
     e.stopPropagation();
@@ -98,15 +92,20 @@ export function RenderText({
 
   const handleBlur = (e: React.FocusEvent) => {
     setEditable(false);
-    setElement((prev) => ({
-      ...prev,
-      content: (e.target as HTMLDivElement).innerText,
-    }));
+    // setElement((prev) => ({
+    //   ...prev,
+    //   content: (e.target as HTMLDivElement).innerText,
+    // }));
   };
 
-  const cursor = isSelected && status === "move" ? "move"
-    : isSelected && status === "resize-br" ? "se-resize"
-      : isSelected && editable ? "text" : "pointer";
+  const cursor =
+    isSelected && status === 'move'
+      ? 'move'
+      : isSelected && status === 'resize-br'
+        ? 'se-resize'
+        : isSelected && editable
+          ? 'text'
+          : 'pointer';
 
   return (
     <Center
@@ -115,6 +114,9 @@ export function RenderText({
       contentEditable={editable}
       suppressContentEditableWarning={true}
       onMouseDown={handleMouseDown}
+      onInput={(e) => {
+        setElement((prev) => ({ ...prev, content: (e.target as HTMLDivElement).innerText }));
+      }}
       onBlur={handleBlur}
       style={{
         left: element.x,
