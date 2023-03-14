@@ -123,6 +123,7 @@ export function RenderText({
         position: 'absolute',
         border: isSelected ? `2px solid ${theme.colors.blue[7]}` : '',
         borderRadius: 3,
+        whiteSpace: 'pre-wrap',
         ...element.props
       }}>
       {element.content}
