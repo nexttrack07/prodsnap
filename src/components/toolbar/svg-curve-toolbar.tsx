@@ -91,6 +91,58 @@ export const START_MARKERS = {
   )
 } as const;
 
+export const END_MARKERS = {
+  none: (<>
+    <path
+      fill="currentColor"
+      fillRule="evenodd"
+      d="M2.75 12a.75.75 0 0 1 .75-.75H19a.75.75 0 0 1 0 1.5H3.5a.75.75 0 0 1-.75-.75z"
+      clipRule="evenodd"
+    />
+    <path fill="currentColor" d="M19 9.5v5l2-2.5-2-2.5z" />
+  </>),
+  "outline-arrow": (
+    <>
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="m16.257 6.697 4.773 4.773a.75.75 0 0 1 0 1.06l-4.773 4.773a.75.75 0 0 1-1.06-1.06l3.492-3.493H3.5a.75.75 0 0 1 0-1.5h15.19l-3.493-3.493a.75.75 0 1 1 1.06-1.06z"
+        clipRule="evenodd"
+      />
+    </>
+  ),
+  "fill-arrow": (
+    <>
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M2.75 12a.75.75 0 0 1 .75-.75H13a.75.75 0 0 1 0 1.5H3.5a.75.75 0 0 1-.75-.75z"
+        clipRule="evenodd"
+      />
+      <path
+        fill="currentColor"
+        d="M21.376 11.584a.5.5 0 0 1 0 .832l-7.599 5.066a.5.5 0 0 1-.777-.416V6.934a.5.5 0 0 1 .777-.416l7.599 5.066z"
+      />
+    </>
+  ),
+  "outline-circle": (
+    <>
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M2.75 12a.75.75 0 0 1 .75-.75H13a.75.75 0 0 1 0 1.5H3.5a.75.75 0 0 1-.75-.75z"
+        clipRule="evenodd"
+      />
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M14.5 12a2.5 2.5 0 1 0 5 0 2.5 2.5 0 0 0-5 0zM17 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"
+        clipRule="evenodd"
+      />
+    </>
+  )
+} as const;
+
 export function SvgCurveToolbar() {
   const handlers = useRef<NumberInputHandlers>();
   const [props, setProps] = useAtom(svgPropsAtom);
@@ -184,6 +236,29 @@ export function SvgCurveToolbar() {
             {Object.entries(START_MARKERS).map(([id, comp]) => (
               <Grid.Col key={id} span="content">
                 <ActionIcon onClick={() => setProps({ startMarker: id })} size={36}>
+                  <svg width={24} height={24}>
+                    {comp}
+                  </svg>
+                </ActionIcon>
+              </Grid.Col>
+            ))}
+          </Grid>
+        </Popover.Dropdown>
+      </Popover>
+
+      <Popover withArrow shadow="sm">
+        <Popover.Target>
+          <ActionIcon variant="default" size={36}>
+            <svg width={24} height={24}>
+              {END_MARKERS[props.endMarker]}
+            </svg>
+          </ActionIcon>
+        </Popover.Target>
+        <Popover.Dropdown>
+          <Grid gutter="xs" justify="center" align="center">
+            {Object.entries(END_MARKERS).map(([id, comp]) => (
+              <Grid.Col key={id} span="content">
+                <ActionIcon onClick={() => setProps({ endMarker: id })} size={36}>
                   <svg width={24} height={24}>
                     {comp}
                   </svg>

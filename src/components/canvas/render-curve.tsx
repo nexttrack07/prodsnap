@@ -30,6 +30,27 @@ const START_MARKERS = {
   'outline-circle': (<circle strokeWidth={1} stroke="currentColor" fill="none" cx={0} cy={0} r="1.2" />)
 } as const;
 
+const END_MARKERS = {
+  none: null,
+  'outline-arrow': (<path
+    fill="none"
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M -2.5,-1.5,-0.5,0,-2.5,1.5 "
+  />
+  ),
+  'fill-arrow': (<path
+    fill="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M -2.5,-1.5,-0.5,0,-2.5,1.5 Z"
+  />
+  ),
+  'outline-circle': (<circle strokeWidth={1} stroke="currentColor" fill="none" cx={0} cy={0} r="1.2" />)
+} as const;
+
+
 type SVGCanvasElement = MoveableElement & SVGCurveType;
 
 type Props = {
@@ -159,6 +180,14 @@ export function RenderCurve({ element, setElement, onSelect, isSelected }: Props
             transform={`translate(${points.at(0)!.x - 7} ${points.at(0)!.y}) scale(5)`}
           >
             {START_MARKERS[element.startMarker]}
+          </g>
+          <g
+            // style={{ position: 'absolute', left: points.at(0)!.x, top: points.at(-1)!.y }}
+            // transform="translate(0 3.5) scale(7)"
+            color={element.stroke}
+            transform={`translate(${points.at(-1)!.x + 7} ${points.at(-1)!.y}) scale(5)`}
+          >
+            {END_MARKERS[element.endMarker]}
           </g>
         </g>
       </svg>

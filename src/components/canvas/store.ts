@@ -53,6 +53,7 @@ export type SVGCurveType = {
   strokeLinecap?: 'inherit' | 'butt' | 'round' | 'square' | undefined;
   strokeDasharray?: string;
   startMarker: "none" | "fill-arrow" | "outline-arrow" | "outline-circle";
+  endMarker: "none" | "fill-arrow" | "outline-arrow" | "outline-circle";
 };
 export type SVGPathType = {
   type: 'svg-path';
