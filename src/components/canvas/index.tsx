@@ -47,6 +47,7 @@ export function Canvas() {
         boxShadow: "0px 0px 0.8px rgba(0,0,0,0.3)",
         position: "relative",
         backgroundColor,
+        overflow: "hidden",
       })}
       onMouseDown={handleCanvasMouseDown}
     >
