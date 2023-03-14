@@ -45,7 +45,7 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
     e.stopPropagation();
     setStatus('moving');
     lastPos.current = { x: e.clientX, y: e.clientY };
-    console.log('element: ', element);
+    console.log('element: ', element, JSON.stringify(element));
   }
 
   const handleResizeMouseDown = (e: React.MouseEvent, status: Status) => {

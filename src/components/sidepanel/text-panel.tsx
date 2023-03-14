@@ -80,27 +80,29 @@ export function TextPanel() {
   const setSelectedAtoms = useSetAtom(selectedElementAtomsAtom);
   const addGroup = useSetAtom(addGroupAtom);
 
-  // useEffect(() => {
-  //   async function getTemplateData() {
-  //     try {
-  //       setLoading(true);
-  //       const data = await getTemplates();
-  //       setData(data);
-  //     } catch (err) {
-  //       console.log(err);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   }
+  useEffect(() => {
+    async function getTemplateData() {
+      try {
+        setLoading(true);
+        const data = await getTemplates();
+        console.log('data: ', data)
+        setData(data);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-  //   getTemplateData();
-  // }, []);
+    getTemplateData();
+  }, []);
 
   const handleAddElement = (newEl: CanvasElement) => {
     addElement(newEl);
   };
 
   const handleAddTemplate = (newEls: CanvasElement[]) => {
+    // console.log('new els: ', newEls)
     const newElAtoms = newEls.map((el) => atom(el));
     setElementAtoms((elAtoms) => [...elAtoms, ...newElAtoms]);
     setSelectedAtoms(newElAtoms);
@@ -143,11 +145,21 @@ export function TextPanel() {
         {loading && <Loader />}
         {data &&
           data.map((item: any) => (
-            <Button onClick={() => handleAddTemplate(JSON.parse(item.data.template))} key={item.id}>
+            <Button onClick={() => handleAddTemplate(deserialize(item.data.template))} key={item.id}>
               Add Template
             </Button>
           ))}
       </SimpleGrid>
     </>
   );
+}
+
+function deserialize(serializedObj: string): any {
+  return JSON.parse(serializedObj, (key, value) => {
+    if (typeof value === 'string' && value.match(/^function/)) {
+      const funcBody = value.slice(value.indexOf('{') + 1, value.lastIndexOf('}'));
+      return new Function(`return ${value}`)();
+    }
+    return value;
+  });
 }

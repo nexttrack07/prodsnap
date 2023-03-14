@@ -10,7 +10,7 @@ const SHAPES: { id: number; data: MoveableElement & SVGPathType}[] = [
       height: 250,
       x: 100,
       y: 10,
-      getViewBox: (w: number, h: number) => `0 0 ${w/3.7} ${h/3.7}`,
+      getViewBox: function (w: number, h: number) { return `0 0 ${w / 3.7} ${h / 3.7}` },
       props: {
         width: "100%",
         height: "100%",
@@ -26,7 +26,7 @@ const SHAPES: { id: number; data: MoveableElement & SVGPathType}[] = [
       },
       path: { d: "M0,0L64,0L64,64L0,64L0,0", },
       // d="M0,0L54,0L54,24L0,24L0,0"
-      getPath: (w: number, h: number) => `M0,0L${w/3.7},0L${w/3.7},${h/3.7}L0,${h/3.7}L0,0`,
+      getPath: function (w: number, h: number) { return `M0,0L${w / 3.7},0L${w / 3.7},${h / 3.7}L0,${h / 3.7}L0,0` },
       strokeProps: {
         clipPathId: "001",
         stroke: DEFAULT_THEME.colors.blue[8],
