@@ -99,11 +99,12 @@ export function Toolbar() {
     deletedSelectedElements();
   };
 
-  const handleDeletePress = (e: KeyboardEvent) => {
-    if (e.key === 'Backspace') deletedSelectedElements();
-  };
-
   // TODO: This is interfering with the Text object. While typing, the delete key is triggering this event instead of backspace.
+
+  // const handleDeletePress = (e: KeyboardEvent) => {
+  //   if (e.key === 'Backspace') deletedSelectedElements();
+  // };
+
   // useEffect(() => {
   //   window.addEventListener('keydown', handleDeletePress);
 

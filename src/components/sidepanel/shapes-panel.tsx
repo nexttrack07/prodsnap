@@ -15,25 +15,6 @@ const useStyles = createStyles(() => ({
     },
   },
 }));
-type LineType = Omit<SVGCurveType & MoveableElement, "p1" | "p2"> & { p1: SVGPointType & Draggable; p2: SVGPointType & Draggable };
-const LINE: LineType = {
-  type: "svg-curve",
-  p1: {
-    type: "svg-point",
-    x: 100,
-    y: 100
-  },
-  p2: {
-    type: "svg-point",
-    x: 400,
-    y: 100
-  },
-  stroke: 8,
-  x: 100,
-  y: 100,
-  width: 100,
-  height: 100,
-}
 
 export function ShapesPanel() {
   const query = useQuery(["shapes"], getShapes);
@@ -43,15 +24,6 @@ export function ShapesPanel() {
   const handleAddElement = (newEl: CanvasElement) => {
     addElement(newEl);
   };
-
-  const handleAddLine = (lineEl: LineType) => {
-    const { p1, p2, ...rest } = lineEl;
-    addElement({
-      p1: atom(p1),
-      p2: atom(p2),
-      ...rest
-    })
-  }
 
   return (
     <>
@@ -74,7 +46,6 @@ export function ShapesPanel() {
             <path {...item.data.path} />
           </svg>
         ))}
-        <Button onClick={() => handleAddLine(LINE)} compact variant="outline">Line</Button>
       </SimpleGrid>
     </>
   );
