@@ -51,10 +51,10 @@ export function Canvas() {
       })}
       onMouseDown={handleCanvasMouseDown}
     >
+      <DragHandler />
       {elementAtoms.map((elementAtom) => (
         <Element key={elementAtom.toString()} elementAtom={elementAtom} />
       ))}
-      <DragHandler />
     </Box>
   );
 }
