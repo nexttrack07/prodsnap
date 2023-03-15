@@ -33,13 +33,15 @@ const useStyles = createStyles(theme => ({
   }
 }))
 
+const SNAP_TOLERANCE = 15;
+
 export function RenderPath({ element, onSelect, setElement, isSelected }: Props) {
   const { x, y, width, height } = element;
-  const [status, setStatus] = useState<Status>('idle');
   const ref = useRef<HTMLDivElement>(null);
-  const lastPos = useRef({ x: 0, y: 0 });
   const theme = useMantineTheme();
   const { classes } = useStyles();
+  const [status, setStatus] = useState<Status>('idle');
+  const lastPos = useRef({ x: 0, y: 0 });
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -58,8 +60,12 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
     function handleMouseMove(e: MouseEvent) {
       e.stopPropagation();
       if (status === 'moving') {
-        const deltaX = e.clientX - lastPos.current.x + x;
-        const deltaY = e.clientY - lastPos.current.y + y;
+        let deltaX = e.clientX - lastPos.current.x + x;
+        let deltaY = e.clientY - lastPos.current.y + y;
+
+        deltaX = deltaX <= SNAP_TOLERANCE ? Math.min(0, deltaX) : deltaX;
+        deltaY = deltaY <= SNAP_TOLERANCE ? Math.min(0, deltaY) : deltaY;
+
         setElement(el => ({ ...el, x: deltaX, y: deltaY }));
       } else if (status === 'resizing-br') {
         const deltaX = e.clientX - lastPos.current.x + width;
