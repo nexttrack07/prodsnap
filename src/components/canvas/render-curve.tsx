@@ -86,6 +86,7 @@ const useStyles = createStyles((theme) => ({
 
 export function RenderCurve({ element, setElement, onSelect, isSelected }: Props) {
   const points = useAtomValue(getPointsAtom(element.points));
+  console.log('points', element.points, typeof element.points);
   const { classes } = useStyles();
   const [moving, setMoving] = useState(false);
   const lastPos = useRef({ x: 0, y: 0 });

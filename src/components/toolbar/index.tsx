@@ -24,10 +24,15 @@ const getTypeAtom = atom((get) => {
 
 const deleteSelectedAtom = atom(null, (get, set) => {
   const selectedElementAtoms = get(selectedElementAtomsAtom);
-  set(elementAtomsAtom, (elementAtoms) =>
-    elementAtoms.filter((elementAtom) => !selectedElementAtoms.includes(elementAtom))
-  );
-  set(selectedElementAtomsAtom, []);
+
+  if (selectedElementAtoms.length === 0) {
+    set(elementAtomsAtom, []);
+  } else {
+    set(elementAtomsAtom, (elementAtoms) =>
+      elementAtoms.filter((elementAtom) => !selectedElementAtoms.includes(elementAtom))
+    );
+    set(selectedElementAtomsAtom, []);
+  }
 });
 
 const isGroupedAtom = atom((get) => {
@@ -177,7 +182,6 @@ export function Toolbar() {
           size={36}
           variant="light"
           onClick={handleDeleteClick}
-          disabled={selectedElements.length === 0}
           color="red">
           <Trash />
         </ActionIcon>

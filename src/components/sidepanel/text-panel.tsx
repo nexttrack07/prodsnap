@@ -17,6 +17,7 @@ import React, { useEffect, useState } from 'react';
 import {
   addElementAtom,
   CanvasElement,
+  createAtom,
   elementAtomsAtom,
   selectedElementAtomsAtom
 } from '../../components/canvas/store';
@@ -105,7 +106,8 @@ export function TextPanel() {
 
   const handleAddTemplate = (newEls: CanvasElement[]) => {
     // console.log('new els: ', newEls)
-    const newElAtoms = newEls.map((el) => atom(el));
+    const newElAtoms = newEls.map((el) => createAtom(el));
+    console.log('new atoms: ', newElAtoms)
     setElementAtoms((elAtoms) => [...elAtoms, ...newElAtoms]);
     setSelectedAtoms(newElAtoms);
     addGroup();

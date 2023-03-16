@@ -103,8 +103,13 @@ export function RenderImage({
       {element.state === ImageState.Loading && <Loader></Loader>}
       {element.state === ImageState.Normal && (
         <>
-          {/* <Image width={width} height={height} src={element.currentUrl ?? element.url} /> */}
-          <div
+          <Image
+            style={{ userSelect: 'none', pointerEvents: 'none' }}
+            width={width}
+            height={height}
+            src={element.currentUrl ?? element.url}
+          />
+          {/* <div
             style={{
               width,
               height,
@@ -113,7 +118,7 @@ export function RenderImage({
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat'
             }}
-          />
+          /> */}
           {isSelected && (
             <Box
               onMouseDown={(e) => handleResizeMouseDown(e, 'resize-br')}
@@ -162,15 +167,15 @@ export function CropImage({ element }: { element: ImageType & MoveableElement })
       sx={() =>
         circleCrop
           ? {
-            '& .cropper-view-box': {
-              borderRadius: '50%',
-              outline: 0,
-              boxShadow: '0 0 0 1px #39f'
-            },
-            '& .cropper-face': {
-              borderRadius: '50%'
+              '& .cropper-view-box': {
+                borderRadius: '50%',
+                outline: 0,
+                boxShadow: '0 0 0 1px #39f'
+              },
+              '& .cropper-face': {
+                borderRadius: '50%'
+              }
             }
-          }
           : {}
       }>
       <Cropper

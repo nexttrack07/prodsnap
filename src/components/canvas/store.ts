@@ -134,3 +134,12 @@ export const canvasAtom = atom({
   scale: 1,
   backgroundColor: 'white'
 })
+
+export const createAtom = (element: CanvasElement): ElementType => {
+  if (element.type === 'svg-curve') {
+    console.log('createAtom curve: ', element);
+    return atom({ ...element, points: element.points.map((point) => atom(point)) }) as any as ElementType;
+  } 
+
+  return atom(element) as any as ElementType;
+}

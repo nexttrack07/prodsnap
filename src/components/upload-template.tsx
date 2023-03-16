@@ -31,7 +31,15 @@ function uuid(): string {
 
 const templateAtom = atom((get) => {
   const allElementAtoms = get(elementAtomsAtom);
-  const elements = allElementAtoms.map((a) => get(a));
+  const elements = allElementAtoms.map((a) => {
+    let el = get(a);
+
+    if (el.type === "svg-curve") {
+      el = { ...el, points: el.points.map(p => get(p)) }
+    }
+
+    return el;
+  });
 
   return serialize(elements);
 });
