@@ -89,7 +89,6 @@ export type GroupType = WritableAtom<ElementType[], Action<ElementType[]>>;
 // [atom([atom(), atom()]), atom([atom(), atom()])]
 export const elementAtomsAtom = atom<ElementType[]>([]);
 export const selectedElementAtomsAtom = atom<ElementType[]>([]);
-export const activeElementAtomAtom = atom<ElementType | null>(null);
 export const groupsByIdAtom = atom<Record<string, ElementType[]>>({});
 
 export function getDefaultMoveable(props?: Partial<MoveableElement>) {
@@ -132,7 +131,8 @@ export const canvasAtom = atom({
   width: 900,
   height: 750,
   scale: 1,
-  backgroundColor: 'white'
+  backgroundColor: 'white',
+  isSelected: false,
 })
 
 export const createAtom = (element: CanvasElement): ElementType => {

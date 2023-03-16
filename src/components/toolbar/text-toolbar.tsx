@@ -10,10 +10,15 @@ import {
   SegmentedControl,
   Slider,
   DEFAULT_THEME
-} from "@mantine/core";
-import { activeElementAtomAtom, MoveableElement, selectedItemsAtom, TextType } from "../canvas/store";
-import { atom, useAtom } from "jotai";
-import React, { useRef } from "react";
+} from '@mantine/core';
+import {
+  MoveableElement,
+  selectedElementAtomsAtom,
+  selectedItemsAtom,
+  TextType
+} from '../canvas/store';
+import { atom, useAtom } from 'jotai';
+import React, { useRef } from 'react';
 import {
   AlignCenter,
   AlignJustified,
@@ -22,27 +27,28 @@ import {
   Bold,
   Italic,
   TextSize,
-  Underline,
-} from "tabler-icons-react";
-import FontPicker from "font-picker-react";
-
+  Underline
+} from 'tabler-icons-react';
+import FontPicker from 'font-picker-react';
 
 const textPropsAtom = atom(
   (get) => {
-    const activeElementAtom = get(activeElementAtomAtom);
-    if (!activeElementAtom) return null;
-    const activeElement = get(activeElementAtom);
-    return (activeElement as MoveableElement & TextType).props;
+    const selectedElementAtoms = get(selectedElementAtomsAtom);
+    if (selectedElementAtoms.length === 1) {
+      const selectedElement = get(selectedElementAtoms[0]);
+      return (selectedElement as MoveableElement & TextType).props;
+    }
   },
   (get, set, update: React.CSSProperties) => {
-    const activeElementAtom = get(activeElementAtomAtom);
-    if (!activeElementAtom) return;
-    set(activeElementAtom, (el) => {
-      if (el.type === "text") {
-        return { ...el, props: { ...el.props, ...update } };
-      }
-      return el;
-    });
+    const selectedElementAtoms = get(selectedElementAtomsAtom);
+    if (selectedElementAtoms.length === 1) {
+      set(selectedElementAtoms[0], (el) => {
+        if (el.type === 'text') {
+          return { ...el, props: { ...el.props, ...update } };
+        }
+        return el;
+      });
+    }
   }
 );
 
@@ -57,18 +63,18 @@ export function TextToolbar() {
       <FontPicker
         apiKey={import.meta.env.VITE_GOOGLE_FONTS_API_KEY}
         activeFontFamily={textProps.fontFamily}
-        onChange={(font) => setTextProps({ fontFamily: font.family ?? "" })}
+        onChange={(font) => setTextProps({ fontFamily: font.family ?? '' })}
       />
       <Popover>
         <Popover.Target>
           <ActionIcon size={36}>
             <Box
               sx={{
-                width: "100%",
-                height: "100%",
+                width: '100%',
+                height: '100%',
                 backgroundColor: textProps.color,
                 borderRadius: 3,
-                border: "1px solid #ccc",
+                border: '1px solid #ccc'
               }}
             />
           </ActionIcon>
@@ -82,17 +88,13 @@ export function TextToolbar() {
               ...DEFAULT_THEME.colors.red,
               ...DEFAULT_THEME.colors.yellow,
               ...DEFAULT_THEME.colors.green,
-              ...DEFAULT_THEME.colors.blue,
+              ...DEFAULT_THEME.colors.blue
             ]}
           />
         </Popover.Dropdown>
       </Popover>
       <Group spacing={5}>
-        <ActionIcon
-          size={36}
-          variant="default"
-          onClick={() => handlers.current?.decrement()}
-        >
+        <ActionIcon size={36} variant="default" onClick={() => handlers.current?.decrement()}>
           –
         </ActionIcon>
 
@@ -104,76 +106,56 @@ export function TextToolbar() {
           max={200}
           min={10}
           step={1}
-          styles={{ input: { width: 54, textAlign: "center" } }}
+          styles={{ input: { width: 54, textAlign: 'center' } }}
         />
 
-        <ActionIcon
-          size={36}
-          variant="default"
-          onClick={() => handlers.current?.increment()}
-        >
+        <ActionIcon size={36} variant="default" onClick={() => handlers.current?.increment()}>
           +
         </ActionIcon>
       </Group>
-      <Group spacing='xs'>
+      <Group spacing="xs">
         <ActionIcon
           size={36}
           color="dark"
-          variant={textProps.fontWeight === "bolder" ? "light" : "subtle"}
+          variant={textProps.fontWeight === 'bolder' ? 'light' : 'subtle'}
           onClick={() =>
             setTextProps({
-              fontWeight:
-                textProps.fontWeight === "bolder" ? "normal" : "bolder",
+              fontWeight: textProps.fontWeight === 'bolder' ? 'normal' : 'bolder'
             })
-          }
-        >
+          }>
           <Bold />
         </ActionIcon>
         <ActionIcon
           size={36}
           color="dark"
-          variant={textProps.fontStyle === "italic" ? "light" : "subtle"}
+          variant={textProps.fontStyle === 'italic' ? 'light' : 'subtle'}
           onClick={() =>
             setTextProps({
-              fontStyle:
-                textProps.fontStyle === "italic" ? "normal" : "italic",
+              fontStyle: textProps.fontStyle === 'italic' ? 'normal' : 'italic'
             })
-          }
-        >
+          }>
           <Italic />
         </ActionIcon>
         <ActionIcon
           size={36}
           color="dark"
-          variant={
-            textProps.textDecoration === "underline" ? "light" : "subtle"
-          }
+          variant={textProps.textDecoration === 'underline' ? 'light' : 'subtle'}
           onClick={() =>
             setTextProps({
-              textDecoration:
-                textProps.textDecoration === "underline"
-                  ? "none"
-                  : "underline",
+              textDecoration: textProps.textDecoration === 'underline' ? 'none' : 'underline'
             })
-          }
-        >
+          }>
           <Underline />
         </ActionIcon>
         <ActionIcon
           size={36}
           color="dark"
-          variant={
-            textProps.textTransform === "uppercase" ? "light" : "subtle"
-          }
+          variant={textProps.textTransform === 'uppercase' ? 'light' : 'subtle'}
           onClick={() =>
             setTextProps({
-              textTransform:
-                textProps.textTransform === "uppercase"
-                  ? "none"
-                  : "uppercase",
+              textTransform: textProps.textTransform === 'uppercase' ? 'none' : 'uppercase'
             })
-          }
-        >
+          }>
           <TextSize />
         </ActionIcon>
       </Group>
@@ -189,14 +171,14 @@ export function TextToolbar() {
             <SegmentedControl
               onChange={(val) =>
                 setTextProps({
-                  textAlign: val as React.CSSProperties["textAlign"],
+                  textAlign: val as React.CSSProperties['textAlign']
                 })
               }
               data={[
-                { label: <AlignLeft />, value: "left" },
-                { label: <AlignCenter />, value: "center" },
-                { label: <AlignRight />, value: "right" },
-                { label: <AlignJustified />, value: "justify" },
+                { label: <AlignLeft />, value: 'left' },
+                { label: <AlignCenter />, value: 'center' },
+                { label: <AlignRight />, value: 'right' },
+                { label: <AlignJustified />, value: 'justify' }
               ]}
             />
           </Menu.Item>

@@ -1,4 +1,4 @@
-import React, { SVGAttributes } from "react";
+import React, { SVGAttributes } from 'react';
 import {
   ActionIcon,
   ColorPicker,
@@ -8,67 +8,64 @@ import {
   Menu,
   Slider,
   SegmentedControl,
-  Box,
-} from "@mantine/core";
+  Box
+} from '@mantine/core';
 import {
   MoveableElement,
-  activeElementAtomAtom,
   SVGPathType,
   SVGStrokeProps,
-} from "../canvas/store";
-import { atom, useAtom } from "jotai";
-import {
-  BorderAll,
-  BorderNone,
-  BorderRadius,
-  BorderStyle2,
-} from "tabler-icons-react";
+  selectedElementAtomsAtom
+} from '@/components/canvas/store';
+import { atom, useAtom } from 'jotai';
+import { BorderAll, BorderNone, BorderRadius, BorderStyle2 } from 'tabler-icons-react';
 
 const svgPropsAtom = atom(
   (get) => {
-    const selectedElementAtom = get(activeElementAtomAtom);
-    if (!selectedElementAtom) return null;
-    const selectedElement = get(selectedElementAtom);
-
-    return (selectedElement as MoveableElement & SVGPathType).props;
+    const selectedElementAtoms = get(selectedElementAtomsAtom);
+    if (selectedElementAtoms.length === 1) {
+      const selectedElement = get(selectedElementAtoms[0]);
+      return (selectedElement as MoveableElement & SVGPathType).props;
+    }
   },
   (get, set, update: SVGAttributes<SVGSVGElement>) => {
-    const selectedElementAtom = get(activeElementAtomAtom);
-    if (!selectedElementAtom) return;
-    set(selectedElementAtom, (el) => {
-      if (el.type === "svg-path") {
-        return { ...el, props: { ...el.props, ...update } };
-      }
-      return el;
-    });
+    const selectedElementAtoms = get(selectedElementAtomsAtom);
+    if (selectedElementAtoms.length === 1) {
+      set(selectedElementAtoms[0], (el) => {
+        if (el.type === 'svg-path') {
+          return { ...el, props: { ...el.props, ...update } };
+        }
+        return el;
+      });
+    }
   }
 );
 
 const svgStrokePropsAtom = atom(
   (get) => {
-    const selectedElementAtom = get(activeElementAtomAtom);
-    if (!selectedElementAtom) return null;
-    const selectedElement = get(selectedElementAtom);
-
-    return (selectedElement as MoveableElement & SVGPathType).strokeProps;
+    const selectedElementAtoms = get(selectedElementAtomsAtom);
+    if (selectedElementAtoms.length === 1) {
+      const selectedElement = get(selectedElementAtoms[0]);
+      return (selectedElement as MoveableElement & SVGPathType).strokeProps;
+    }
   },
   (get, set, update: Partial<SVGStrokeProps>) => {
-    const selectedElementAtom = get(activeElementAtomAtom);
-    if (!selectedElementAtom) return;
-    set(selectedElementAtom, (el) => {
-      if (el.type === "svg-path") {
-        return { ...el, strokeProps: { ...el.strokeProps, ...update } };
-      }
-      return el;
-    });
+    const selectedElementAtoms = get(selectedElementAtomsAtom);
+    if (selectedElementAtoms.length === 1) {
+      set(selectedElementAtoms[0], (el) => {
+        if (el.type === 'svg-path') {
+          return { ...el, strokeProps: { ...el.strokeProps, ...update } };
+        }
+        return el;
+      });
+    }
   }
 );
 
 export function SvgPathToolbar() {
-  const [props, setProps] = useAtom(svgPropsAtom);
+  const [svgProps, setProps] = useAtom(svgPropsAtom);
   const [strokeProps, setStrokeProps] = useAtom(svgStrokePropsAtom);
 
-  if (!props || !strokeProps) return null;
+  if (!svgProps || !strokeProps) return null;
 
   return (
     <Group>
@@ -77,12 +74,12 @@ export function SvgPathToolbar() {
           <ActionIcon size={36}>
             <Box
               sx={{
-                width: "100%",
-                height: "100%",
+                width: '100%',
+                height: '100%',
                 borderColor: strokeProps.stroke,
                 borderWidth: 8,
-                borderStyle: "solid",
-                borderRadius: 3,
+                borderStyle: 'solid',
+                borderRadius: 3
               }}
             />
           </ActionIcon>
@@ -94,14 +91,14 @@ export function SvgPathToolbar() {
             onChange={(val) =>
               setStrokeProps({
                 stroke: val,
-                strokeWidth: strokeProps.strokeWidth ?? 10,
+                strokeWidth: strokeProps.strokeWidth ?? 10
               })
             }
             swatches={[
               ...DEFAULT_THEME.colors.red,
               ...DEFAULT_THEME.colors.yellow,
               ...DEFAULT_THEME.colors.green,
-              ...DEFAULT_THEME.colors.blue,
+              ...DEFAULT_THEME.colors.blue
             ]}
           />
         </Popover.Dropdown>
@@ -111,10 +108,10 @@ export function SvgPathToolbar() {
           <ActionIcon size={36}>
             <Box
               sx={{
-                width: "100%",
-                height: "100%",
-                backgroundColor: props?.fill,
-                borderRadius: 3,
+                width: '100%',
+                height: '100%',
+                backgroundColor: svgProps?.fill,
+                borderRadius: 3
               }}
             />
           </ActionIcon>
@@ -122,13 +119,13 @@ export function SvgPathToolbar() {
         <Popover.Dropdown>
           <ColorPicker
             format="rgba"
-            value={props?.fill}
+            value={svgProps.fill}
             onChange={(val) => setProps({ fill: val })}
             swatches={[
               ...DEFAULT_THEME.colors.red,
               ...DEFAULT_THEME.colors.yellow,
               ...DEFAULT_THEME.colors.green,
-              ...DEFAULT_THEME.colors.blue,
+              ...DEFAULT_THEME.colors.blue
             ]}
           />
         </Popover.Dropdown>
@@ -145,25 +142,19 @@ export function SvgPathToolbar() {
             <SegmentedControl
               onChange={(val) => {
                 switch (val) {
-                  case "none":
+                  case 'none':
                     setStrokeProps({ strokeWidth: 0 });
                     return;
-                  case "dashed":
+                  case 'dashed':
                     setStrokeProps({
-                      strokeDasharray: "5,10",
-                      strokeWidth:
-                        strokeProps?.strokeWidth === 0
-                          ? 10
-                          : strokeProps.strokeWidth,
+                      strokeDasharray: '5,10',
+                      strokeWidth: strokeProps?.strokeWidth === 0 ? 10 : strokeProps.strokeWidth
                     });
                     return;
-                  case "all":
+                  case 'all':
                     setStrokeProps({
-                      strokeDasharray: "0",
-                      strokeWidth:
-                        strokeProps.strokeWidth === 0
-                          ? 10
-                          : strokeProps.strokeWidth,
+                      strokeDasharray: '0',
+                      strokeWidth: strokeProps.strokeWidth === 0 ? 10 : strokeProps.strokeWidth
                     });
                     return;
                   default:
@@ -171,9 +162,9 @@ export function SvgPathToolbar() {
                 }
               }}
               data={[
-                { label: <BorderNone />, value: "none" },
-                { label: <BorderStyle2 />, value: "dashed" },
-                { label: <BorderAll />, value: "all" },
+                { label: <BorderNone />, value: 'none' },
+                { label: <BorderStyle2 />, value: 'dashed' },
+                { label: <BorderAll />, value: 'all' }
               ]}
             />
           </Menu.Item>

@@ -1,36 +1,38 @@
-import { ActionIcon, Button, Group, SegmentedControl } from "@mantine/core";
+import React from 'react';
+import { ActionIcon, Button, Group, SegmentedControl } from '@mantine/core';
 import {
-  activeElementAtomAtom,
   CanvasElement,
   ImageState,
   ImageType,
   MoveableElement,
-} from "../../components/canvas/store";
-import { httpsCallable } from "firebase/functions";
-import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { functions } from "../../utils/firebase";
-import { Check, Circle, Rectangle, X } from "tabler-icons-react";
-import { cropperAtom } from "../../components/canvas/render-image";
+  selectedElementAtomsAtom
+} from '@/components/canvas/store';
+import { httpsCallable } from 'firebase/functions';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { functions } from '@/utils/firebase';
+import { Check, Circle, Rectangle, X } from 'tabler-icons-react';
+import { cropperAtom } from '@/components/canvas/render-image';
 
-const removeBackground = httpsCallable(functions, "removeBackground");
+const removeBackground = httpsCallable(functions, 'removeBackground');
 
 const selectedImageAtom = atom(
   (get) => {
-    const activeElementAtom = get(activeElementAtomAtom);
-    if (activeElementAtom) {
-      const activeElement = get(activeElementAtom);
-      return activeElement.type === "image" ? activeElement : null;
+    const selectedElementAtoms = get(selectedElementAtomsAtom);
+    if (selectedElementAtoms.length === 1) {
+      const selectedElement = get(selectedElementAtoms[0]);
+      return selectedElement.type === 'image' ? selectedElement : null;
     }
+
+    return null;
   },
   (get, set, update: Partial<MoveableElement & ImageType>) => {
-    const activeElementAtom = get(activeElementAtomAtom);
-
-    if (activeElementAtom) {
-      set(activeElementAtom, (el) =>
-        el.type === "image"
+    const selectedElementAtoms = get(selectedElementAtomsAtom);
+    if (selectedElementAtoms.length === 1) {
+      set(selectedElementAtoms[0], (el) =>
+        el.type === 'image'
           ? ({
               ...el,
-              ...update,
+              ...update
             } as CanvasElement)
           : el
       );
@@ -39,7 +41,7 @@ const selectedImageAtom = atom(
 );
 
 const imageUrlAtom = atom((get) => {
-  return get(selectedImageAtom)?.url ?? "";
+  return get(selectedImageAtom)?.url ?? '';
 });
 
 const imageStateAtom = atom((get) => {
@@ -53,7 +55,7 @@ export const imageDimensionsAtom = atom((get) => {
   if (image) {
     return {
       width: image.width,
-      height: image.height,
+      height: image.height
     };
   }
 
@@ -94,14 +96,14 @@ export function ImageToolbar() {
         currentUrl: circleCrop
           ? getRoundedCanvas(cropper.getCroppedCanvas()).toDataURL()
           : cropper.getCroppedCanvas().toDataURL(),
-        state: ImageState.Normal,
+        state: ImageState.Normal
       });
       setIsCropping(false);
 
       return;
     }
     setSelectedImage({
-      state: ImageState.Normal,
+      state: ImageState.Normal
     });
     setIsCropping(false);
   };
@@ -109,7 +111,7 @@ export function ImageToolbar() {
   const handleCropCancel = () => {
     setSelectedImage({
       state: ImageState.Normal,
-      currentUrl: url,
+      currentUrl: url
     });
     setIsCropping(false);
   };
@@ -131,11 +133,11 @@ export function ImageToolbar() {
           <SegmentedControl
             color="indigo"
             size="xs"
-            defaultValue={circleCrop ? "circle" : "rectangle"}
-            onChange={(val) => setCircleCrop(val === "circle")}
+            defaultValue={circleCrop ? 'circle' : 'rectangle'}
+            onChange={(val) => setCircleCrop(val === 'circle')}
             data={[
-              { label: <Circle />, value: "circle" },
-              { label: <Rectangle />, value: "rectangle" },
+              { label: <Circle />, value: 'circle' },
+              { label: <Rectangle />, value: 'rectangle' }
             ]}
           />
           <ActionIcon onClick={handleCropCancel} color="red">
@@ -151,8 +153,8 @@ export function ImageToolbar() {
 }
 
 function getRoundedCanvas(sourceCanvas: HTMLCanvasElement) {
-  let canvas = document.createElement("canvas");
-  let context = canvas.getContext("2d");
+  let canvas = document.createElement('canvas');
+  let context = canvas.getContext('2d');
   let width = sourceCanvas.width;
   let height = sourceCanvas.height;
 
@@ -161,16 +163,9 @@ function getRoundedCanvas(sourceCanvas: HTMLCanvasElement) {
   if (context) {
     context.imageSmoothingEnabled = true;
     context.drawImage(sourceCanvas, 0, 0, width, height);
-    context.globalCompositeOperation = "destination-in";
+    context.globalCompositeOperation = 'destination-in';
     context.beginPath();
-    context.arc(
-      width / 2,
-      height / 2,
-      Math.min(width, height) / 2,
-      0,
-      2 * Math.PI,
-      true
-    );
+    context.arc(width / 2, height / 2, Math.min(width, height) / 2, 0, 2 * Math.PI, true);
     context.fill();
   }
   return canvas;

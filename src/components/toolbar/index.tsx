@@ -5,8 +5,8 @@ import { atom, useAtomValue, useSetAtom } from 'jotai';
 import {
   elementAtomsAtom,
   selectedElementAtomsAtom,
-  activeElementAtomAtom,
-  groupsByIdAtom
+  groupsByIdAtom,
+  canvasAtom
 } from '../canvas/store';
 import { SvgPathToolbar } from './svg-path-toolbar';
 import { ImageToolbar } from './image-toolbar';
@@ -16,10 +16,16 @@ import { Copy, Eye, Trash } from 'tabler-icons-react';
 import { SvgCurveToolbar } from './svg-curve-toolbar';
 
 const getTypeAtom = atom((get) => {
-  const activeElementAtom = get(activeElementAtomAtom);
-  if (!activeElementAtom) return 'canvas';
-  const activeElement = get(activeElementAtom);
-  return activeElement.type;
+  const { isSelected } = get(canvasAtom);
+  if (isSelected) return 'canvas';
+  const selectedElementAtoms = get(selectedElementAtomsAtom);
+  const typesArr = selectedElementAtoms.map((a) => get(a).type);
+  const typesSet = new Set(typesArr);
+  if (typesSet.size === 1) {
+    return typesArr[0];
+  }
+
+  return 'mixed';
 });
 
 const deleteSelectedAtom = atom(null, (get, set) => {
@@ -178,11 +184,7 @@ export function Toolbar() {
             </ActionIcon>
           </Menu.Target>
         </Menu>
-        <ActionIcon
-          size={36}
-          variant="light"
-          onClick={handleDeleteClick}
-          color="red">
+        <ActionIcon size={36} variant="light" onClick={handleDeleteClick} color="red">
           <Trash />
         </ActionIcon>
       </Group>
