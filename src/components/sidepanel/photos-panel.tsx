@@ -1,52 +1,53 @@
-import { Text, Space, createStyles, SimpleGrid, Image } from "@mantine/core";
-import { useSetAtom } from "jotai";
+import React from 'react';
+import { Text, Space, createStyles, SimpleGrid, Image } from '@mantine/core';
+import { useSetAtom } from 'jotai';
 import {
   CanvasElement,
   MoveableElement,
   ImageType,
   ImageState,
-  addElementAtom,
-} from "../../components/canvas/store";
+  addElementAtom
+} from '../../components/canvas/store';
 
 const useStyles = createStyles((theme) => ({
   shape: {
-    cursor: "pointer",
+    cursor: 'pointer',
     border: `1px solid ${theme.colors.gray[2]}`,
-    boxShadow: "0 0 1px rgba(0,0,0,0.3)",
+    boxShadow: '0 0 1px rgba(0,0,0,0.3)',
     padding: 8,
-    "&:hover": {
+    '&:hover': {
       opacity: 0.7,
-      transform: "scale(1.1)",
-      transition: "transform 0.3s",
-    },
-  },
+      transform: 'scale(1.1)',
+      transition: 'transform 0.3s'
+    }
+  }
 }));
 
 const data: { id: number; data: MoveableElement & ImageType }[] = [
   {
     id: 0,
     data: {
-      type: "image",
+      type: 'image',
       state: ImageState.Normal,
       x: 200,
       y: 200,
       width: 300,
       height: 200,
-      url: "https://media.kohlsimg.com/is/image/kohls/4637183_Navy_Blue?wid=600&hei=600&op_sharpen=1",
-    },
+      url: 'https://media.kohlsimg.com/is/image/kohls/4637183_Navy_Blue?wid=600&hei=600&op_sharpen=1'
+    }
   },
   {
     id: 1,
     data: {
-      type: "image",
+      type: 'image',
       state: ImageState.Normal,
       x: 200,
       y: 200,
       width: 300,
       height: 200,
-      url: "/winter-hat.png",
-    },
-  },
+      url: '/winter-hat.png'
+    }
+  }
 ];
 
 export function PhotosPanel() {

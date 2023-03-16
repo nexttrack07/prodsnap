@@ -24,11 +24,11 @@ type Status =
 
 const useStyles = createStyles((theme) => ({
   resizeHandle: {
-    backgroundColor: theme.colors.gray[2],
-    border: `1px solid ${theme.colors.dark[3]}`,
+    backgroundColor: theme.colors.blue[0],
+    border: `1px solid ${theme.colors.blue[4]}`,
     borderRadius: '50%',
-    width: 18,
-    height: 18,
+    width: 16,
+    height: 16,
     position: 'absolute'
   }
 }));

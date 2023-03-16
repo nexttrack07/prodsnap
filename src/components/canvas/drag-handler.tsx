@@ -3,8 +3,9 @@ import { atom, useAtom, useAtomValue } from 'jotai';
 import { selectedItemsAtom } from '@/components/canvas/store';
 import { isCroppingAtom } from '@/components/toolbar/image-toolbar';
 import { useCallback, useRef, useState } from 'react';
-import { useMantineTheme } from '@mantine/core';
+import { ActionIcon, Center, ThemeIcon, useMantineTheme } from '@mantine/core';
 import { useEventListener } from '@/utils';
+import { ArrowsMove, BorderRadius } from 'tabler-icons-react';
 
 export const positionAtom = atom(
   (get) => {
@@ -102,10 +103,25 @@ export function DragHandler() {
       id="moveable"
       onMouseDown={handleMouseDown}
       onClick={handleClick}>
+      <Center
+        onMouseDown={handleMouseDown}
+        style={{
+          position: 'absolute',
+          top: -50,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          boxShadow: '0 0 4px rbga(0,0,0,0.5)',
+          borderRadius: '50%',
+          border: `1px solid ${theme.colors.blue[4]}`,
+          backgroundColor: theme.colors.blue[0],
+          padding: 2
+        }}>
+        <ArrowsMove color={theme.colors.blue[7]} size={14} />
+      </Center>
       <div
         style={{
           position: 'absolute',
-          border: `2px dashed ${theme.colors.blue[6]}`,
+          border: `2px dashed ${theme.colors.blue[3]}`,
           top: 0,
           left: 0,
           bottom: 0,
