@@ -1,22 +1,16 @@
 import React from 'react';
-import { atom, useAtom, useAtomValue } from "jotai";
-import { selectedItemsAtom } from "./store";
-import { isCroppingAtom } from "../toolbar/image-toolbar";
-import { useCallback, useRef, useState } from "react";
-import { useMantineTheme } from "@mantine/core";
-import { useEventListener } from "../../utils";
+import { atom, useAtom, useAtomValue } from 'jotai';
+import { selectedItemsAtom } from '@/components/canvas/store';
+import { isCroppingAtom } from '@/components/toolbar/image-toolbar';
+import { useCallback, useRef, useState } from 'react';
+import { useMantineTheme } from '@mantine/core';
+import { useEventListener } from '@/utils';
 
 export const positionAtom = atom(
   (get) => {
     const selected = get(selectedItemsAtom);
-    const x = selected.elements.reduce(
-      (prev, el) => Math.min(prev, el.x),
-      Infinity
-    );
-    const y = selected.elements.reduce(
-      (prev, el) => Math.min(prev, el.y),
-      Infinity
-    );
+    const x = selected.elements.reduce((prev, el) => Math.min(prev, el.x), Infinity);
+    const y = selected.elements.reduce((prev, el) => Math.min(prev, el.y), Infinity);
 
     return { x, y };
   },
@@ -26,7 +20,7 @@ export const positionAtom = atom(
       set(elementAtom, (el) => ({
         ...el,
         x: update.x + el.x,
-        y: update.y + el.y,
+        y: update.y + el.y
       }));
     });
   }
@@ -36,14 +30,8 @@ export const dimensionAtom = atom(
   (get) => {
     const selected = get(selectedItemsAtom);
     const { x, y } = get(positionAtom);
-    const width = selected.elements.reduce(
-      (prev, el) => Math.max(prev, el.x + el.width - x),
-      0
-    );
-    const height = selected.elements.reduce(
-      (prev, el) => Math.max(prev, el.y + el.height - y),
-      0
-    );
+    const width = selected.elements.reduce((prev, el) => Math.max(prev, el.x + el.width - x), 0);
+    const height = selected.elements.reduce((prev, el) => Math.max(prev, el.y + el.height - y), 0);
 
     return { width, height };
   },
@@ -54,7 +42,7 @@ export const dimensionAtom = atom(
         return {
           ...el,
           height: el.height + height,
-          width: el.width + width,
+          width: el.width + width
         };
       });
     });
@@ -89,11 +77,10 @@ export function DragHandler() {
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-  }
+  };
 
-
-  useEventListener("pointerup", handleMouseUp, documentRef);
-  useEventListener("pointermove", handleMouseMove, documentRef, [moving]);
+  useEventListener('pointerup', handleMouseUp, documentRef);
+  useEventListener('pointermove', handleMouseMove, documentRef, [moving]);
 
   if (isCropping) return null;
 
@@ -104,30 +91,28 @@ export function DragHandler() {
   return (
     <div
       style={{
-        position: "absolute",
+        position: 'absolute',
         left: x,
         top: y,
         height: height,
         width: width,
-        userSelect: "none",
-        cursor: 'move',
+        userSelect: 'none',
+        cursor: 'move'
       }}
       id="moveable"
       onMouseDown={handleMouseDown}
-      onClick={handleClick}
-    >
+      onClick={handleClick}>
       <div
         style={{
-          position: "absolute",
+          position: 'absolute',
           border: `2px dashed ${theme.colors.blue[6]}`,
           top: 0,
           left: 0,
           bottom: 0,
           right: 0,
-          transform: "scale(1.03)",
+          transform: 'scale(1.03)',
           borderRadius: 3
-        }}>
-      </div>
+        }}></div>
     </div>
   );
 }

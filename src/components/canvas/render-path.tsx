@@ -1,8 +1,8 @@
 import React from 'react';
-import { Box, createStyles, useMantineTheme } from "@mantine/core";
-import { SetStateAction } from "jotai";
-import { useState, useEffect, useRef } from "react";
-import { CanvasElement, MoveableElement, SVGPathType } from "./store";
+import { Box, createStyles, useMantineTheme } from '@mantine/core';
+import { SetStateAction } from 'jotai';
+import { useState, useEffect, useRef } from 'react';
+import { CanvasElement, MoveableElement, SVGPathType } from '@/components/canvas/store';
 
 type SVGCanvasElement = MoveableElement & SVGPathType;
 
@@ -14,24 +14,24 @@ type Props = {
 };
 
 type Status =
-  | "idle"
-  | "rotating"
-  | "moving"
-  | "resizing-br"
-  | "resizing-tl"
-  | "resizing-bl"
-  | "resizing-tr";
+  | 'idle'
+  | 'rotating'
+  | 'moving'
+  | 'resizing-br'
+  | 'resizing-tl'
+  | 'resizing-bl'
+  | 'resizing-tr';
 
-const useStyles = createStyles(theme => ({
+const useStyles = createStyles((theme) => ({
   resizeHandle: {
     backgroundColor: theme.colors.gray[2],
     border: `1px solid ${theme.colors.dark[3]}`,
     borderRadius: '50%',
     width: 18,
     height: 18,
-    position: 'absolute',
+    position: 'absolute'
   }
-}))
+}));
 
 const SNAP_TOLERANCE = 15;
 
@@ -48,13 +48,13 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
     setStatus('moving');
     lastPos.current = { x: e.clientX, y: e.clientY };
     console.log('element: ', element, JSON.stringify(element));
-  }
+  };
 
   const handleResizeMouseDown = (e: React.MouseEvent, status: Status) => {
     e.stopPropagation();
     setStatus(status);
     lastPos.current = { x: e.clientX, y: e.clientY };
-  }
+  };
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
@@ -66,10 +66,10 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
         deltaX = deltaX <= SNAP_TOLERANCE ? Math.min(0, deltaX) : deltaX;
         deltaY = deltaY <= SNAP_TOLERANCE ? Math.min(0, deltaY) : deltaY;
 
-        setElement(el => ({ ...el, x: deltaX, y: deltaY }));
+        setElement((el) => ({ ...el, x: deltaX, y: deltaY }));
       } else if (status === 'resizing-br') {
         const deltaX = e.clientX - lastPos.current.x + width;
-        setElement(el => ({ ...el, width: deltaX, height: el.height / el.width * deltaX }))
+        setElement((el) => ({ ...el, width: deltaX, height: (el.height / el.width) * deltaX }));
       }
     }
 
@@ -84,9 +84,8 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
-    }
-  }, [status, setElement])
-
+    };
+  }, [status, setElement]);
 
   return (
     <Box
@@ -98,25 +97,13 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
         width,
         height,
         position: 'absolute',
-        border: isSelected ? `3px solid ${theme.colors.indigo[8]}` : '',
+        border: isSelected ? `3px solid ${theme.colors.indigo[8]}` : ''
       }}
-      onClick={onSelect}
-    >
-      <svg
-        opacity={element.opacity}
-        {...element.props}
-        viewBox={element.getViewBox(width, height)}
-      >
-        <path
-          {...element.path}
-          d={element.getPath(width, height)}
-        />
+      onClick={onSelect}>
+      <svg opacity={element.opacity} {...element.props} viewBox={element.getViewBox(width, height)}>
+        <path {...element.path} d={element.getPath(width, height)} />
       </svg>
-      <svg
-        opacity={element.opacity}
-        {...element.props}
-        viewBox={element.getViewBox(width, height)}
-      >
+      <svg opacity={element.opacity} {...element.props} viewBox={element.getViewBox(width, height)}>
         <clipPath id={element.strokeProps.clipPathId}>
           <path d={element.getPath(width, height)} />
         </clipPath>
@@ -131,13 +118,13 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
           vectorEffect="non-scaling-stroke"
         />
       </svg>
-      {isSelected &&
+      {isSelected && (
         <span
           className={classes.resizeHandle}
           style={{ bottom: 0, right: 0, transform: 'translate(50%, 50%)' }}
-          onMouseDown={e => handleResizeMouseDown(e, 'resizing-br')}
+          onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-br')}
         />
-      }
+      )}
     </Box>
   );
 }
