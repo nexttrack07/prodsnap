@@ -3,6 +3,7 @@ import { Box } from '@mantine/core';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { createElement, ReactNode } from 'react';
 import {
+  activeElementAtomAtom,
   canvasAtom,
   CanvasElement,
   elementAtomsAtom,
@@ -87,10 +88,12 @@ export function Element({ elementAtom }: { elementAtom: ElementType }) {
   const [selectedElementAtoms, setSelectedElementAtoms] = useAtom(selectedElementAtomsAtom);
   const atomGroup = useAtomValue(groupFromElementAtom(element));
   const isShiftPressed = useShiftKeyPressed();
+  const setActiveElementAtom = useSetAtom(activeElementAtomAtom);
 
   const handleSelectElement = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedElementAtoms((selectedItems) => {
+      setActiveElementAtom(elementAtom);
       if (selectedItems.includes(elementAtom)) return selectedItems;
       if (atomGroup) {
         return isShiftPressed ? selectedItems.concat(atomGroup) : atomGroup;

@@ -1,12 +1,15 @@
 import React, { useEffect } from 'react';
 import { Box, Group, ActionIcon, Menu, Button } from '@mantine/core';
 import { FaRegObjectGroup, FaRegObjectUngroup } from 'react-icons/fa';
-import { atom, useAtomValue, useSetAtom } from 'jotai';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import {
   elementAtomsAtom,
   selectedElementAtomsAtom,
   groupsByIdAtom,
-  canvasAtom
+  canvasAtom,
+  isPath,
+  activeElementAtomAtom,
+  CanvasElement
 } from '../canvas/store';
 import { SvgPathToolbar } from './svg-path-toolbar';
 import { ImageToolbar } from './image-toolbar';
@@ -97,6 +100,22 @@ function getRandomNumber(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+const activeElementAtom = atom(
+  (get) => {
+    const activeElementAtom = get(activeElementAtomAtom);
+    if (activeElementAtom) {
+      return get(activeElementAtom);
+    }
+    return null;
+  },
+  (get, set, element: CanvasElement) => {
+    const activeElementAtom = get(activeElementAtomAtom);
+    if (activeElementAtom) {
+      set(activeElementAtom, element);
+    }
+  }
+);
+
 export function Toolbar() {
   const type = useAtomValue(getTypeAtom);
   const deletedSelectedElements = useSetAtom(deleteSelectedAtom);
@@ -105,6 +124,7 @@ export function Toolbar() {
   const removeGroup = useSetAtom(removeGroupAtom);
   const isGrouped = useAtomValue(isGroupedAtom);
   const copySelected = useSetAtom(copySelectedAtom);
+  const [activeElement, setActiveElement] = useAtom(activeElementAtom);
 
   const handleDeleteClick = () => {
     deletedSelectedElements();
@@ -144,9 +164,12 @@ export function Toolbar() {
         alignItems: 'center',
         justifyContent: 'space-between'
       }}>
+      {activeElement && isPath(activeElement) && (
+        <SvgPathToolbar element={activeElement} setElement={setActiveElement} />
+      )}
       {type === 'text' && <TextToolbar />}
       {type === 'image' && <ImageToolbar />}
-      {type === 'svg-path' && <SvgPathToolbar />}
+      {/* {type === 'svg-path' && <SvgPathToolbar />} */}
       {type === 'svg-curve' && <SvgCurveToolbar />}
       {type === 'canvas' && <CanvasToolbar />}
       <div style={{ flex: 1 }} />

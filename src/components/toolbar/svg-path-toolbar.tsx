@@ -14,7 +14,8 @@ import {
   MoveableElement,
   SVGPathType,
   SVGStrokeProps,
-  selectedElementAtomsAtom
+  selectedElementAtomsAtom,
+  CanvasElement
 } from '@/components/canvas/store';
 import { atom, useAtom } from 'jotai';
 import { BorderAll, BorderNone, BorderRadius, BorderStyle2 } from 'tabler-icons-react';
@@ -61,12 +62,12 @@ const svgStrokePropsAtom = atom(
   }
 );
 
-export function SvgPathToolbar() {
-  const [svgProps, setProps] = useAtom(svgPropsAtom);
-  const [strokeProps, setStrokeProps] = useAtom(svgStrokePropsAtom);
+type Props = {
+  element: MoveableElement & SVGPathType;
+  setElement: (update: CanvasElement) => void;
+};
 
-  if (!svgProps || !strokeProps) return null;
-
+export function SvgPathToolbar({ element, setElement }: Props) {
   return (
     <Group>
       <Popover>
@@ -76,7 +77,7 @@ export function SvgPathToolbar() {
               sx={{
                 width: '100%',
                 height: '100%',
-                borderColor: strokeProps.stroke,
+                borderColor: element.strokeProps.stroke,
                 borderWidth: 8,
                 borderStyle: 'solid',
                 borderRadius: 3
@@ -87,11 +88,19 @@ export function SvgPathToolbar() {
         <Popover.Dropdown>
           <ColorPicker
             format="rgba"
-            value={strokeProps.stroke}
+            value={element.strokeProps.stroke}
             onChange={(val) =>
-              setStrokeProps({
-                stroke: val,
-                strokeWidth: strokeProps.strokeWidth ?? 10
+              // setStrokeProps({
+              //   stroke: val,
+              //   strokeWidth: strokeProps.strokeWidth ?? 10
+              // })
+              setElement({
+                ...element,
+                strokeProps: {
+                  ...element.strokeProps,
+                  stroke: val,
+                  strokeWidth: element.strokeProps.strokeWidth ?? 10
+                }
               })
             }
             swatches={[
@@ -110,7 +119,7 @@ export function SvgPathToolbar() {
               sx={{
                 width: '100%',
                 height: '100%',
-                backgroundColor: svgProps?.fill,
+                backgroundColor: element.props.fill,
                 borderRadius: 3
               }}
             />
@@ -119,8 +128,8 @@ export function SvgPathToolbar() {
         <Popover.Dropdown>
           <ColorPicker
             format="rgba"
-            value={svgProps.fill}
-            onChange={(val) => setProps({ fill: val })}
+            value={element.props.fill}
+            onChange={(val) => setElement({ ...element, props: { ...element.props, fill: val } })}
             swatches={[
               ...DEFAULT_THEME.colors.red,
               ...DEFAULT_THEME.colors.yellow,
@@ -141,25 +150,24 @@ export function SvgPathToolbar() {
           <Menu.Item>
             <SegmentedControl
               onChange={(val) => {
+                let strokeWidth = 0,
+                  strokeDasharray = '0';
                 switch (val) {
                   case 'none':
-                    setStrokeProps({ strokeWidth: 0 });
-                    return;
+                    strokeWidth = 0;
                   case 'dashed':
-                    setStrokeProps({
-                      strokeDasharray: '5,10',
-                      strokeWidth: strokeProps?.strokeWidth === 0 ? 10 : strokeProps.strokeWidth
-                    });
-                    return;
+                    strokeDasharray = '5,10';
+                    strokeWidth =
+                      element.strokeProps.strokeWidth === 0 ? 10 : element.strokeProps.strokeWidth;
                   case 'all':
-                    setStrokeProps({
-                      strokeDasharray: '0',
-                      strokeWidth: strokeProps.strokeWidth === 0 ? 10 : strokeProps.strokeWidth
-                    });
-                    return;
-                  default:
-                    return;
+                    strokeDasharray = '0';
+                    strokeWidth =
+                      element.strokeProps.strokeWidth === 0 ? 10 : element.strokeProps.strokeWidth;
                 }
+                setElement({
+                  ...element,
+                  strokeProps: { ...element.strokeProps, strokeWidth, strokeDasharray }
+                });
               }}
               data={[
                 { label: <BorderNone />, value: 'none' },
@@ -171,8 +179,10 @@ export function SvgPathToolbar() {
           <Menu.Label>Border Width</Menu.Label>
           <Menu.Item>
             <Slider
-              value={strokeProps.strokeWidth}
-              onChange={(strokeWidth) => setStrokeProps({ strokeWidth })}
+              value={element.strokeProps.strokeWidth}
+              onChange={(strokeWidth) =>
+                setElement({ ...element, strokeProps: { ...element.strokeProps, strokeWidth } })
+              }
             />
           </Menu.Item>
           <Menu.Label>Rounded Corner</Menu.Label>

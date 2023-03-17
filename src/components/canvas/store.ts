@@ -42,7 +42,7 @@ export type SVGPointType = {
   type: 'svg-point';
 };
 
-export type SVGPointAtom = WritableAtom<SVGPointType & Draggable, Action<SVGPointType & Draggable>>
+export type SVGPointAtom = WritableAtom<SVGPointType & Draggable, Action<SVGPointType & Draggable>>;
 
 export type SVGCurveType = {
   type: 'svg-curve';
@@ -52,14 +52,14 @@ export type SVGCurveType = {
   strokeWidth: number;
   strokeLinecap?: 'inherit' | 'butt' | 'round' | 'square' | undefined;
   strokeDasharray?: string;
-  startMarker: "none" | "fill-arrow" | "outline-arrow" | "outline-circle";
-  endMarker: "none" | "fill-arrow" | "outline-arrow" | "outline-circle";
+  startMarker: 'none' | 'fill-arrow' | 'outline-arrow' | 'outline-circle';
+  endMarker: 'none' | 'fill-arrow' | 'outline-arrow' | 'outline-circle';
 };
 export type SVGPathType = {
   type: 'svg-path';
   getViewBox: (w: number, h: number) => string;
   getPath: (w: number, h: number) => string;
-  props?: SVGAttributes<SVGSVGElement>;
+  props: SVGAttributes<SVGSVGElement>;
   path: SVGAttributes<SVGPathElement>;
   strokeProps: SVGStrokeProps;
 };
@@ -88,6 +88,7 @@ export type GroupType = WritableAtom<ElementType[], Action<ElementType[]>>;
 
 // [atom([atom(), atom()]), atom([atom(), atom()])]
 export const elementAtomsAtom = atom<ElementType[]>([]);
+export const activeElementAtomAtom = atom<ElementType | null>(null);
 export const selectedElementAtomsAtom = atom<ElementType[]>([]);
 export const groupsByIdAtom = atom<Record<string, ElementType[]>>({});
 
@@ -132,14 +133,26 @@ export const canvasAtom = atom({
   height: 750,
   scale: 1,
   backgroundColor: 'white',
-  isSelected: false,
-})
+  isSelected: false
+});
 
 export const createAtom = (element: CanvasElement): ElementType => {
   if (element.type === 'svg-curve') {
     console.log('createAtom curve: ', element);
-    return atom({ ...element, points: element.points.map((point) => atom(point)) }) as any as ElementType;
-  } 
+    return atom({
+      ...element,
+      points: element.points.map((point) => atom(point))
+    }) as any as ElementType;
+  }
 
   return atom(element) as any as ElementType;
-}
+};
+
+export const isPath = (element: CanvasElement): element is SVGPathType & MoveableElement =>
+  element && element.type === 'svg-path';
+export const isImage = (element: CanvasElement): element is ImageType & MoveableElement =>
+  element && element.type === 'image';
+export const isText = (element: CanvasElement): element is TextType & MoveableElement =>
+  element && element.type === 'text';
+export const isCurve = (element: CanvasElement): element is SVGCurveType & MoveableElement =>
+  element && element.type === 'svg-curve';
