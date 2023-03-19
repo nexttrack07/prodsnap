@@ -12,31 +12,12 @@ import {
   Grid
 } from '@mantine/core';
 import { MoveableElement, selectedElementAtomsAtom, SVGCurveType } from '@/components/canvas/store';
-import { atom, useAtom } from 'jotai';
+import { atom } from 'jotai';
 import { Line, LineDashed, LineDotted } from 'tabler-icons-react';
 
-const svgPropsAtom = atom(
-  (get) => {
-    const selectedElementAtoms = get(selectedElementAtomsAtom);
-    if (selectedElementAtoms.length === 1) {
-      const selectedElement = get(selectedElementAtoms[0]);
-      return selectedElement as MoveableElement & SVGCurveType;
-    }
-  },
-  (get, set, update: { stroke?: string; strokeWidth?: number }) => {
-    const selectedElementAtoms = get(selectedElementAtomsAtom);
-    if (selectedElementAtoms.length === 1) {
-      set(selectedElementAtoms[0], (el) => {
-        if (el.type === 'svg-curve') {
-          return { ...el, ...update };
-        }
-        return el;
-      });
-    }
-  }
-);
+type Marker = Record<SVGCurveType['startMarker'], React.ReactNode>;
 
-export const START_MARKERS = {
+export const START_MARKERS: Marker = {
   none: (
     <>
       <path
@@ -88,9 +69,9 @@ export const START_MARKERS = {
       />
     </>
   )
-} as const;
+};
 
-export const END_MARKERS = {
+export const END_MARKERS: Marker = {
   none: (
     <>
       <path
@@ -142,13 +123,38 @@ export const END_MARKERS = {
       />
     </>
   )
-} as const;
+};
 
-export function SvgCurveToolbar() {
+const svgPropsAtom = atom(
+  (get) => {
+    const selectedElementAtoms = get(selectedElementAtomsAtom);
+    if (selectedElementAtoms.length === 1) {
+      const selectedElement = get(selectedElementAtoms[0]);
+      return selectedElement as MoveableElement & SVGCurveType;
+    }
+  },
+  (get, set, update: { stroke?: string; strokeWidth?: number }) => {
+    const selectedElementAtoms = get(selectedElementAtomsAtom);
+    if (selectedElementAtoms.length === 1) {
+      set(selectedElementAtoms[0], (el) => {
+        if (el.type === 'svg-curve') {
+          return { ...el, ...update };
+        }
+        return el;
+      });
+    }
+  }
+);
+
+type Props = {
+  element: MoveableElement & SVGCurveType;
+  setElement: (element: MoveableElement & SVGCurveType) => void;
+};
+
+export function SvgCurveToolbar({ element, setElement }: Props) {
   const handlers = useRef<NumberInputHandlers>();
-  const [svgProps, setSvgProps] = useAtom(svgPropsAtom);
 
-  if (!svgProps) return null;
+  if (!element) return null;
 
   return (
     <Group>
@@ -159,7 +165,7 @@ export function SvgCurveToolbar() {
               sx={{
                 width: '100%',
                 height: '100%',
-                borderColor: svgProps.stroke,
+                borderColor: element.stroke,
                 borderWidth: 8,
                 borderStyle: 'solid',
                 borderRadius: 3
@@ -170,9 +176,10 @@ export function SvgCurveToolbar() {
         <Popover.Dropdown>
           <ColorPicker
             format="rgba"
-            value={svgProps.stroke}
+            value={element.stroke}
             onChange={(val) =>
-              setSvgProps({
+              setElement({
+                ...element,
                 stroke: val
               })
             }
@@ -192,8 +199,8 @@ export function SvgCurveToolbar() {
 
         <NumberInput
           hideControls
-          value={svgProps.strokeWidth}
-          onChange={(val) => setSvgProps({ strokeWidth: val })}
+          value={element.strokeWidth}
+          onChange={(val) => setElement({ ...element, strokeWidth: val ?? element.strokeWidth })}
           handlersRef={handlers}
           max={50}
           min={1}
@@ -207,8 +214,8 @@ export function SvgCurveToolbar() {
       </Group>
 
       <SegmentedControl
-        value={svgProps.strokeDasharray ?? ''}
-        onChange={(val) => setSvgProps({ strokeDasharray: val ?? '' })}
+        value={element.strokeDasharray ?? ''}
+        onChange={(val) => setElement({ ...element, strokeDasharray: val ?? '' })}
         data={[
           { label: <Line />, value: '' },
           { label: <LineDashed />, value: '21,7' },
@@ -220,7 +227,7 @@ export function SvgCurveToolbar() {
         <Popover.Target>
           <ActionIcon variant="default" size={36}>
             <svg width={24} height={24}>
-              {START_MARKERS[svgProps.startMarker]}
+              {START_MARKERS[element.startMarker]}
             </svg>
           </ActionIcon>
         </Popover.Target>
@@ -228,7 +235,9 @@ export function SvgCurveToolbar() {
           <Grid gutter="xs" justify="center" align="center">
             {Object.entries(START_MARKERS).map(([id, comp]) => (
               <Grid.Col key={id} span="content">
-                <ActionIcon onClick={() => setSvgProps({ startMarker: id })} size={36}>
+                <ActionIcon
+                  onClick={() => setElement({ ...element, startMarker: id as keyof Marker })}
+                  size={36}>
                   <svg width={24} height={24}>
                     {comp}
                   </svg>
@@ -243,7 +252,7 @@ export function SvgCurveToolbar() {
         <Popover.Target>
           <ActionIcon variant="default" size={36}>
             <svg width={24} height={24}>
-              {END_MARKERS[svgProps.endMarker]}
+              {END_MARKERS[element.endMarker]}
             </svg>
           </ActionIcon>
         </Popover.Target>
@@ -251,7 +260,9 @@ export function SvgCurveToolbar() {
           <Grid gutter="xs" justify="center" align="center">
             {Object.entries(END_MARKERS).map(([id, comp]) => (
               <Grid.Col key={id} span="content">
-                <ActionIcon onClick={() => setSvgProps({ endMarker: id })} size={36}>
+                <ActionIcon
+                  onClick={() => setElement({ ...element, endMarker: id as keyof Marker })}
+                  size={36}>
                   <svg width={24} height={24}>
                     {comp}
                   </svg>

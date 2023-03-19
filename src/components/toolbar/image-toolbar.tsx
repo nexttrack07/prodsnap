@@ -1,6 +1,7 @@
 import React from 'react';
 import { ActionIcon, Button, Group, SegmentedControl } from '@mantine/core';
 import {
+  activeElementAtomAtom,
   CanvasElement,
   ImageState,
   ImageType,
@@ -17,18 +18,17 @@ const removeBackground = httpsCallable(functions, 'removeBackground');
 
 const selectedImageAtom = atom(
   (get) => {
-    const selectedElementAtoms = get(selectedElementAtomsAtom);
-    if (selectedElementAtoms.length === 1) {
-      const selectedElement = get(selectedElementAtoms[0]);
+    const activeElementAtom = get(activeElementAtomAtom);
+    if (activeElementAtom) {
+      const selectedElement = get(activeElementAtom);
       return selectedElement.type === 'image' ? selectedElement : null;
     }
-
     return null;
   },
   (get, set, update: Partial<MoveableElement & ImageType>) => {
-    const selectedElementAtoms = get(selectedElementAtomsAtom);
-    if (selectedElementAtoms.length === 1) {
-      set(selectedElementAtoms[0], (el) =>
+    const activeElementAtom = get(activeElementAtomAtom);
+    if (activeElementAtom) {
+      set(activeElementAtom, (el) =>
         el.type === 'image'
           ? ({
               ...el,

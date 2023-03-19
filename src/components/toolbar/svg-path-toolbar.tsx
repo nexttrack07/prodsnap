@@ -20,51 +20,9 @@ import {
 import { atom, useAtom } from 'jotai';
 import { BorderAll, BorderNone, BorderRadius, BorderStyle2 } from 'tabler-icons-react';
 
-const svgPropsAtom = atom(
-  (get) => {
-    const selectedElementAtoms = get(selectedElementAtomsAtom);
-    if (selectedElementAtoms.length === 1) {
-      const selectedElement = get(selectedElementAtoms[0]);
-      return (selectedElement as MoveableElement & SVGPathType).props;
-    }
-  },
-  (get, set, update: SVGAttributes<SVGSVGElement>) => {
-    const selectedElementAtoms = get(selectedElementAtomsAtom);
-    if (selectedElementAtoms.length === 1) {
-      set(selectedElementAtoms[0], (el) => {
-        if (el.type === 'svg-path') {
-          return { ...el, props: { ...el.props, ...update } };
-        }
-        return el;
-      });
-    }
-  }
-);
-
-const svgStrokePropsAtom = atom(
-  (get) => {
-    const selectedElementAtoms = get(selectedElementAtomsAtom);
-    if (selectedElementAtoms.length === 1) {
-      const selectedElement = get(selectedElementAtoms[0]);
-      return (selectedElement as MoveableElement & SVGPathType).strokeProps;
-    }
-  },
-  (get, set, update: Partial<SVGStrokeProps>) => {
-    const selectedElementAtoms = get(selectedElementAtomsAtom);
-    if (selectedElementAtoms.length === 1) {
-      set(selectedElementAtoms[0], (el) => {
-        if (el.type === 'svg-path') {
-          return { ...el, strokeProps: { ...el.strokeProps, ...update } };
-        }
-        return el;
-      });
-    }
-  }
-);
-
 type Props = {
   element: MoveableElement & SVGPathType;
-  setElement: (update: CanvasElement) => void;
+  setElement: (element: MoveableElement & SVGPathType) => void;
 };
 
 export function SvgPathToolbar({ element, setElement }: Props) {

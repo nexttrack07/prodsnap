@@ -9,7 +9,10 @@ import {
   canvasAtom,
   isPath,
   activeElementAtomAtom,
-  CanvasElement
+  CanvasElement,
+  isCurve,
+  isText,
+  isImage
 } from '../canvas/store';
 import { SvgPathToolbar } from './svg-path-toolbar';
 import { ImageToolbar } from './image-toolbar';
@@ -167,11 +170,14 @@ export function Toolbar() {
       {activeElement && isPath(activeElement) && (
         <SvgPathToolbar element={activeElement} setElement={setActiveElement} />
       )}
-      {type === 'text' && <TextToolbar />}
-      {type === 'image' && <ImageToolbar />}
-      {/* {type === 'svg-path' && <SvgPathToolbar />} */}
-      {type === 'svg-curve' && <SvgCurveToolbar />}
-      {type === 'canvas' && <CanvasToolbar />}
+      {activeElement && isCurve(activeElement) && (
+        <SvgCurveToolbar element={activeElement} setElement={setActiveElement} />
+      )}
+      {activeElement && isText(activeElement) && (
+        <TextToolbar element={activeElement} setElement={setActiveElement} />
+      )}
+      {activeElement && isImage(activeElement) && <ImageToolbar />}
+      {!activeElement && <CanvasToolbar />}
       <div style={{ flex: 1 }} />
       <Group spacing="xs">
         {!isGrouped && selectedElements.length > 1 ? (
