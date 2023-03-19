@@ -5,8 +5,7 @@ import {
   CanvasElement,
   ImageState,
   ImageType,
-  MoveableElement,
-  selectedElementAtomsAtom
+  MoveableElement
 } from '@/components/canvas/store';
 import { httpsCallable } from 'firebase/functions';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
