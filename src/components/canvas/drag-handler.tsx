@@ -1,58 +1,21 @@
 import React from 'react';
 import { atom, useAtom, useAtomValue } from 'jotai';
-import { selectedItemsAtom } from '@/components/canvas/store';
+import { Draggable, Resizable, selectedItemsAtom } from '@/components/canvas/store';
 import { isCroppingAtom } from '@/components/toolbar/image-toolbar';
 import { useCallback, useRef, useState } from 'react';
 import { ActionIcon, Center, ThemeIcon, useMantineTheme } from '@mantine/core';
 import { useEventListener } from '@/utils';
 import { ArrowsMove, BorderRadius } from 'tabler-icons-react';
 
-export const positionAtom = atom(
-  (get) => {
-    const selected = get(selectedItemsAtom);
-    const x = selected.elements.reduce((prev, el) => Math.min(prev, el.x), Infinity);
-    const y = selected.elements.reduce((prev, el) => Math.min(prev, el.y), Infinity);
+type Props = {
+  dimension: Resizable;
+  position: Draggable;
+  onMove: (p: Draggable) => void;
+};
 
-    return { x, y };
-  },
-  (get, set, update: { x: number; y: number }) => {
-    const selected = get(selectedItemsAtom);
-    selected.atoms.forEach((elementAtom) => {
-      set(elementAtom, (el) => ({
-        ...el,
-        x: update.x + el.x,
-        y: update.y + el.y
-      }));
-    });
-  }
-);
-
-export const dimensionAtom = atom(
-  (get) => {
-    const selected = get(selectedItemsAtom);
-    const { x, y } = get(positionAtom);
-    const width = selected.elements.reduce((prev, el) => Math.max(prev, el.x + el.width - x), 0);
-    const height = selected.elements.reduce((prev, el) => Math.max(prev, el.y + el.height - y), 0);
-
-    return { width, height };
-  },
-  (get, set, { width, height }: { width: number; height: number }) => {
-    const selected = get(selectedItemsAtom);
-    selected.atoms.forEach((elementAtom) => {
-      set(elementAtom, (el) => {
-        return {
-          ...el,
-          height: el.height + height,
-          width: el.width + width
-        };
-      });
-    });
-  }
-);
-
-export function DragHandler() {
-  const [{ x, y }, setPosition] = useAtom(positionAtom);
-  const [{ width, height }] = useAtom(dimensionAtom);
+export function DragHandler({ dimension, position, onMove }: Props) {
+  const { x, y } = position;
+  const { width, height } = dimension;
   const isCropping = useAtomValue(isCroppingAtom);
   const selected = useAtomValue(selectedItemsAtom);
   const documentRef = useRef<Document>(document);
@@ -72,7 +35,7 @@ export function DragHandler() {
   const handleMouseMove = (e: MouseEvent) => {
     e.stopPropagation();
     if (moving) {
-      setPosition({ x: e.movementX, y: e.movementY });
+      onMove({ x: e.movementX, y: e.movementY });
     }
   };
 

@@ -10,6 +10,7 @@ import {
   ElementType,
   groupsByIdAtom,
   selectedElementAtomsAtom,
+  selectedItemsAtom,
   SVGType
 } from './store';
 import { RenderImage } from './render-image';
@@ -26,7 +27,52 @@ const unSelectAllAtom = atom(null, (_get, set) => {
   set(selectedElementAtomsAtom, []);
 });
 
+export const positionAtom = atom(
+  (get) => {
+    const selected = get(selectedItemsAtom);
+    const x = selected.elements.reduce((prev, el) => Math.min(prev, el.x), Infinity);
+    const y = selected.elements.reduce((prev, el) => Math.min(prev, el.y), Infinity);
+
+    return { x, y };
+  },
+  (get, set, update: { x: number; y: number }) => {
+    const selected = get(selectedItemsAtom);
+    selected.atoms.forEach((elementAtom) => {
+      set(elementAtom, (el) => ({
+        ...el,
+        x: update.x + el.x,
+        y: update.y + el.y
+      }));
+    });
+  }
+);
+
+export const dimensionAtom = atom(
+  (get) => {
+    const selected = get(selectedItemsAtom);
+    const { x, y } = get(positionAtom);
+    const width = selected.elements.reduce((prev, el) => Math.max(prev, el.x + el.width - x), 0);
+    const height = selected.elements.reduce((prev, el) => Math.max(prev, el.y + el.height - y), 0);
+
+    return { width, height };
+  },
+  (get, set, { width, height }: { width: number; height: number }) => {
+    const selected = get(selectedItemsAtom);
+    selected.atoms.forEach((elementAtom) => {
+      set(elementAtom, (el) => {
+        return {
+          ...el,
+          height: el.height + height,
+          width: el.width + width
+        };
+      });
+    });
+  }
+);
+
 export function Canvas() {
+  const dimension = useAtomValue(dimensionAtom);
+  const [position, setPosition] = useAtom(positionAtom);
   const elementAtoms = useAtomValue(elementAtomsAtom);
   const unSelectAllElements = useSetAtom(unSelectAllAtom);
   const { width, height, backgroundColor } = useAtomValue(canvasAtom);
@@ -51,7 +97,7 @@ export function Canvas() {
         overflow: 'hidden'
       })}
       onMouseDown={handleCanvasMouseDown}>
-      <DragHandler />
+      <DragHandler dimension={dimension} position={position} onMove={setPosition} />
       {elementAtoms.map((elementAtom) => (
         <Element key={elementAtom.toString()} elementAtom={elementAtom} />
       ))}
