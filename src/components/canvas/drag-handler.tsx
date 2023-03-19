@@ -11,9 +11,10 @@ type Props = {
   dimension: Resizable;
   position: Draggable;
   onMove: (p: Draggable) => void;
+  children?: React.ReactNode;
 };
 
-export function DragHandler({ dimension, position, onMove }: Props) {
+export function DragHandler({ dimension, position, onMove, children }: Props) {
   const { x, y } = position;
   const { width, height } = dimension;
   const isCropping = useAtomValue(isCroppingAtom);
@@ -66,6 +67,7 @@ export function DragHandler({ dimension, position, onMove }: Props) {
       id="moveable"
       onMouseDown={handleMouseDown}
       onClick={handleClick}>
+      {children}
       <Center
         onMouseDown={handleMouseDown}
         style={{
