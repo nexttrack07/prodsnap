@@ -20,6 +20,18 @@ type Props = {
   onSelect: (e: React.MouseEvent) => void;
 };
 
+const SNAP_TOLERANCE = 5;
+
+function getSnap(num: number, d = 0, max = 1000) {
+  if (num > -SNAP_TOLERANCE && num < SNAP_TOLERANCE) {
+    return 0;
+  } else if (num + d > max - SNAP_TOLERANCE && num + d < max + SNAP_TOLERANCE) {
+    return max - d;
+  }
+
+  return num;
+}
+
 export function RenderPath({ element, onSelect, setElement, isSelected }: Props) {
   const { x, y, width, height } = element;
   const canvasProps = useAtomValue(canvasAtom);
@@ -29,8 +41,8 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
       setElement((el) => {
         return {
           ...el,
-          x: p.x + el.x,
-          y: p.y + el.y
+          x: getSnap(p.x + el.x, el.width, canvasProps.width),
+          y: getSnap(p.y + el.y, el.height, canvasProps.height)
         };
       });
     },
@@ -42,13 +54,42 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
   };
 
   const handleResize = ({ x, y, width, height }: Draggable & Resizable) => {
-    setElement((prev) => ({
-      ...prev,
-      x: prev.x + x,
-      y: prev.y + y,
-      width: prev.width + width,
-      height: prev.height + height
-    }));
+    setElement((prev) => {
+      let newX = prev.x + x;
+      let newY = prev.y + y;
+      let newWidth = prev.width + width;
+      let newHeight = prev.height + height;
+
+      if (newX > -SNAP_TOLERANCE && newX < SNAP_TOLERANCE) {
+        newX = 0;
+      }
+
+      if (newY > -SNAP_TOLERANCE && newY < SNAP_TOLERANCE) {
+        newY = 0;
+      }
+
+      if (
+        newX + newWidth > canvasProps.width - SNAP_TOLERANCE &&
+        newX + newWidth < canvasProps.width + SNAP_TOLERANCE
+      ) {
+        newWidth = canvasProps.width - newX;
+      }
+
+      if (
+        newY + newHeight > canvasProps.height - SNAP_TOLERANCE &&
+        newY + newHeight < canvasProps.height + SNAP_TOLERANCE
+      ) {
+        newHeight = canvasProps.height - newY;
+      }
+
+      return {
+        ...prev,
+        x: newX,
+        y: newY,
+        width: newWidth,
+        height: newHeight
+      };
+    });
   };
 
   return (
