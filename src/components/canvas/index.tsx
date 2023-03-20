@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Box } from '@mantine/core';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { createElement, ReactNode } from 'react';
@@ -97,7 +97,8 @@ export function Canvas() {
         backgroundColor,
         overflow: 'hidden'
       })}
-      onMouseDown={handleCanvasMouseDown}>
+      onMouseDown={handleCanvasMouseDown}
+    >
       <DragHandler
         withBorders
         withMoveHandle
@@ -157,13 +158,17 @@ export function Element({ elementAtom }: { elementAtom: ElementType }) {
     });
   };
 
+  const handleSetElement = useCallback((element: CanvasElement) => {
+    setElement(element);
+  }, []);
+
   const Comp = elementCompMap[element.type];
 
   return (
     <Comp
       onSelect={handleSelectElement}
       element={element}
-      setElement={setElement}
+      setElement={handleSetElement}
       isSelected={selectedElementAtoms.includes(elementAtom)}
     />
   );

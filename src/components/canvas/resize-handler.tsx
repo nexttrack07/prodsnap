@@ -1,19 +1,15 @@
 import { createStyles } from '@mantine/core';
-import React from 'react';
+import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import { Resizable } from '@/components/canvas/store';
-
-type Props = {
-  dimension: Resizable;
-};
 
 const useStyles = createStyles((theme) => ({
   resize: {
     backgroundColor: theme.colors.blue[0],
     border: `1px solid ${theme.colors.blue[4]}`,
     borderRadius: '50%',
-    width: 14,
-    height: 14,
+    width: 10,
+    height: 10,
     position: 'absolute',
     '&:hover': {
       backgroundColor: theme.colors.blue[6]
@@ -45,8 +41,8 @@ const useStyles = createStyles((theme) => ({
   },
   resize_tm: {
     borderRadius: '40%',
-    width: 20,
-    height: 10,
+    width: 16,
+    height: 8,
     top: 0,
     left: '50%',
     cursor: 'n-resize',
@@ -54,8 +50,8 @@ const useStyles = createStyles((theme) => ({
   },
   resize_bm: {
     borderRadius: '40%',
-    width: 20,
-    height: 10,
+    width: 16,
+    height: 8,
     bottom: 0,
     left: '50%',
     cursor: 's-resize',
@@ -63,8 +59,8 @@ const useStyles = createStyles((theme) => ({
   },
   resize_lm: {
     borderRadius: '40%',
-    height: 20,
-    width: 10,
+    height: 16,
+    width: 8,
     left: 0,
     cursor: 'w-resize',
     top: '50%',
@@ -72,8 +68,8 @@ const useStyles = createStyles((theme) => ({
   },
   resize_rm: {
     borderRadius: '40%',
-    height: 20,
-    width: 10,
+    height: 16,
+    width: 8,
     right: 0,
     cursor: 'e-resize',
     top: '50%',
@@ -84,9 +80,115 @@ const useStyles = createStyles((theme) => ({
   }
 }));
 
-export function ResizeHandler({ dimension }: Props) {
+type Props = {
+  dimension: Resizable;
+  withSEResize?: boolean;
+  withSWResize?: boolean;
+  withNEResize?: boolean;
+  withNWResize?: boolean;
+  withTMResize?: boolean;
+  withBMResize?: boolean;
+  withLMResize?: boolean;
+  withRMResize?: boolean;
+  onSEResize?: (p: { x: number; y: number }) => void;
+  onSWResize?: (p: { x: number; y: number }) => void;
+  onNEResize?: (p: { x: number; y: number }) => void;
+  onNWResize?: (p: { x: number; y: number }) => void;
+  onTMResize?: (p: { x: number; y: number }) => void;
+  onBMResize?: (p: { x: number; y: number }) => void;
+  onLMResize?: (p: { x: number; y: number }) => void;
+  onRMResize?: (p: { x: number; y: number }) => void;
+  onResize: (p: { x: number; y: number; width: number; height: number }) => void;
+};
+
+type Status =
+  | 'idle'
+  | 'resizing-br'
+  | 'resizing-tl'
+  | 'resizing-bl'
+  | 'resizing-tr'
+  | 'resizing-tm'
+  | 'resizing-bm'
+  | 'resizing-lm'
+  | 'resizing-rm';
+
+export function ResizeHandler({
+  dimension,
+  withBMResize = true,
+  withLMResize = true,
+  withNEResize = true,
+  withTMResize = true,
+  withNWResize = true,
+  withRMResize = true,
+  withSEResize = true,
+  withSWResize = true,
+  onBMResize,
+  onLMResize,
+  onNEResize,
+  onTMResize,
+  onNWResize,
+  onRMResize,
+  onSEResize,
+  onSWResize,
+  onResize
+}: Props) {
   const { width, height } = dimension;
   const { classes } = useStyles();
+  const [status, setStatus] = React.useState<Status>('idle');
+  const lastPosition = React.useRef({ x: 0, y: 0 });
+
+  const handleResizeMouseDown = (
+    e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
+    type: Status
+  ) => {
+    e.stopPropagation();
+    setStatus(type);
+    lastPosition.current = { x: e.clientX, y: e.clientY };
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (status === 'idle') return;
+
+      if (status === 'resizing-br') {
+        const delta = e.movementX;
+        onResize({ x: 0, y: 0, width: delta, height: delta });
+      } else if (status === 'resizing-tl') {
+        const delta = e.movementX;
+        onResize({ x: delta, y: delta, width: -delta, height: -delta });
+      } else if (status === 'resizing-bl') {
+        const delta = e.movementX;
+        onResize({ x: 0, y: 0, width: -delta, height: delta });
+      } else if (status === 'resizing-tr') {
+        const delta = e.movementX;
+        onResize({ x: 0, y: 0, width: delta, height: -delta });
+      } else if (status === 'resizing-tm') {
+        const delta = e.movementY;
+        onResize({ x: 0, y: delta, width: 0, height: -delta });
+      } else if (status === 'resizing-bm') {
+        const delta = e.movementY;
+        onResize({ x: 0, y: 0, width: 0, height: delta });
+      } else if (status === 'resizing-lm') {
+        const delta = e.movementX;
+        onResize({ x: delta, y: 0, width: -delta, height: 0 });
+      } else if (status === 'resizing-rm') {
+        const delta = e.movementX;
+        onResize({ x: 0, y: 0, width: delta, height: 0 });
+      }
+    };
+
+    const handleMouseUp = () => {
+      setStatus('idle');
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [status]);
 
   return (
     <div
@@ -101,14 +203,54 @@ export function ResizeHandler({ dimension }: Props) {
       }}
       className={classes.borders}
     >
-      <span className={clsx(classes.resize, classes.resize_tl)} />
-      <span className={clsx(classes.resize, classes.resize_tr)} />
-      <span className={clsx(classes.resize, classes.resize_bl)} />
-      <span className={clsx(classes.resize, classes.resize_br)} />
-      <span className={clsx(classes.resize, classes.resize_tm)} />
-      <span className={clsx(classes.resize, classes.resize_bm)} />
-      <span className={clsx(classes.resize, classes.resize_lm)} />
-      <span className={clsx(classes.resize, classes.resize_rm)} />
+      {withNEResize && (
+        <span
+          onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-tl')}
+          className={clsx(classes.resize, classes.resize_tl)}
+        />
+      )}
+      {withNWResize && (
+        <span
+          onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-tr')}
+          className={clsx(classes.resize, classes.resize_tr)}
+        />
+      )}
+      {withSWResize && (
+        <span
+          onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-bl')}
+          className={clsx(classes.resize, classes.resize_bl)}
+        />
+      )}
+      {withSEResize && (
+        <span
+          onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-br')}
+          className={clsx(classes.resize, classes.resize_br)}
+        />
+      )}
+      {withTMResize && (
+        <span
+          onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-tm')}
+          className={clsx(classes.resize, classes.resize_tm)}
+        />
+      )}
+      {withBMResize && (
+        <span
+          onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-bm')}
+          className={clsx(classes.resize, classes.resize_bm)}
+        />
+      )}
+      {withLMResize && (
+        <span
+          onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-lm')}
+          className={clsx(classes.resize, classes.resize_lm)}
+        />
+      )}
+      {withRMResize && (
+        <span
+          onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-rm')}
+          className={clsx(classes.resize, classes.resize_rm)}
+        />
+      )}
     </div>
   );
 }

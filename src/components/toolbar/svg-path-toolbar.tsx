@@ -30,15 +30,14 @@ export function SvgPathToolbar({ element, setElement }: Props) {
     <Group>
       <Popover>
         <Popover.Target>
-          <ActionIcon size={36}>
+          <ActionIcon variant="default" size={36}>
             <Box
               sx={{
                 width: '100%',
                 height: '100%',
                 borderColor: element.strokeProps.stroke,
                 borderWidth: 8,
-                borderStyle: 'solid',
-                borderRadius: 3
+                borderStyle: 'solid'
               }}
             />
           </ActionIcon>
@@ -72,13 +71,12 @@ export function SvgPathToolbar({ element, setElement }: Props) {
       </Popover>
       <Popover>
         <Popover.Target>
-          <ActionIcon size={36}>
+          <ActionIcon variant="default" size={36}>
             <Box
               sx={{
                 width: '100%',
                 height: '100%',
-                backgroundColor: element.props.fill,
-                borderRadius: 3
+                backgroundColor: element.props.fill
               }}
             />
           </ActionIcon>

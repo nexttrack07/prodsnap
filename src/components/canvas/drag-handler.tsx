@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAtomValue } from 'jotai';
 import { Draggable, Resizable, selectedItemsAtom } from '@/components/canvas/store';
 import { isCroppingAtom } from '@/components/toolbar/image-toolbar';
-import { useCallback, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Center, useMantineTheme } from '@mantine/core';
-import { useEventListener } from '@/utils';
 import { ArrowsMove } from 'tabler-icons-react';
 
 type Props = {
@@ -31,37 +30,44 @@ export function DragHandler({
   const { x, y } = position;
   const { width, height } = dimension;
   const isCropping = useAtomValue(isCroppingAtom);
-  const selected = useAtomValue(selectedItemsAtom);
-  const documentRef = useRef<Document>(document);
   const theme = useMantineTheme();
   const [moving, setMoving] = useState(false);
   const lastPos = useRef({ x: 0, y: 0 });
 
-  const handleMouseUp = useCallback((e: MouseEvent) => {
-    e.stopPropagation();
-    setMoving(false);
-  }, []);
-
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+  const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
     lastPos.current = { x: e.clientX, y: e.clientY };
     setMoving(true);
-  }, []);
-
-  const handleMouseMove = (e: MouseEvent) => {
-    e.stopPropagation();
-    if (moving) {
-      onMove({ x: e.movementX, y: e.movementY });
-    }
   };
+
+  useEffect(() => {
+    const handleMouseUp = (e: MouseEvent) => {
+      e.stopPropagation();
+      setMoving(false);
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      e.stopPropagation();
+      if (moving) {
+        const deltaX = e.movementX;
+        const deltaY = e.movementY;
+        onMove({ x: deltaX, y: deltaY });
+      }
+    };
+
+    document.addEventListener('pointerup', handleMouseUp);
+    document.addEventListener('pointermove', handleMouseMove);
+
+    return () => {
+      document.removeEventListener('pointerup', handleMouseUp);
+      document.removeEventListener('pointermove', handleMouseMove);
+    };
+  }, [moving, onMove]);
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onClick && onClick(e);
   };
-
-  useEventListener('pointerup', handleMouseUp, documentRef);
-  useEventListener('pointermove', handleMouseMove, documentRef, [moving]);
 
   if (isCropping) return null;
 
@@ -82,7 +88,8 @@ export function DragHandler({
       }}
       id="moveable"
       onMouseDown={handleMouseDown}
-      onClick={handleClick}>
+      onClick={handleClick}
+    >
       {children}
       {withMoveHandle && (
         <Center
@@ -97,7 +104,8 @@ export function DragHandler({
             border: `1px solid ${theme.colors.blue[4]}`,
             backgroundColor: theme.colors.blue[0],
             padding: 2
-          }}>
+          }}
+        >
           <ArrowsMove color={theme.colors.blue[7]} size={14} />
         </Center>
       )}
@@ -112,7 +120,8 @@ export function DragHandler({
             right: 0,
             transform: 'scale(1.03)',
             borderRadius: 3
-          }}></div>
+          }}
+        ></div>
       )}
     </div>
   );
