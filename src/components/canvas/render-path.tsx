@@ -1,8 +1,10 @@
 import React from 'react';
-import { Box, createStyles, useMantineTheme } from '@mantine/core';
+import { Box, createStyles } from '@mantine/core';
 import { SetStateAction } from 'jotai';
-import { useState, useEffect, useRef } from 'react';
-import { CanvasElement, MoveableElement, SVGPathType } from '@/components/canvas/store';
+import { useState, useRef } from 'react';
+import { CanvasElement, Draggable, MoveableElement, SVGPathType } from '@/components/canvas/store';
+import { DragHandler } from './drag-handler';
+import { ResizeHandler } from './resize-handler';
 
 type SVGCanvasElement = MoveableElement & SVGPathType;
 
@@ -33,22 +35,13 @@ const useStyles = createStyles((theme) => ({
   }
 }));
 
-const SNAP_TOLERANCE = 15;
-
 export function RenderPath({ element, onSelect, setElement, isSelected }: Props) {
   const { x, y, width, height } = element;
-  const ref = useRef<HTMLDivElement>(null);
-  const theme = useMantineTheme();
   const { classes } = useStyles();
   const [status, setStatus] = useState<Status>('idle');
-  const lastPos = useRef({ x: 0, y: 0 });
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setStatus('moving');
-    lastPos.current = { x: e.clientX, y: e.clientY };
-    console.log('element: ', element, JSON.stringify(element));
-  };
+  console.log('hello');
+  const lastPos = useRef({ x: 0, y: 0 });
 
   const handleResizeMouseDown = (e: React.MouseEvent, status: Status) => {
     e.stopPropagation();
@@ -56,50 +49,20 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
     lastPos.current = { x: e.clientX, y: e.clientY };
   };
 
-  useEffect(() => {
-    function handleMouseMove(e: MouseEvent) {
-      e.stopPropagation();
-      if (status === 'moving') {
-        let deltaX = e.clientX - lastPos.current.x + x;
-        let deltaY = e.clientY - lastPos.current.y + y;
+  const handleMouseMove = (p: Draggable) => {
+    setElement((el) => ({ ...el, x: p.x + el.x, y: p.y + el.y }));
+  };
 
-        deltaX = deltaX <= SNAP_TOLERANCE ? Math.min(0, deltaX) : deltaX;
-        deltaY = deltaY <= SNAP_TOLERANCE ? Math.min(0, deltaY) : deltaY;
-
-        setElement((el) => ({ ...el, x: deltaX, y: deltaY }));
-      } else if (status === 'resizing-br') {
-        const deltaX = e.clientX - lastPos.current.x + width;
-        setElement((el) => ({ ...el, width: deltaX, height: (el.height / el.width) * deltaX }));
-      }
-    }
-
-    function handleMouseUp(e: MouseEvent) {
-      e.stopPropagation();
-      setStatus('idle');
-    }
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [status, setElement]);
+  const handleClick = (e: React.MouseEvent) => {
+    onSelect(e);
+  };
 
   return (
-    <Box
-      ref={ref}
-      onMouseDown={handleMouseDown}
-      style={{
-        left: x,
-        top: y,
-        width,
-        height,
-        position: 'absolute',
-        border: isSelected ? `3px solid ${theme.colors.indigo[8]}` : ''
-      }}
-      onClick={onSelect}>
+    <DragHandler
+      onClick={handleClick}
+      position={{ x, y }}
+      dimension={{ width, height }}
+      onMove={handleMouseMove}>
       <svg opacity={element.opacity} {...element.props} viewBox={element.getViewBox(width, height)}>
         <path {...element.path} d={element.getPath(width, height)} />
       </svg>
@@ -118,13 +81,14 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
           vectorEffect="non-scaling-stroke"
         />
       </svg>
-      {isSelected && (
+      {/* {isSelected && (
         <span
           className={classes.resizeHandle}
           style={{ bottom: 0, right: 0, transform: 'translate(50%, 50%)' }}
           onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-br')}
         />
-      )}
-    </Box>
+      )} */}
+      <ResizeHandler dimension={{ width, height }} />
+    </DragHandler>
   );
 }

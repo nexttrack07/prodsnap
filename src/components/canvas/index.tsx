@@ -76,7 +76,7 @@ export function Canvas() {
   const elementAtoms = useAtomValue(elementAtomsAtom);
   const unSelectAllElements = useSetAtom(unSelectAllAtom);
   const { width, height, backgroundColor } = useAtomValue(canvasAtom);
-  const selected = useAtomValue(selectedElementAtomsAtom).length === 0;
+  const selected = useAtomValue(selectedElementAtomsAtom);
 
   const handleCanvasMouseDown = () => {
     unSelectAllElements();
@@ -88,16 +88,24 @@ export function Canvas() {
       sx={(theme) => ({
         width,
         height,
-        border: selected
-          ? `1px solid ${theme.colors.blue[7]}`
-          : `1px solid ${theme.colors.gray[4]}`,
+        border:
+          selected.length === 0
+            ? `1px solid ${theme.colors.blue[7]}`
+            : `1px solid ${theme.colors.gray[4]}`,
         boxShadow: '0px 0px 0.8px rgba(0,0,0,0.3)',
         position: 'relative',
         backgroundColor,
         overflow: 'hidden'
       })}
       onMouseDown={handleCanvasMouseDown}>
-      <DragHandler dimension={dimension} position={position} onMove={setPosition} />
+      <DragHandler
+        withBorders
+        withMoveHandle
+        hide={selected.length < 2}
+        dimension={dimension}
+        position={position}
+        onMove={setPosition}
+      />
       {elementAtoms.map((elementAtom) => (
         <Element key={elementAtom.toString()} elementAtom={elementAtom} />
       ))}
@@ -137,6 +145,7 @@ export function Element({ elementAtom }: { elementAtom: ElementType }) {
   const setActiveElementAtom = useSetAtom(activeElementAtomAtom);
 
   const handleSelectElement = (e: React.MouseEvent) => {
+    console.log('Hello from onSelect');
     e.stopPropagation();
     setSelectedElementAtoms((selectedItems) => {
       setActiveElementAtom(elementAtom);
