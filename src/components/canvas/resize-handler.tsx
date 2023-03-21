@@ -7,9 +7,9 @@ const useStyles = createStyles((theme) => ({
   resize: {
     backgroundColor: theme.colors.blue[0],
     border: `1px solid ${theme.colors.blue[4]}`,
-    borderRadius: '50%',
-    width: 10,
-    height: 10,
+    borderRadius: '25%',
+    width: 12,
+    height: 12,
     position: 'absolute',
     '&:hover': {
       backgroundColor: theme.colors.blue[6]
@@ -41,8 +41,8 @@ const useStyles = createStyles((theme) => ({
   },
   resize_tm: {
     borderRadius: '40%',
-    width: 16,
-    height: 8,
+    width: 20,
+    height: 10,
     top: 0,
     left: '50%',
     cursor: 'n-resize',
@@ -50,8 +50,8 @@ const useStyles = createStyles((theme) => ({
   },
   resize_bm: {
     borderRadius: '40%',
-    width: 16,
-    height: 8,
+    width: 20,
+    height: 10,
     bottom: 0,
     left: '50%',
     cursor: 's-resize',
@@ -59,8 +59,8 @@ const useStyles = createStyles((theme) => ({
   },
   resize_lm: {
     borderRadius: '40%',
-    height: 16,
-    width: 8,
+    height: 20,
+    width: 10,
     left: 0,
     cursor: 'w-resize',
     top: '50%',
@@ -68,8 +68,8 @@ const useStyles = createStyles((theme) => ({
   },
   resize_rm: {
     borderRadius: '40%',
-    height: 16,
-    width: 8,
+    height: 20,
+    width: 10,
     right: 0,
     cursor: 'e-resize',
     top: '50%',
