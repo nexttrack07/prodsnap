@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { Box, Group, ActionIcon, Menu, Button } from '@mantine/core';
-import { FaRegObjectGroup, FaRegObjectUngroup } from 'react-icons/fa';
+import React from 'react';
+import { Box, Group, ActionIcon, Menu, SegmentedControl } from '@mantine/core';
+import { FaRegObjectUngroup } from 'react-icons/fa';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import {
   elementAtomsAtom,
@@ -18,7 +18,18 @@ import { SvgPathToolbar } from './svg-path-toolbar';
 import { ImageToolbar } from './image-toolbar';
 import { TextToolbar } from './text-toolbar';
 import { CanvasToolbar } from './canvas-toolbar';
-import { Copy, Eye, Trash } from 'tabler-icons-react';
+import {
+  Copy,
+  Eye,
+  LayoutAlignBottom,
+  LayoutAlignCenter,
+  LayoutAlignLeft,
+  LayoutAlignMiddle,
+  LayoutAlignRight,
+  LayoutAlignTop,
+  LayoutDashboard,
+  Trash
+} from 'tabler-icons-react';
 import { SvgCurveToolbar } from './svg-curve-toolbar';
 
 const getTypeAtom = atom((get) => {
@@ -68,6 +79,7 @@ export const addGroupAtom = atom(null, (get, set) => {
     }));
   });
 });
+
 const removeGroupAtom = atom(null, (get, set) => {
   const selectedElementAtoms = get(selectedElementAtomsAtom);
   const selectedElements = selectedElementAtoms.map((a) => get(a));
@@ -119,6 +131,14 @@ const activeElementAtom = atom(
   }
 );
 
+const alignElementsAtom = atom(
+  null,
+  (get, set, align: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => {
+    const selectedElementAtoms = get(selectedElementAtomsAtom);
+    const selectedElements = selectedElementAtoms.map((a) => get(a));
+  }
+);
+
 export function Toolbar() {
   const type = useAtomValue(getTypeAtom);
   const deletedSelectedElements = useSetAtom(deleteSelectedAtom);
@@ -166,7 +186,8 @@ export function Toolbar() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between'
-      }}>
+      }}
+    >
       {activeElement && isPath(activeElement) && (
         <SvgPathToolbar element={activeElement} setElement={setActiveElement} />
       )}
@@ -180,13 +201,42 @@ export function Toolbar() {
       {!activeElement && <CanvasToolbar />}
       <div style={{ flex: 1 }} />
       <Group spacing="xs">
+        <Menu closeOnItemClick={false}>
+          <Menu.Target>
+            <ActionIcon size={36} variant="default">
+              <LayoutDashboard />
+            </ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Label>Alignment</Menu.Label>
+            <Menu.Item>
+              <SegmentedControl
+                data={[
+                  { label: <LayoutAlignBottom />, value: 'none' },
+                  { label: <LayoutAlignCenter />, value: 'dashed' },
+                  { label: <LayoutAlignTop />, value: 'all' }
+                ]}
+              />
+            </Menu.Item>
+            <Menu.Item>
+              <SegmentedControl
+                data={[
+                  { label: <LayoutAlignLeft />, value: 'none' },
+                  { label: <LayoutAlignMiddle />, value: 'dashed' },
+                  { label: <LayoutAlignRight />, value: 'all' }
+                ]}
+              />
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
         {!isGrouped && selectedElements.length > 1 ? (
           <ActionIcon
             onClick={handleGroupElements}
             variant="outline"
             color="dark"
             style={{ borderRadius: 4, borderColor: '#ccc' }}
-            size={36}>
+            size={36}
+          >
             <FaRegObjectUngroup />
           </ActionIcon>
         ) : selectedElements.length > 1 ? (
@@ -195,7 +245,8 @@ export function Toolbar() {
             variant="light"
             color="dark"
             style={{ borderRadius: 4, borderColor: '#ccc' }}
-            size={36}>
+            size={36}
+          >
             <FaRegObjectUngroup />
           </ActionIcon>
         ) : null}
@@ -203,7 +254,8 @@ export function Toolbar() {
           size={36}
           variant="default"
           onClick={handleCopyClick}
-          disabled={selectedElements.length === 0}>
+          disabled={selectedElements.length === 0}
+        >
           <Copy />
         </ActionIcon>
         <Menu width={170} position="bottom-end" closeOnItemClick={false}>
