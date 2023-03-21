@@ -136,6 +136,55 @@ const alignElementsAtom = atom(
   (get, set, align: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => {
     const selectedElementAtoms = get(selectedElementAtomsAtom);
     const selectedElements = selectedElementAtoms.map((a) => get(a));
+    // get min and max x and y
+    const minX = Math.min(...selectedElements.map((el) => el.x));
+    const maxX = Math.max(...selectedElements.map((el) => el.x + el.width));
+    const minY = Math.min(...selectedElements.map((el) => el.y));
+    const maxY = Math.max(...selectedElements.map((el) => el.y + el.height));
+
+    if (align === 'left') {
+      selectedElementAtoms.forEach((elAtom) => {
+        set(elAtom, (el) => ({
+          ...el,
+          x: minX
+        }));
+      });
+    } else if (align === 'center') {
+      selectedElementAtoms.forEach((elAtom) => {
+        set(elAtom, (el) => ({
+          ...el,
+          x: minX + (maxX - minX) / 2 - el.width / 2
+        }));
+      });
+    } else if (align === 'right') {
+      selectedElementAtoms.forEach((elAtom) => {
+        set(elAtom, (el) => ({
+          ...el,
+          x: maxX - el.width
+        }));
+      });
+    } else if (align === 'top') {
+      selectedElementAtoms.forEach((elAtom) => {
+        set(elAtom, (el) => ({
+          ...el,
+          y: minY
+        }));
+      });
+    } else if (align === 'middle') {
+      selectedElementAtoms.forEach((elAtom) => {
+        set(elAtom, (el) => ({
+          ...el,
+          y: minY + (maxY - minY) / 2 - el.height / 2
+        }));
+      });
+    } else if (align === 'bottom') {
+      selectedElementAtoms.forEach((elAtom) => {
+        set(elAtom, (el) => ({
+          ...el,
+          y: maxY - el.height
+        }));
+      });
+    }
   }
 );
 
@@ -148,6 +197,7 @@ export function Toolbar() {
   const isGrouped = useAtomValue(isGroupedAtom);
   const copySelected = useSetAtom(copySelectedAtom);
   const [activeElement, setActiveElement] = useAtom(activeElementAtom);
+  const alignElements = useSetAtom(alignElementsAtom);
 
   const handleDeleteClick = () => {
     deletedSelectedElements();
@@ -176,6 +226,10 @@ export function Toolbar() {
 
   const handleCopyClick = () => {
     copySelected();
+  };
+
+  const handleAlignClick = (align: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => {
+    alignElements(align);
   };
 
   return (
@@ -211,19 +265,29 @@ export function Toolbar() {
             <Menu.Label>Alignment</Menu.Label>
             <Menu.Item>
               <SegmentedControl
+                onChange={(value) =>
+                  handleAlignClick(
+                    value as 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom'
+                  )
+                }
                 data={[
-                  { label: <LayoutAlignBottom />, value: 'none' },
-                  { label: <LayoutAlignCenter />, value: 'dashed' },
-                  { label: <LayoutAlignTop />, value: 'all' }
+                  { label: <LayoutAlignBottom />, value: 'bottom' },
+                  { label: <LayoutAlignCenter />, value: 'center' },
+                  { label: <LayoutAlignTop />, value: 'top' }
                 ]}
               />
             </Menu.Item>
             <Menu.Item>
               <SegmentedControl
+                onChange={(value) =>
+                  handleAlignClick(
+                    value as 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom'
+                  )
+                }
                 data={[
-                  { label: <LayoutAlignLeft />, value: 'none' },
-                  { label: <LayoutAlignMiddle />, value: 'dashed' },
-                  { label: <LayoutAlignRight />, value: 'all' }
+                  { label: <LayoutAlignLeft />, value: 'left' },
+                  { label: <LayoutAlignMiddle />, value: 'middle' },
+                  { label: <LayoutAlignRight />, value: 'right' }
                 ]}
               />
             </Menu.Item>
