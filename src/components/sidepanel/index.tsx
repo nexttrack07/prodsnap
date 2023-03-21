@@ -15,11 +15,20 @@ import { PhotosPanel } from './photos-panel';
 import { TextPanel } from './text-panel';
 import { UploadPanel } from './upload-panel';
 import { CurvesPanel } from './curves-panel';
+import { atom, useAtom } from 'jotai';
 
 export const SIDEBAR_SIZE = 60;
-export const SIDEPANEL_SIZE = 300 + SIDEBAR_SIZE;
+export const SIDEPANEL_SIZE = 350 + SIDEBAR_SIZE;
 
-type NavState = 'templates' | 'upload' | 'photos' | 'text' | 'curves' | 'shapes' | 'graphics';
+type NavState =
+  | 'templates'
+  | 'upload'
+  | 'photos'
+  | 'text'
+  | 'curves'
+  | 'shapes'
+  | 'graphics'
+  | 'position';
 
 const navItems: { icon: Icon; label: string; id: NavState }[] = [
   { icon: Template, label: 'Template', id: 'templates' },
@@ -38,11 +47,14 @@ const panelMap: Record<NavState, JSX.Element> = {
   text: <TextPanel />,
   curves: <CurvesPanel />,
   shapes: <ShapesPanel />,
-  graphics: <div>Graphics</div>
+  graphics: <div>Graphics</div>,
+  position: <div>Position</div>
 };
 
+export const sidepanelAtom = atom<NavState>('shapes');
+
 export function Sidepanel() {
-  const [active, setActive] = useState<NavState>('shapes');
+  const [active, setActive] = useAtom(sidepanelAtom);
   const theme = useMantineTheme();
 
   return (
@@ -56,14 +68,16 @@ export function Sidepanel() {
           paddingTop: theme.spacing.lg,
           borderRight: `1px solid ${theme.colors.gray[4]}`
         }}
-        justify="flex-start">
+        justify="flex-start"
+      >
         {navItems.map((item) => (
           <Button
             key={item.label}
             onClick={() => setActive(item.id)}
             variant={active === item.id ? 'light' : 'subtle'}
             color={active === item.id ? 'blue' : 'dark.8'}
-            sx={{ margin: 1, padding: 4 }}>
+            sx={{ margin: 1, padding: 4 }}
+          >
             <item.icon strokeWidth={1.2} />
           </Button>
         ))}

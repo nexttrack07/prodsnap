@@ -129,8 +129,8 @@ export const addElementsAtom = atom(null, (_, set, newEls: CanvasElement[]) => {
 });
 
 export const canvasAtom = atom({
-  width: 900,
-  height: 750,
+  width: 800,
+  height: 650,
   scale: 1,
   backgroundColor: 'white',
   isSelected: false
