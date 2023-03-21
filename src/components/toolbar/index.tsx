@@ -255,44 +255,46 @@ export function Toolbar() {
       {!activeElement && <CanvasToolbar />}
       <div style={{ flex: 1 }} />
       <Group spacing="xs">
-        <Menu closeOnItemClick={false}>
-          <Menu.Target>
-            <ActionIcon size={36} variant="default">
-              <LayoutDashboard />
-            </ActionIcon>
-          </Menu.Target>
-          <Menu.Dropdown>
-            <Menu.Label>Alignment</Menu.Label>
-            <Menu.Item>
-              <SegmentedControl
-                onChange={(value) =>
-                  handleAlignClick(
-                    value as 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom'
-                  )
-                }
-                data={[
-                  { label: <LayoutAlignBottom />, value: 'bottom' },
-                  { label: <LayoutAlignCenter />, value: 'center' },
-                  { label: <LayoutAlignTop />, value: 'top' }
-                ]}
-              />
-            </Menu.Item>
-            <Menu.Item>
-              <SegmentedControl
-                onChange={(value) =>
-                  handleAlignClick(
-                    value as 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom'
-                  )
-                }
-                data={[
-                  { label: <LayoutAlignLeft />, value: 'left' },
-                  { label: <LayoutAlignMiddle />, value: 'middle' },
-                  { label: <LayoutAlignRight />, value: 'right' }
-                ]}
-              />
-            </Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
+        {selectedElements.length > 1 && (
+          <Menu closeOnItemClick={false}>
+            <Menu.Target>
+              <ActionIcon size={36} variant="default">
+                <LayoutDashboard />
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Label>Alignment</Menu.Label>
+              <Menu.Item>
+                <SegmentedControl
+                  onChange={(value) =>
+                    handleAlignClick(
+                      value as 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom'
+                    )
+                  }
+                  data={[
+                    { label: <LayoutAlignBottom />, value: 'bottom' },
+                    { label: <LayoutAlignCenter />, value: 'center' },
+                    { label: <LayoutAlignTop />, value: 'top' }
+                  ]}
+                />
+              </Menu.Item>
+              <Menu.Item>
+                <SegmentedControl
+                  onChange={(value) =>
+                    handleAlignClick(
+                      value as 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom'
+                    )
+                  }
+                  data={[
+                    { label: <LayoutAlignLeft />, value: 'left' },
+                    { label: <LayoutAlignMiddle />, value: 'middle' },
+                    { label: <LayoutAlignRight />, value: 'right' }
+                  ]}
+                />
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        )}
         {!isGrouped && selectedElements.length > 1 ? (
           <ActionIcon
             onClick={handleGroupElements}
