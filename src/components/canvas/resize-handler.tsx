@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import { Resizable } from '@/components/canvas/store';
 
-const useStyles = createStyles((theme) => ({
+export const useResizeStyles = createStyles((theme) => ({
   resize: {
     backgroundColor: theme.colors.blue[0],
     border: `1px solid ${theme.colors.blue[4]}`,
@@ -90,18 +90,10 @@ type Props = {
   withBMResize?: boolean;
   withLMResize?: boolean;
   withRMResize?: boolean;
-  onSEResize?: (p: { x: number; y: number }) => void;
-  onSWResize?: (p: { x: number; y: number }) => void;
-  onNEResize?: (p: { x: number; y: number }) => void;
-  onNWResize?: (p: { x: number; y: number }) => void;
-  onTMResize?: (p: { x: number; y: number }) => void;
-  onBMResize?: (p: { x: number; y: number }) => void;
-  onLMResize?: (p: { x: number; y: number }) => void;
-  onRMResize?: (p: { x: number; y: number }) => void;
   onResize: (p: { x: number; y: number; width: number; height: number }) => void;
 };
 
-type Status =
+export type Status =
   | 'idle'
   | 'resizing-br'
   | 'resizing-tl'
@@ -122,18 +114,10 @@ export function ResizeHandler({
   withRMResize = true,
   withSEResize = true,
   withSWResize = true,
-  onBMResize,
-  onLMResize,
-  onNEResize,
-  onTMResize,
-  onNWResize,
-  onRMResize,
-  onSEResize,
-  onSWResize,
   onResize
 }: Props) {
   const { width, height } = dimension;
-  const { classes } = useStyles();
+  const { classes } = useResizeStyles();
   const [status, setStatus] = React.useState<Status>('idle');
   const lastPosition = React.useRef({ x: 0, y: 0 });
 

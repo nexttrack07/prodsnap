@@ -2,8 +2,21 @@ import React, { SetStateAction, useCallback, useEffect, useRef, useState } from 
 import { MoveableElement, TextType } from './store';
 import { Box, Center, useMantineTheme } from '@mantine/core';
 import { useWindowEvent } from '@mantine/hooks';
+import clsx from 'clsx';
+import { useResizeStyles } from './resize-handler';
 
-type Status = 'none' | 'rotate' | 'move' | 'resize-br' | 'resize-tl' | 'resize-bl' | 'resize-tr';
+type Status =
+  | 'none'
+  | 'rotate'
+  | 'move'
+  | 'resizing-br'
+  | 'resizing-tl'
+  | 'resizing-bl'
+  | 'resizing-tr'
+  | 'resizing-tm'
+  | 'resizing-bm'
+  | 'resizing-lm'
+  | 'resizing-rm';
 
 function selectElementContents(el: HTMLElement) {
   var range = document.createRange();
@@ -27,16 +40,27 @@ export function RenderText({
   onSelect: (e: React.MouseEvent) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLSpanElement>(null);
   const [editable, setEditable] = useState(false);
-  const theme = useMantineTheme();
   const [status, setStatus] = useState<Status>('none');
   const lastPos = useRef({ x: 0, y: 0 });
+  const { classes } = useResizeStyles();
 
   useWindowEvent('keydown', (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
       setEditable(false);
     }
   });
+
+  useEffect(() => {
+    if (textRef.current) {
+      setElement((el) => ({
+        ...el,
+        width: textRef.current!.offsetWidth,
+        height: textRef.current!.offsetHeight
+      }));
+    }
+  }, []);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
@@ -46,12 +70,15 @@ export function RenderText({
         const deltaX = e.clientX - lastPos.current.x + element.x;
         const deltaY = e.clientY - lastPos.current.y + element.y;
         setElement((el) => ({ ...el, x: deltaX, y: deltaY }));
-      } else if (status === 'resize-br') {
+      } else if (status === 'resizing-br') {
         const newWidth = e.clientX - lastPos.current.x + element.width;
         const newFontSize = (newWidth / element.width) * (element.props.fontSize as number);
-
+        // calculate new height based on new width
+        const newHeight = (newWidth / element.width) * element.height;
         setElement((el) => ({
           ...el,
+          width: newWidth,
+          height: newHeight,
           props: { ...el.props, fontSize: newFontSize }
         }));
       }
@@ -92,65 +119,70 @@ export function RenderText({
 
   const handleBlur = (e: React.FocusEvent) => {
     setEditable(false);
-    // setElement((prev) => ({
-    //   ...prev,
-    //   content: (e.target as HTMLDivElement).innerText,
-    // }));
+    setElement((prev) => ({
+      ...prev,
+      content: (e.target as HTMLSpanElement).innerText,
+      width: (e.target as HTMLSpanElement).offsetWidth,
+      height: (e.target as HTMLSpanElement).offsetHeight
+    }));
   };
 
   const cursor =
     isSelected && status === 'move'
       ? 'move'
-      : isSelected && status === 'resize-br'
-        ? 'se-resize'
-        : isSelected && editable
-          ? 'text'
-          : 'pointer';
+      : isSelected && status === 'resizing-br'
+      ? 'se-resize'
+      : isSelected && editable
+      ? 'text'
+      : 'pointer';
 
   return (
     <Center
       ref={ref}
-      // onClick={handleClick}
-      contentEditable={editable}
-      suppressContentEditableWarning={true}
-      onMouseDown={handleMouseDown}
-      onInput={(e) => {
-        setElement((prev) => ({ ...prev, content: (e.target as HTMLDivElement).innerText }));
-      }}
-      onBlur={handleBlur}
       style={{
         left: element.x,
         top: element.y,
         userSelect: 'none',
         position: 'absolute',
-        border: isSelected ? `2px solid ${theme.colors.blue[7]}` : '',
-        borderRadius: 3,
         whiteSpace: 'pre-wrap',
+        // width: element.width,
+        // height: element.height,
+        cursor,
         ...element.props
-      }}>
-      {element.content}
+      }}
+      className={clsx({ [classes.borders]: isSelected })}
+    >
+      <span
+        onMouseDown={handleMouseDown}
+        onBlur={handleBlur}
+        contentEditable={editable}
+        suppressContentEditableWarning={true}
+        // onInput={(e) => {
+        //   setElement((prev) => ({ ...prev, content: (e.target as HTMLSpanElement).innerText }));
+        // }}
+        ref={textRef}
+      >
+        {element.content}
+      </span>
       {isSelected && (
-        <Box
-          onMouseDown={(e) => handleResizeMouseDown(e, 'resize-br')}
-          onMouseUp={(e) => e.stopPropagation()}
-          component="span"
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-          sx={{
-            position: 'absolute',
-            right: 0,
-            bottom: 0,
-            height: 15,
-            width: 15,
-            borderRadius: '50%',
-            transform: 'translate(50%,50%)',
-            backgroundColor: theme.colors.gray[2],
-            boxShadow: '0 0 1px rgba(0,0,0,0.4)',
-            border: '1px solid rgba(0,0,0,0.3)',
-            cursor: 'grab'
-          }}
-        />
+        <>
+          <span
+            onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-tl')}
+            className={clsx(classes.resize, classes.resize_tl)}
+          />
+          <span
+            onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-tr')}
+            className={clsx(classes.resize, classes.resize_tr)}
+          />
+          <span
+            onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-bl')}
+            className={clsx(classes.resize, classes.resize_bl)}
+          />
+          <span
+            onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-br')}
+            className={clsx(classes.resize, classes.resize_br)}
+          />
+        </>
       )}
     </Center>
   );
