@@ -1,6 +1,6 @@
 import React from 'react';
-import { Box, Group, ActionIcon, Menu, SegmentedControl } from '@mantine/core';
-import { FaRegObjectUngroup } from 'react-icons/fa';
+import { Box, Group, ActionIcon, Menu, SegmentedControl, Button } from '@mantine/core';
+import { FaFirstOrder, FaRegObjectUngroup } from 'react-icons/fa';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import {
   elementAtomsAtom,
@@ -31,6 +31,7 @@ import {
   Trash
 } from 'tabler-icons-react';
 import { SvgCurveToolbar } from './svg-curve-toolbar';
+import { sidepanelAtom } from '../sidepanel';
 
 const getTypeAtom = atom((get) => {
   const { isSelected } = get(canvasAtom);
@@ -198,6 +199,7 @@ export function Toolbar() {
   const copySelected = useSetAtom(copySelectedAtom);
   const [activeElement, setActiveElement] = useAtom(activeElementAtom);
   const alignElements = useSetAtom(alignElementsAtom);
+  const [position, setPosition] = useAtom(sidepanelAtom);
 
   const handleDeleteClick = () => {
     deletedSelectedElements();
@@ -232,6 +234,10 @@ export function Toolbar() {
     alignElements(align);
   };
 
+  const handlePositionClick = () => {
+    setPosition('position');
+  };
+
   return (
     <Box
       p="xs"
@@ -258,9 +264,12 @@ export function Toolbar() {
         {selectedElements.length > 1 && (
           <Menu closeOnItemClick={false}>
             <Menu.Target>
-              <ActionIcon size={36} variant="default">
+              {/* <ActionIcon size={36} variant="default">
                 <LayoutDashboard />
-              </ActionIcon>
+              </ActionIcon> */}
+              <Button leftIcon={<LayoutDashboard size={18} />} variant="default" size="xs">
+                Alignment
+              </Button>
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Label>Alignment</Menu.Label>
@@ -295,7 +304,7 @@ export function Toolbar() {
             </Menu.Dropdown>
           </Menu>
         )}
-        {!isGrouped && selectedElements.length > 1 ? (
+        {/* {!isGrouped && selectedElements.length > 1 ? (
           <ActionIcon
             onClick={handleGroupElements}
             variant="outline"
@@ -308,30 +317,42 @@ export function Toolbar() {
         ) : selectedElements.length > 1 ? (
           <ActionIcon
             onClick={handleUngroupElements}
-            variant="light"
+            variant="default"
             color="dark"
             style={{ borderRadius: 4, borderColor: '#ccc' }}
             size={36}
           >
             <FaRegObjectUngroup />
           </ActionIcon>
+        ) : null} */}
+        {!isGrouped && selectedElements.length > 1 ? (
+          <Button onClick={handleGroupElements} variant="default" size="xs">
+            Group
+          </Button>
+        ) : selectedElements.length > 1 ? (
+          <Button onClick={handleUngroupElements} variant="light" size="xs">
+            Ungroup
+          </Button>
         ) : null}
-        <ActionIcon
+        {/* <ActionIcon
           size={36}
           variant="default"
           onClick={handleCopyClick}
           disabled={selectedElements.length === 0}
         >
           <Copy />
-        </ActionIcon>
-        <Menu width={170} position="bottom-end" closeOnItemClick={false}>
-          <Menu.Target>
-            <ActionIcon size={36} variant="default" disabled={selectedElements.length !== 1}>
-              <Eye />
-            </ActionIcon>
-          </Menu.Target>
-        </Menu>
-        <ActionIcon size={36} variant="light" onClick={handleDeleteClick} color="red">
+        </ActionIcon> */}
+        <Button leftIcon={<Copy size={18} />} onClick={handleCopyClick} size="xs" variant="default">
+          Copy
+        </Button>
+        <Button
+          onClick={handlePositionClick}
+          size="xs"
+          variant={position === 'position' ? 'light' : 'default'}
+        >
+          Position
+        </Button>
+        <ActionIcon size={36} variant="outline" onClick={handleDeleteClick} color="red">
           <Trash />
         </ActionIcon>
       </Group>

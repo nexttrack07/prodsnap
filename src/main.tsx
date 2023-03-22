@@ -34,11 +34,12 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <MantineProvider
       theme={{
         colorScheme: 'light',
-        primaryColor: 'gray',
-        primaryShade: 7,
+        primaryColor: 'blue',
+        primaryShade: 9,
         defaultRadius: 'xs',
         components: { Button: { defaultProps: { size: 'sm', variant: 'default' } } }
-      }}>
+      }}
+    >
       <Global
         styles={(theme) => ({
           '*, *::before, *::after': { boxSizing: 'border-box' },
