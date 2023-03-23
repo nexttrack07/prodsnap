@@ -1,22 +1,50 @@
 import React from 'react';
-import { Header, TextInput, Avatar, Space, Group, Button, Menu, Portal, Text, Divider } from '@mantine/core';
+import {
+  Header,
+  TextInput,
+  Avatar,
+  Space,
+  Group,
+  Button,
+  Menu,
+  Portal,
+  Text,
+  Divider
+} from '@mantine/core';
 import { Logo } from './logo';
 import { HEADER_SIZE } from '../pages';
-import { Settings, ArrowForward, ArrowBack, Edit, ArrowsLeftRight, Trash, MessageCircle, Photo, Search, Download } from 'tabler-icons-react';
+import {
+  Settings,
+  ArrowForward,
+  ArrowBack,
+  Edit,
+  ArrowsLeftRight,
+  Trash,
+  MessageCircle,
+  Photo,
+  Search,
+  Download
+} from 'tabler-icons-react';
 import domToImage from 'dom-to-image-more';
 import { saveAs } from 'file-saver';
-import { UploadTemplate } from "./upload-template";
+import { UploadTemplate } from './upload-template';
+import { UploadSelection } from './upload-selection';
+import { useAtomValue } from 'jotai';
+import { selectedElementAtomsAtom } from './canvas/store';
 
 export function HeaderComponent() {
+  const isSelected = useAtomValue(selectedElementAtomsAtom).length > 0;
   const handleDownloadClick = () => {
-    domToImage
-      .toBlob(document.getElementById("canvas"))
-      .then(function (blob: any) {
-        saveAs(blob, "my-image.png")
-      })
-  }
+    domToImage.toBlob(document.getElementById('canvas')).then(function (blob: any) {
+      saveAs(blob, 'my-image.png');
+    });
+  };
   return (
-    <Header sx={theme => ({ display: "flex", borderBottom: `1px solid ${theme.colors.gray[4]}` })} height={HEADER_SIZE} p="xs">
+    <Header
+      sx={(theme) => ({ display: 'flex', borderBottom: `1px solid ${theme.colors.gray[4]}` })}
+      height={HEADER_SIZE}
+      p="xs"
+    >
       <Logo />
       <Space w={100} />
       <Group>
@@ -54,9 +82,7 @@ export function HeaderComponent() {
               <Menu.Divider />
 
               <Menu.Label>Danger zone</Menu.Label>
-              <Menu.Item icon={<ArrowsLeftRight size={14} />}>
-                Transfer my data
-              </Menu.Item>
+              <Menu.Item icon={<ArrowsLeftRight size={14} />}>Transfer my data</Menu.Item>
               <Menu.Item color="red" icon={<Trash size={14} />}>
                 Delete my account
               </Menu.Item>
@@ -88,9 +114,7 @@ export function HeaderComponent() {
               <Menu.Divider />
 
               <Menu.Label>Danger zone</Menu.Label>
-              <Menu.Item icon={<ArrowsLeftRight size={14} />}>
-                Transfer my data
-              </Menu.Item>
+              <Menu.Item icon={<ArrowsLeftRight size={14} />}>Transfer my data</Menu.Item>
               <Menu.Item color="red" icon={<Trash size={14} />}>
                 Delete my account
               </Menu.Item>
@@ -105,20 +129,18 @@ export function HeaderComponent() {
           <ArrowForward />
         </Button>
         <Divider orientation="vertical" />
-        <TextInput
-          placeholder="Untitled Design"
-          rightSection={<Edit color="gray" size={14} />}
-        />
+        <TextInput placeholder="Untitled Design" rightSection={<Edit color="gray" size={14} />} />
       </Group>
       <div style={{ flex: 1 }} />
       <Group>
-        <UploadTemplate />
+        {isSelected ? <UploadSelection /> : <UploadTemplate />}
         <Avatar color="cyan" radius="xl">
           FH
         </Avatar>
-        <Button onClick={handleDownloadClick} variant="outline" leftIcon={<Download />}>Download</Button>
+        <Button onClick={handleDownloadClick} variant="outline" leftIcon={<Download />}>
+          Download
+        </Button>
       </Group>
     </Header>
   );
 }
-

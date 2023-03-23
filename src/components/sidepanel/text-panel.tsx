@@ -27,56 +27,56 @@ const elementData: {
   id: number;
   data: CanvasElement;
 }[] = [
-    {
-      id: 0,
-      data: {
-        x: 200,
-        y: 100,
-        type: 'text' as const,
-        width: 300,
-        height: 50,
-        content: 'Heading',
-        props: {
-          fontSize: 50,
-          color: '#000',
-        }
+  {
+    id: 0,
+    data: {
+      x: 200,
+      y: 100,
+      type: 'text' as const,
+      width: 300,
+      height: 50,
+      content: 'Heading',
+      props: {
+        fontSize: 50,
+        color: '#000'
       }
-    },
-    {
-      id: 1,
-      data: {
-        x: 200,
-        y: 100,
-        type: 'text' as const,
-        width: 300,
-        height: 50,
-        content: 'Subheading',
-        props: {
-          fontSize: 30,
-          color: '#000',
-        }
+    }
+  },
+  {
+    id: 1,
+    data: {
+      x: 200,
+      y: 100,
+      type: 'text' as const,
+      width: 300,
+      height: 50,
+      content: 'Subheading',
+      props: {
+        fontSize: 30,
+        color: '#000'
       }
-    },
-    {
-      id: 2,
-      data: {
-        x: 200,
-        y: 100,
-        type: 'text' as const,
-        width: 300,
-        height: 50,
-        content: 'A little bit of text',
-        props: {
-          fontSize: 20,
-          color: '#000',
-        }
+    }
+  },
+  {
+    id: 2,
+    data: {
+      x: 200,
+      y: 100,
+      type: 'text' as const,
+      width: 300,
+      height: 50,
+      content: 'A little bit of text',
+      props: {
+        fontSize: 20,
+        color: '#000'
       }
-    },
-  ];
+    }
+  }
+];
 
 export function TextPanel() {
   const addElement = useSetAtom(addElementAtom);
-  const theme = useMantineTheme()
+  const theme = useMantineTheme();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const setElementAtoms = useSetAtom(elementAtomsAtom);
@@ -88,7 +88,7 @@ export function TextPanel() {
       try {
         setLoading(true);
         const data = await getTemplates();
-        console.log('data: ', data)
+        console.log('data: ', data);
         setData(data);
       } catch (err) {
         console.log(err);
@@ -107,7 +107,7 @@ export function TextPanel() {
   const handleAddTemplate = (newEls: CanvasElement[]) => {
     // console.log('new els: ', newEls)
     const newElAtoms = newEls.map((el) => createAtom(el));
-    console.log('new atoms: ', newElAtoms)
+    console.log('new atoms: ', newElAtoms);
     setElementAtoms((elAtoms) => [...elAtoms, ...newElAtoms]);
     setSelectedAtoms(newElAtoms);
     addGroup();
@@ -136,7 +136,8 @@ export function TextPanel() {
                   borderColor: theme.colors.gray[4],
                   cursor: 'pointer',
                   display: 'block'
-                }}>
+                }}
+              >
                 {item.data.content}
               </Text>
             );
@@ -145,12 +146,12 @@ export function TextPanel() {
         })}
       </SimpleGrid>
       <Divider my="xl" variant="dotted" />
-      <SimpleGrid cols={1}>
+      <SimpleGrid cols={2}>
         {loading && <Loader />}
         {data &&
           data.map((item: any) => (
             <Box onClick={() => handleAddTemplate(deserialize(item.data.template))} key={item.id}>
-              <Image width={200} src={item.data.url} />
+              <Image src={item.data.url} />
             </Box>
           ))}
       </SimpleGrid>

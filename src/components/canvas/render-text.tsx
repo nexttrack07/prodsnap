@@ -40,7 +40,7 @@ export function RenderText({
   onSelect: (e: React.MouseEvent) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLSpanElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
   const [editable, setEditable] = useState(false);
   const [status, setStatus] = useState<Status>('none');
   const lastPos = useRef({ x: 0, y: 0 });
@@ -118,13 +118,13 @@ export function RenderText({
   };
 
   const handleBlur = (e: React.FocusEvent) => {
-    setEditable(false);
     setElement((prev) => ({
       ...prev,
-      content: (e.target as HTMLSpanElement).innerText,
-      width: (e.target as HTMLSpanElement).offsetWidth,
-      height: (e.target as HTMLSpanElement).offsetHeight
+      content: (e.target as HTMLDivElement).innerText,
+      width: (e.target as HTMLDivElement).offsetWidth,
+      height: (e.target as HTMLDivElement).offsetHeight
     }));
+    setEditable(false);
   };
 
   const cursor =
@@ -152,18 +152,16 @@ export function RenderText({
       }}
       className={clsx({ [classes.borders]: isSelected })}
     >
-      <span
+      <div
+        tabIndex={0}
         onMouseDown={handleMouseDown}
         onBlur={handleBlur}
         contentEditable={editable}
         suppressContentEditableWarning={true}
-        // onInput={(e) => {
-        //   setElement((prev) => ({ ...prev, content: (e.target as HTMLSpanElement).innerText }));
-        // }}
         ref={textRef}
       >
         {element.content}
-      </span>
+      </div>
       {isSelected && (
         <>
           <span
@@ -186,4 +184,8 @@ export function RenderText({
       )}
     </Center>
   );
+}
+
+function reverseString(str: string): string {
+  return str.split('').reverse().join('');
 }

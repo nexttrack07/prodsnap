@@ -1,16 +1,14 @@
-import { Button } from "@mantine/core";
-import { addTemplate } from "../api/template";
-import { atom, useAtomValue } from "jotai";
-import React, { useState } from "react";
-import { firestore, storage } from "../utils/firebase";
+import { Button } from '@mantine/core';
+import { addTemplate } from '../api/template';
+import { atom, useAtomValue } from 'jotai';
+import React, { useState } from 'react';
+import { firestore, storage } from '../utils/firebase';
 import domToImage from 'dom-to-image-more';
-import { Check, CloudUpload, X } from "tabler-icons-react";
-import {
-  elementAtomsAtom,
-} from "./canvas/store";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { showNotification, updateNotification } from "@mantine/notifications";
-import { addDoc } from "firebase/firestore";
+import { Check, CloudUpload, X } from 'tabler-icons-react';
+import { elementAtomsAtom } from './canvas/store';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import { showNotification, updateNotification } from '@mantine/notifications';
+import { addDoc } from 'firebase/firestore';
 
 function serialize(obj: any): string {
   return JSON.stringify(obj, (key, value) => {
@@ -34,8 +32,8 @@ const templateAtom = atom((get) => {
   const elements = allElementAtoms.map((a) => {
     let el = get(a);
 
-    if (el.type === "svg-curve") {
-      el = { ...el, points: el.points.map(p => get(p)) }
+    if (el.type === 'svg-curve') {
+      el = { ...el, points: el.points.map((p) => get(p)) };
     }
 
     return el;
@@ -54,24 +52,24 @@ export function UploadTemplate() {
   if (allElementAtoms.length === 0) return null;
 
   const handleTemplateUpload = async () => {
-    console.log('upload template')
-    const dataURL = await domToImage.toBlob(document.getElementById("canvas"));
+    console.log('upload template');
+    const dataURL = await domToImage.toBlob(document.getElementById('canvas'));
     const filename = `template-${Date.now()}.png`;
     const storageRef = ref(storage, `images/${filename}`);
     const uploadTask = uploadBytesResumable(storageRef, dataURL);
 
     uploadTask.on(
-      "state_changed",
+      'state_changed',
       () => {
         // const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         // setProgress(progress);
         showNotification({
-          id: "upload-photo",
+          id: 'upload-photo',
           loading: true,
-          title: "Uploading your photo",
-          message: "Your photo is being uploaded...",
+          title: 'Uploading your photo',
+          message: 'Your photo is being uploaded...',
           autoClose: false,
-          disallowClose: true,
+          disallowClose: true
         });
       },
       (err) => {
@@ -79,12 +77,12 @@ export function UploadTemplate() {
         console.error(err);
         setError(err);
         updateNotification({
-          id: "upload-photo",
-          color: "red",
-          title: "Upload failed!",
+          id: 'upload-photo',
+          color: 'red',
+          title: 'Upload failed!',
           message: error!.message,
           icon: <X size={16} />,
-          autoClose: 2000,
+          autoClose: 2000
         });
       },
       () => {
@@ -94,12 +92,12 @@ export function UploadTemplate() {
           await postTemplate(url);
         });
         updateNotification({
-          id: "upload-photo",
-          color: "teal",
-          title: "Photo Uploaded Successfully",
-          message: "Your photo has been uploaded successfully",
+          id: 'upload-photo',
+          color: 'teal',
+          title: 'Photo Uploaded Successfully',
+          message: 'Your photo has been uploaded successfully',
           icon: <Check size={16} />,
-          autoClose: 2000,
+          autoClose: 2000
         });
       }
     );
@@ -107,12 +105,12 @@ export function UploadTemplate() {
     async function postTemplate(url: string) {
       try {
         showNotification({
-          id: "upload-template",
+          id: 'upload-template',
           loading: true,
-          title: "Uploading your template",
-          message: "Your template is being uploaded...",
+          title: 'Uploading your template',
+          message: 'Your template is being uploaded...',
           autoClose: false,
-          disallowClose: true,
+          disallowClose: true
         });
         setLoading(true);
         await addTemplate({ id, template, url });
@@ -121,21 +119,20 @@ export function UploadTemplate() {
       } finally {
         setLoading(false);
         updateNotification({
-          id: "upload-template",
-          color: "teal",
-          title: "Template Uploaded Successfully",
-          message: "Your template has been uploaded successfully",
+          id: 'upload-template',
+          color: 'teal',
+          title: 'Template Uploaded Successfully',
+          message: 'Your template has been uploaded successfully',
           icon: <Check size={16} />,
-          autoClose: 2000,
+          autoClose: 2000
         });
       }
     }
-
   };
   return (
     <>
-      <Button leftIcon={<CloudUpload />} onClick={handleTemplateUpload} loading={loading}>
-        Upload
+      <Button size="xs" leftIcon={<CloudUpload />} onClick={handleTemplateUpload} loading={loading}>
+        Upload Template
       </Button>
     </>
   );

@@ -3,7 +3,7 @@ import { addTemplate } from '../api/template';
 import { atom, useAtomValue } from 'jotai';
 import React, { useState } from 'react';
 import { Check, CloudUpload, X } from 'tabler-icons-react';
-import { elementAtomsAtom } from './canvas/store';
+import { selectedElementAtomsAtom } from './canvas/store';
 import { showNotification, updateNotification } from '@mantine/notifications';
 
 function serialize(obj: any): string {
@@ -24,7 +24,7 @@ function uuid(): string {
 }
 
 const templateAtom = atom((get) => {
-  const allElementAtoms = get(elementAtomsAtom);
+  const allElementAtoms = get(selectedElementAtomsAtom);
   const elements = allElementAtoms.map((a) => {
     let el: any = get(a);
 
@@ -38,12 +38,12 @@ const templateAtom = atom((get) => {
   return serialize(elements);
 });
 
-export function UploadTemplate() {
-  const allElementAtoms = useAtomValue(elementAtomsAtom);
+export function UploadSelection() {
+  const selectedElementAtoms = useAtomValue(selectedElementAtomsAtom);
   const selection = useAtomValue(templateAtom);
   const [loading, setLoading] = useState(false);
 
-  if (allElementAtoms.length === 0) return null;
+  if (selectedElementAtoms.length === 0) return null;
 
   const handleTemplateUpload = async () => {
     const id = uuid();
@@ -58,7 +58,7 @@ export function UploadTemplate() {
         disallowClose: true
       });
       setLoading(true);
-      await addTemplate({ id, selection });
+      await addTemplate({ id, selection }, 'selections');
     } catch (err) {
       console.error(err);
     } finally {
@@ -76,8 +76,8 @@ export function UploadTemplate() {
 
   return (
     <>
-      <Button leftIcon={<CloudUpload />} onClick={handleTemplateUpload} loading={loading}>
-        Upload
+      <Button size="xs" leftIcon={<CloudUpload />} onClick={handleTemplateUpload} loading={loading}>
+        Upload Selection
       </Button>
     </>
   );
