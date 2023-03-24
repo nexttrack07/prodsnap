@@ -1,27 +1,7 @@
-import {
-  Text,
-  Space,
-  createStyles,
-  SimpleGrid,
-  Center,
-  Divider,
-  Loader,
-  Button,
-  useMantineTheme,
-  Image,
-  Box
-} from '@mantine/core';
-import { getTemplates } from '../../api/template';
-import { atom, useSetAtom } from 'jotai';
-import React, { useEffect, useState } from 'react';
-import {
-  addElementAtom,
-  CanvasElement,
-  createAtom,
-  elementAtomsAtom,
-  selectedElementAtomsAtom
-} from '../../components/canvas/store';
-import { addGroupAtom } from '../toolbar';
+import { Text, Space, SimpleGrid, Divider, useMantineTheme } from '@mantine/core';
+import { useSetAtom } from 'jotai';
+import React from 'react';
+import { addElementAtom, CanvasElement } from '../../components/canvas/store';
 
 const elementData: {
   id: number;
@@ -77,40 +57,9 @@ const elementData: {
 export function TextPanel() {
   const addElement = useSetAtom(addElementAtom);
   const theme = useMantineTheme();
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const setElementAtoms = useSetAtom(elementAtomsAtom);
-  const setSelectedAtoms = useSetAtom(selectedElementAtomsAtom);
-  const addGroup = useSetAtom(addGroupAtom);
-
-  useEffect(() => {
-    async function getTemplateData() {
-      try {
-        setLoading(true);
-        const data = await getTemplates();
-        console.log('data: ', data);
-        setData(data);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    getTemplateData();
-  }, []);
 
   const handleAddElement = (newEl: CanvasElement) => {
     addElement(newEl);
-  };
-
-  const handleAddTemplate = (newEls: CanvasElement[]) => {
-    // console.log('new els: ', newEls)
-    const newElAtoms = newEls.map((el) => createAtom(el));
-    console.log('new atoms: ', newElAtoms);
-    setElementAtoms((elAtoms) => [...elAtoms, ...newElAtoms]);
-    setSelectedAtoms(newElAtoms);
-    addGroup();
   };
 
   return (
@@ -146,25 +95,6 @@ export function TextPanel() {
         })}
       </SimpleGrid>
       <Divider my="xl" variant="dotted" />
-      <SimpleGrid cols={2}>
-        {loading && <Loader />}
-        {data &&
-          data.map((item: any) => (
-            <Box onClick={() => handleAddTemplate(deserialize(item.data.template))} key={item.id}>
-              <Image src={item.data.url} />
-            </Box>
-          ))}
-      </SimpleGrid>
     </>
   );
-}
-
-function deserialize(serializedObj: string): any {
-  return JSON.parse(serializedObj, (key, value) => {
-    if (typeof value === 'string' && value.match(/^function/)) {
-      const funcBody = value.slice(value.indexOf('{') + 1, value.lastIndexOf('}'));
-      return new Function(`return ${value}`)();
-    }
-    return value;
-  });
 }

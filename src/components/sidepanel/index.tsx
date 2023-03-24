@@ -18,6 +18,7 @@ import { CurvesPanel } from './curves-panel';
 import { atom, useAtom } from 'jotai';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PositionPanel } from './position-panel';
+import { TemplatesPanel } from './templates-panel';
 
 export const SIDEBAR_SIZE = 60;
 export const SIDEPANEL_SIZE = 350 + SIDEBAR_SIZE;
@@ -50,7 +51,7 @@ const panelMap: Record<NavState, JSX.Element> = {
       transition={{ duration: 1 }}
       exit={{ opacity: 0 }}
     >
-      Templates
+      <TemplatesPanel />
     </motion.div>
   ),
   upload: (
