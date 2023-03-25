@@ -3,9 +3,12 @@ import { addTemplate } from '../api/template';
 import { atom, useAtom, useAtomValue } from 'jotai';
 import React, { useState } from 'react';
 import { Check, CloudUpload, X } from 'tabler-icons-react';
-import { selectedElementAtomsAtom, ElementType, Draggable } from './canvas/store';
+import { selectedElementAtomsAtom, ElementType, Draggable, elementAtomsAtom } from './canvas/store';
 import { dimensionAtom, positionAtom, elementCompMap } from './canvas';
 import { showNotification, updateNotification } from '@mantine/notifications';
+import domToImage from 'dom-to-image-more';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import { storage } from '@/utils/firebase';
 
 function serialize(obj: any): string {
   return JSON.stringify(obj, (key, value) => {
@@ -41,43 +44,105 @@ const templateAtom = atom((get) => {
 
 const SCALE = 1.2;
 
+function reorderArrays<T>(array1: T[], array2: T[]): T[] {
+  const orderedArray: T[] = [];
+
+  array1.forEach((element) => {
+    if (array2.includes(element)) {
+      orderedArray.push(element);
+    }
+  });
+
+  return orderedArray;
+}
+
 export function UploadSelection() {
   const selectedElementAtoms = useAtomValue(selectedElementAtomsAtom);
+  const allElementAtoms = useAtomValue(elementAtomsAtom);
   const selection = useAtomValue(templateAtom);
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
   const position = useAtomValue(positionAtom);
   const dimension = useAtomValue(dimensionAtom);
+  const [error, setError] = useState<Error | null>(null);
   const [type, setType] = useState<'curves' | 'shapes' | 'text'>('curves');
 
   if (selectedElementAtoms.length === 0) return null;
 
   const handleTemplateUpload = async () => {
-    const id = uuid();
+    const dataURL = await domToImage.toBlob(document.getElementById('canvas-selection'));
+    const filename = `template-${Date.now()}.png`;
+    const storageRef = ref(storage, `images/${filename}`);
+    const uploadTask = uploadBytesResumable(storageRef, dataURL);
 
-    try {
-      showNotification({
-        id: 'upload-selection',
-        loading: true,
-        title: 'Uploading your selection',
-        message: 'Your selection is being uploaded...',
-        autoClose: false,
-        disallowClose: true
-      });
-      setLoading(true);
-      await addTemplate({ id, selection, type }, 'selections');
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-      updateNotification({
-        id: 'upload-selection',
-        color: 'teal',
-        title: 'Selection Uploaded Successfully',
-        message: 'Your selection has been uploaded successfully',
-        icon: <Check size={16} />,
-        autoClose: 2000
-      });
+    uploadTask.on(
+      'state_changed',
+      () => {
+        // const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        // setProgress(progress);
+        showNotification({
+          id: 'upload-selection-photo',
+          loading: true,
+          title: 'Uploading your selection photo',
+          message: 'Your selection-photo is being uploaded...',
+          autoClose: false
+        });
+      },
+      (err) => {
+        // Handle unsuccessful uploads
+        console.error(err);
+        setError(err);
+        updateNotification({
+          id: 'upload-selection-photo',
+          color: 'red',
+          title: 'Upload failed!',
+          message: error!.message,
+          icon: <X size={16} />,
+          autoClose: 2000
+        });
+      },
+      () => {
+        // Handle successful uploads on complete
+        // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+        getDownloadURL(uploadTask.snapshot.ref).then(async (url) => {
+          await postSelection(url);
+        });
+        updateNotification({
+          id: 'upload-selection-photo',
+          color: 'teal',
+          title: 'Selection Photo Uploaded Successfully',
+          message: 'Your photo has been uploaded successfully',
+          icon: <Check size={16} />,
+          autoClose: 2000
+        });
+      }
+    );
+    const id = uuid();
+    async function postSelection(url: string) {
+      try {
+        showNotification({
+          id: 'upload-selection',
+          loading: true,
+          title: 'Uploading your selection',
+          message: 'Your selection is being uploaded...',
+          autoClose: false,
+          disallowClose: true
+        });
+        setLoading(true);
+        await addTemplate({ id, selection, type, url }, 'selections');
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+        updateNotification({
+          id: 'upload-selection',
+          color: 'teal',
+          title: 'Selection Uploaded Successfully',
+          message: 'Your selection has been uploaded successfully',
+          icon: <Check size={16} />,
+          autoClose: 2000
+        });
+      }
     }
   };
 
@@ -89,6 +154,7 @@ export function UploadSelection() {
 
       <Modal size="auto" opened={opened} onClose={() => setOpened(false)} title="Upload Selection">
         <Box
+          id="canvas-selection"
           sx={(theme) => ({
             background: 'white',
             // margin: 25,
@@ -97,7 +163,7 @@ export function UploadSelection() {
             position: 'relative'
           })}
         >
-          {selectedElementAtoms.map((elementAtom) => (
+          {reorderArrays(allElementAtoms, selectedElementAtoms).map((elementAtom) => (
             <RenderElement
               canvasPosition={position}
               key={elementAtom.toString()}

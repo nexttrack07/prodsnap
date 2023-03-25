@@ -52,7 +52,6 @@ export function UploadTemplate() {
   if (allElementAtoms.length === 0) return null;
 
   const handleTemplateUpload = async () => {
-    console.log('upload template');
     const dataURL = await domToImage.toBlob(document.getElementById('canvas'));
     const filename = `template-${Date.now()}.png`;
     const storageRef = ref(storage, `images/${filename}`);

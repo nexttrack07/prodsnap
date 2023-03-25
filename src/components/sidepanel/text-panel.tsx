@@ -5,7 +5,8 @@ import {
   Divider,
   useMantineTheme,
   LoadingOverlay,
-  Box
+  Box,
+  Image
 } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { useAtomValue, useSetAtom } from 'jotai';
@@ -22,7 +23,6 @@ import {
 import { getSelections } from '@/api/template';
 import { addGroupAtom } from '../toolbar';
 import { deserialize } from '@/utils';
-import { dimensionAtom, elementCompMap, positionAtom } from '../canvas';
 
 const elementData: {
   id: number;
@@ -81,8 +81,6 @@ export function TextPanel() {
   const setElementAtoms = useSetAtom(elementAtomsAtom);
   const setSelectedAtoms = useSetAtom(selectedElementAtomsAtom);
   const addGroup = useSetAtom(addGroupAtom);
-  const position = useAtomValue(positionAtom);
-  const dimension = useAtomValue(dimensionAtom);
   const query = useQuery(['selections'], getSelections);
 
   const handleAddElement = (newEl: CanvasElement) => {
@@ -139,15 +137,11 @@ export function TextPanel() {
         {query.data &&
           query.data.map((item: any) => (
             <Box
-              style={{
-                position: 'relative',
-                width: dimension.width,
-                height: dimension.height
-              }}
+              style={{ cursor: 'pointer' }}
               onClick={() => handleAddTemplate(deserialize(item.data.selection))}
               key={item.id}
             >
-              {item.id}
+              <Image src={item.data.url} />
             </Box>
           ))}
       </SimpleGrid>
