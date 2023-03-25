@@ -21,3 +21,14 @@ export function getRandomInt(min: number = 100, max: number = 500) {
   const x = Math.floor(max);
   return Math.floor(Math.random() * (x - n + 1)) + n;
 }
+
+
+export function deserialize(serializedObj: string): any {
+  return JSON.parse(serializedObj, (key, value) => {
+    if (typeof value === 'string' && value.match(/^function/)) {
+      const funcBody = value.slice(value.indexOf('{') + 1, value.lastIndexOf('}'));
+      return new Function(`return ${value}`)();
+    }
+    return value;
+  });
+}

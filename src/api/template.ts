@@ -13,3 +13,12 @@ export async function getTemplates() {
   })
   return result;
 }
+
+export async function getSelections() {
+  const snap = await getDocs(collection(firestore, "selections"));
+  let result: { id: string; data: any }[] = []
+  snap.forEach((doc) => {
+    result.push({ id: doc.id, data: doc.data() });
+  })
+  return result;
+}

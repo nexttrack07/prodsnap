@@ -1,7 +1,28 @@
-import { Text, Space, SimpleGrid, Divider, useMantineTheme } from '@mantine/core';
-import { useSetAtom } from 'jotai';
+import {
+  Text,
+  Space,
+  SimpleGrid,
+  Divider,
+  useMantineTheme,
+  LoadingOverlay,
+  Box
+} from '@mantine/core';
+import { useQuery } from '@tanstack/react-query';
+import { useAtomValue, useSetAtom } from 'jotai';
 import React from 'react';
-import { addElementAtom, CanvasElement } from '../../components/canvas/store';
+import {
+  addElementAtom,
+  CanvasElement,
+  createAtom,
+  Draggable,
+  elementAtomsAtom,
+  ElementType,
+  selectedElementAtomsAtom
+} from '../../components/canvas/store';
+import { getSelections } from '@/api/template';
+import { addGroupAtom } from '../toolbar';
+import { deserialize } from '@/utils';
+import { dimensionAtom, elementCompMap, positionAtom } from '../canvas';
 
 const elementData: {
   id: number;
@@ -57,9 +78,24 @@ const elementData: {
 export function TextPanel() {
   const addElement = useSetAtom(addElementAtom);
   const theme = useMantineTheme();
+  const setElementAtoms = useSetAtom(elementAtomsAtom);
+  const setSelectedAtoms = useSetAtom(selectedElementAtomsAtom);
+  const addGroup = useSetAtom(addGroupAtom);
+  const position = useAtomValue(positionAtom);
+  const dimension = useAtomValue(dimensionAtom);
+  const query = useQuery(['selections'], getSelections);
 
   const handleAddElement = (newEl: CanvasElement) => {
     addElement(newEl);
+  };
+
+  const handleAddTemplate = (newEls: CanvasElement[]) => {
+    // console.log('new els: ', newEls)
+    const newElAtoms = newEls.map((el) => createAtom(el));
+    console.log('new atoms: ', newElAtoms);
+    setElementAtoms((elAtoms) => [...elAtoms, ...newElAtoms]);
+    setSelectedAtoms(newElAtoms);
+    addGroup();
   };
 
   return (
@@ -95,6 +131,26 @@ export function TextPanel() {
         })}
       </SimpleGrid>
       <Divider my="xl" variant="dotted" />
+      <SimpleGrid cols={2}>
+        <LoadingOverlay
+          loaderProps={{ size: 'sm', color: 'pink', variant: 'bars' }}
+          visible={query.isLoading}
+        />
+        {query.data &&
+          query.data.map((item: any) => (
+            <Box
+              style={{
+                position: 'relative',
+                width: dimension.width,
+                height: dimension.height
+              }}
+              onClick={() => handleAddTemplate(deserialize(item.data.selection))}
+              key={item.id}
+            >
+              {item.id}
+            </Box>
+          ))}
+      </SimpleGrid>
     </>
   );
 }

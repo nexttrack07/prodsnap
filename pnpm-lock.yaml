@@ -14,7 +14,7 @@ importers:
       '@mantine/modals': ^5.3.3
       '@mantine/notifications': ^5.3.3
       '@supabase/supabase-js': ^2.0.0-rc.10
-      '@tanstack/react-query': ^4.3.7
+      '@tanstack/react-query': ^4.28.0
       '@types/file-saver': ^2.0.5
       '@types/react': ^18.0.17
       '@types/react-beautiful-dnd': ^13.1.4
@@ -65,7 +65,7 @@ importers:
       '@mantine/modals': 5.3.3_kf3fyxgaphdbmkg3vjncjrjyhy
       '@mantine/notifications': 5.3.3_kf3fyxgaphdbmkg3vjncjrjyhy
       '@supabase/supabase-js': 2.0.0-rc.10
-      '@tanstack/react-query': 4.3.7_biqbaboplfbrettd7655fr4n2y
+      '@tanstack/react-query': 4.28.0_biqbaboplfbrettd7655fr4n2y
       '@types/react-beautiful-dnd': 13.1.4
       axios: 0.27.2
       clsx: 1.2.1
@@ -1506,12 +1506,12 @@ packages:
       - supports-color
     dev: false
 
-  /@tanstack/query-core/4.3.7:
-    resolution: {integrity: sha512-lCoAYhcx8i/o4lCQa06kbg5zqtnRnXp0tOYIm7NcSh6M9QLUcKO6UPoS+T9XwteLYnKcGHa3j3MGnin18fSPHA==}
+  /@tanstack/query-core/4.27.0:
+    resolution: {integrity: sha512-sm+QncWaPmM73IPwFlmWSKPqjdTXZeFf/7aEmWh00z7yl2FjqophPt0dE1EHW9P1giMC5rMviv7OUbSDmWzXXA==}
     dev: false
 
-  /@tanstack/react-query/4.3.7_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-aoJs8WXHUILQyEjFwNxDfV9smOTD2kBYeXnN2e7UCQqSfL0k5ZqDK9+zQG8vxiC9ZDBnC3xuoSQG24lYIfiOzA==}
+  /@tanstack/react-query/4.28.0_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-8cGBV5300RHlvYdS4ea+G1JcZIt5CIuprXYFnsWggkmGoC0b5JaqG0fIX3qwDL9PTNkKvG76NGThIWbpXivMrQ==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
@@ -1522,7 +1522,7 @@ packages:
       react-native:
         optional: true
     dependencies:
-      '@tanstack/query-core': 4.3.7
+      '@tanstack/query-core': 4.27.0
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       use-sync-external-store: 1.2.0_react@18.2.0

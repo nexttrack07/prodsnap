@@ -8,6 +8,7 @@ import {
   selectedElementAtomsAtom
 } from '../canvas/store';
 import { addGroupAtom } from '../toolbar';
+import { deserialize } from '@/utils';
 import { Box, Image, LoadingOverlay, SimpleGrid } from '@mantine/core';
 
 export function TemplatesPanel() {
@@ -57,14 +58,4 @@ export function TemplatesPanel() {
         ))}
     </SimpleGrid>
   );
-}
-
-function deserialize(serializedObj: string): any {
-  return JSON.parse(serializedObj, (key, value) => {
-    if (typeof value === 'string' && value.match(/^function/)) {
-      const funcBody = value.slice(value.indexOf('{') + 1, value.lastIndexOf('}'));
-      return new Function(`return ${value}`)();
-    }
-    return value;
-  });
 }

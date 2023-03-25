@@ -98,7 +98,7 @@ export function UploadSelection() {
           })}
         >
           {selectedElementAtoms.map((elementAtom) => (
-            <Element
+            <RenderElement
               canvasPosition={position}
               key={elementAtom.toString()}
               elementAtom={elementAtom}
@@ -125,7 +125,7 @@ export function UploadSelection() {
   );
 }
 
-function Element({
+export function RenderElement({
   elementAtom,
   canvasPosition
 }: {
