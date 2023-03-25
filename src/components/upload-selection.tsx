@@ -28,8 +28,10 @@ function uuid(): string {
 }
 
 const templateAtom = atom((get) => {
-  const allElementAtoms = get(selectedElementAtomsAtom);
-  const elements = allElementAtoms.map((a) => {
+  const selectedElementAtoms = get(selectedElementAtomsAtom);
+  const allElementAtoms = get(elementAtomsAtom);
+  const selectedEls = reorderArrays(allElementAtoms, selectedElementAtoms);
+  const elements = selectedEls.map((a) => {
     let el: any = get(a);
 
     if (el.type === 'svg-curve') {
