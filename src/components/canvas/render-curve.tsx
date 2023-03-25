@@ -2,54 +2,56 @@ import { createStyles, useMantineTheme } from '@mantine/core';
 import { atom, SetStateAction, useSetAtom, useAtomValue } from 'jotai';
 import { atomFamily } from 'jotai/utils';
 import React, { useCallback, useRef, useState, useEffect } from 'react';
-import {
-  CanvasElement,
-  MoveableElement,
-  SVGCurveType,
-  SVGPointAtom,
-  SVGPointType,
-  Draggable
-} from './store';
+import { CanvasElement, MoveableElement, SVGCurveType, SVGPointAtom } from './store';
 import { RenderPoint } from './render-point';
 
 const START_MARKERS = {
   none: null,
-  'outline-arrow': (<path
-    fill="none"
-    stroke="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    d="M 2.5,-1.5,0.5,0,2.5,1.5 "
-  />),
-  'fill-arrow': (<path
-    fill="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    d="M 2.5,-1.5,0.5,0,2.5,1.5 Z"
-  />),
-  'outline-circle': (<circle strokeWidth={1} stroke="currentColor" fill="none" cx={0} cy={0} r="1.2" />)
+  'outline-arrow': (
+    <path
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M 2.5,-1.5,0.5,0,2.5,1.5 "
+    />
+  ),
+  'fill-arrow': (
+    <path
+      fill="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M 2.5,-1.5,0.5,0,2.5,1.5 Z"
+    />
+  ),
+  'outline-circle': (
+    <circle strokeWidth={1} stroke="currentColor" fill="none" cx={0} cy={0} r="1.2" />
+  )
 } as const;
 
 const END_MARKERS = {
   none: null,
-  'outline-arrow': (<path
-    fill="none"
-    stroke="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    d="M -2.5,-1.5,-0.5,0,-2.5,1.5 "
-  />
+  'outline-arrow': (
+    <path
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M -2.5,-1.5,-0.5,0,-2.5,1.5 "
+    />
   ),
-  'fill-arrow': (<path
-    fill="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    d="M -2.5,-1.5,-0.5,0,-2.5,1.5 Z"
-  />
+  'fill-arrow': (
+    <path
+      fill="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M -2.5,-1.5,-0.5,0,-2.5,1.5 Z"
+    />
   ),
-  'outline-circle': (<circle strokeWidth={1} stroke="currentColor" fill="none" cx={0} cy={0} r="1.2" />)
+  'outline-circle': (
+    <circle strokeWidth={1} stroke="currentColor" fill="none" cx={0} cy={0} r="1.2" />
+  )
 } as const;
-
 
 type SVGCanvasElement = MoveableElement & SVGCurveType;
 
@@ -66,14 +68,43 @@ const getPointsAtom = atomFamily((atoms: SVGPointAtom[]) =>
   })
 );
 
-const getPathFromPoints = (points: { x: number; y: number }[]) => {
-  return points.reduce((acc, point) => {
-    if (acc === '') {
-      return acc + `M ${point.x} ${point.y}`;
-    } else {
-      return acc + `L ${point.x} ${point.y}`;
+// const getPathFromPoints = (points: { x: number; y: number }[]) => {
+//   return points.reduce((acc, point) => {
+//     if (acc === '') {
+//       return acc + `M ${point.x} ${point.y}`;
+//     } else {
+//       return acc + `L ${point.x} ${point.y}`;
+//     }
+//   }, '');
+// };
+
+const getPathFromPoints = (points: { x: number; y: number }[], isQuadratic = false) => {
+  if (points.length < 2) {
+    throw new Error('At least two points are required to create a path.');
+  }
+
+  let pathData = `M${points[0].x} ${points[0].y}`;
+
+  if (isQuadratic && points.length > 2) {
+    for (let i = 1; i < points.length - 1; i++) {
+      const p0 = points[i - 1];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+
+      const midX = (p1.x + p2.x) / 2;
+      const midY = (p1.y + p2.y) / 2;
+
+      pathData += ` Q${p1.x} ${p1.y} ${midX} ${midY}`;
     }
-  }, '');
+    const lastPoint = points[points.length - 1];
+    pathData += ` L${lastPoint.x} ${lastPoint.y}`;
+  } else {
+    for (let i = 1; i < points.length; i++) {
+      pathData += ` L${points[i].x} ${points[i].y}`;
+    }
+  }
+
+  return pathData;
 };
 
 const useStyles = createStyles((theme) => ({
@@ -148,13 +179,14 @@ export function RenderCurve({ element, setElement, onSelect, isSelected }: Props
           height: '10',
           position: 'absolute'
         }}
-        vectorEffect="non-scaling-stroke">
+        vectorEffect="non-scaling-stroke"
+      >
         <g>
           <g style={{ userSelect: 'none' }}>
             <path
               onMouseDown={handleMouseDown}
               className={classes.path}
-              d={getPathFromPoints(points)}
+              d={getPathFromPoints(points, element.isQuadratic)}
               strokeWidth="32"
               fill="none"
               opacity={0}
@@ -168,7 +200,7 @@ export function RenderCurve({ element, setElement, onSelect, isSelected }: Props
               fill="none"
               strokeLinecap="butt"
               pointerEvents="auto"
-              d={getPathFromPoints(points)}
+              d={getPathFromPoints(points, element.isQuadratic)}
               strokeWidth={element.strokeWidth}
               stroke={element.stroke}
               strokeDasharray={element.strokeDasharray}
@@ -178,7 +210,8 @@ export function RenderCurve({ element, setElement, onSelect, isSelected }: Props
             // style={{ position: 'absolute', left: points.at(0)!.x, top: points.at(-1)!.y }}
             // transform="translate(0 3.5) scale(7)"
             color={element.stroke}
-            transform={`translate(${points.at(0)!.x - 7} ${points.at(0)!.y}) scale(5)`}
+            style={{ transformOrigin: 'left top' }}
+            transform={`translate(${points.at(0)!.x - 7} ${points.at(0)!.y}) scale(5) rotate(15)`}
           >
             {START_MARKERS[element.startMarker]}
           </g>

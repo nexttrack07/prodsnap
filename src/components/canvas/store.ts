@@ -47,6 +47,7 @@ export type SVGPointAtom = WritableAtom<SVGPointType & Draggable, Action<SVGPoin
 export type SVGCurveType = {
   type: 'svg-curve';
   points: SVGPointAtom[];
+  isQuadratic?: boolean;
   clipPathId?: string;
   stroke: string;
   strokeWidth: number;

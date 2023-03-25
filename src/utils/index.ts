@@ -32,3 +32,37 @@ export function deserialize(serializedObj: string): any {
     return value;
   });
 }
+
+type Point = {
+  x: number;
+  y: number;
+};
+
+export function calculateAnglesOfRightTriangle(A: Point, B: Point, C: Point): [number, number, number] {
+  function distance(p1: Point, p2: Point): number {
+    return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+  }
+
+  const a = distance(B, C);
+  const b = distance(A, C);
+  const c = distance(A, B);
+
+  const maxSide = Math.max(a, b, c);
+  let alpha, beta, gamma;
+
+  if (maxSide === c) {
+    alpha = Math.atan2(b, a) * (180 / Math.PI);
+    beta = 90 - alpha;
+    gamma = 90;
+  } else if (maxSide === b) {
+    beta = Math.atan2(a, c) * (180 / Math.PI);
+    alpha = 90 - beta;
+    gamma = 90;
+  } else {
+    gamma = Math.atan2(b, c) * (180 / Math.PI);
+    alpha = 90;
+    beta = 90 - gamma;
+  }
+
+  return [alpha, beta, gamma];
+}

@@ -32,20 +32,63 @@ const data: { id: number; prev: string; data: MoveableElement & SVGCurveType }[]
       height: 3,
       strokeWidth: 2,
       stroke: 'black',
-      startMarker: "none",
-      endMarker: "none",
+      startMarker: 'none',
+      endMarker: 'none',
       // TODO: DONT USE THIS - create atoms inside the component
       points: [
-        atom({
+        {
           type: 'svg-point',
           x: 100,
           y: 100
-        }),
-        atom({
+        },
+        {
+          type: 'svg-point',
+          x: 200,
+          y: 200
+        },
+        {
           type: 'svg-point',
           x: 500,
           y: 100
-        })
+        }
+      ]
+    }
+  },
+  {
+    id: 1,
+    prev: 'M 0 0 L 50 0',
+    data: {
+      type: 'svg-curve',
+      x: 200,
+      y: 200,
+      width: 100,
+      height: 3,
+      strokeWidth: 2,
+      stroke: 'black',
+      startMarker: 'none',
+      endMarker: 'none',
+      // TODO: DONT USE THIS - create atoms inside the component
+      points: [
+        {
+          type: 'svg-point',
+          x: 100,
+          y: 100
+        },
+        {
+          type: 'svg-point',
+          x: 400,
+          y: 400
+        },
+        {
+          type: 'svg-point',
+          x: 200,
+          y: 200
+        },
+        {
+          type: 'svg-point',
+          x: 500,
+          y: 100
+        }
       ]
     }
   }
@@ -63,7 +106,7 @@ export function CurvesPanel() {
   const { classes } = useStyles();
 
   const handleAddElement = (newEl: CanvasElement) => {
-    addElement(newEl);
+    addElement({ ...newEl, points: newEl.points.map((p) => atom(p)) });
   };
 
   return (
@@ -87,7 +130,8 @@ export function CurvesPanel() {
                 minWidth: 1,
                 overflow: 'visible'
               }}
-              onClick={() => handleAddElement(item.data)}>
+              onClick={() => handleAddElement(item.data)}
+            >
               <g transform="scale(1) translate(0, 0.5)">
                 <path d={item.prev} />
               </g>

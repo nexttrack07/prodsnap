@@ -13,7 +13,7 @@ import {
 } from '@mantine/core';
 import { MoveableElement, selectedElementAtomsAtom, SVGCurveType } from '@/components/canvas/store';
 import { atom } from 'jotai';
-import { Line, LineDashed, LineDotted } from 'tabler-icons-react';
+import { Line, LineDashed, LineDotted, VectorBezier } from 'tabler-icons-react';
 
 type Marker = Record<SVGCurveType['startMarker'], React.ReactNode>;
 
@@ -125,27 +125,6 @@ export const END_MARKERS: Marker = {
   )
 };
 
-const svgPropsAtom = atom(
-  (get) => {
-    const selectedElementAtoms = get(selectedElementAtomsAtom);
-    if (selectedElementAtoms.length === 1) {
-      const selectedElement = get(selectedElementAtoms[0]);
-      return selectedElement as MoveableElement & SVGCurveType;
-    }
-  },
-  (get, set, update: { stroke?: string; strokeWidth?: number }) => {
-    const selectedElementAtoms = get(selectedElementAtomsAtom);
-    if (selectedElementAtoms.length === 1) {
-      set(selectedElementAtoms[0], (el) => {
-        if (el.type === 'svg-curve') {
-          return { ...el, ...update };
-        }
-        return el;
-      });
-    }
-  }
-);
-
 type Props = {
   element: MoveableElement & SVGCurveType;
   setElement: (element: MoveableElement & SVGCurveType) => void;
@@ -237,7 +216,8 @@ export function SvgCurveToolbar({ element, setElement }: Props) {
               <Grid.Col key={id} span="content">
                 <ActionIcon
                   onClick={() => setElement({ ...element, startMarker: id as keyof Marker })}
-                  size={36}>
+                  size={36}
+                >
                   <svg width={24} height={24}>
                     {comp}
                   </svg>
@@ -262,7 +242,8 @@ export function SvgCurveToolbar({ element, setElement }: Props) {
               <Grid.Col key={id} span="content">
                 <ActionIcon
                   onClick={() => setElement({ ...element, endMarker: id as keyof Marker })}
-                  size={36}>
+                  size={36}
+                >
                   <svg width={24} height={24}>
                     {comp}
                   </svg>
@@ -272,6 +253,14 @@ export function SvgCurveToolbar({ element, setElement }: Props) {
           </Grid>
         </Popover.Dropdown>
       </Popover>
+      <SegmentedControl
+        value={element.isQuadratic ? 'curved' : 'straight'}
+        onChange={(val) => setElement({ ...element, isQuadratic: val === 'curved' })}
+        data={[
+          { label: <Line />, value: 'straight' },
+          { label: <VectorBezier />, value: 'curved' }
+        ]}
+      />
     </Group>
   );
 }

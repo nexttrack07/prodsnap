@@ -43,7 +43,7 @@
     "react-image-crop": "^10.0.7",
     "react-router-dom": "^6.4.0",
     "recoil": "^0.7.6",
-    "tabler-icons-react": "^1.55.0",
+    "tabler-icons-react": "^1.56.0",
     "use-fit-text": "^2.4.0"
   },
   "devDependencies": {
