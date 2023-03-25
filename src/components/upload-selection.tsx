@@ -1,9 +1,10 @@
-import { Button } from '@mantine/core';
+import { Box, Button, Group, Modal, SegmentedControl } from '@mantine/core';
 import { addTemplate } from '../api/template';
-import { atom, useAtomValue } from 'jotai';
+import { atom, useAtom, useAtomValue } from 'jotai';
 import React, { useState } from 'react';
 import { Check, CloudUpload, X } from 'tabler-icons-react';
-import { selectedElementAtomsAtom } from './canvas/store';
+import { selectedElementAtomsAtom, ElementType, Draggable } from './canvas/store';
+import { dimensionAtom, positionAtom, elementCompMap } from './canvas';
 import { showNotification, updateNotification } from '@mantine/notifications';
 
 function serialize(obj: any): string {
@@ -38,10 +39,16 @@ const templateAtom = atom((get) => {
   return serialize(elements);
 });
 
+const SCALE = 1.2;
+
 export function UploadSelection() {
   const selectedElementAtoms = useAtomValue(selectedElementAtomsAtom);
   const selection = useAtomValue(templateAtom);
   const [loading, setLoading] = useState(false);
+  const [opened, setOpened] = useState(false);
+  const position = useAtomValue(positionAtom);
+  const dimension = useAtomValue(dimensionAtom);
+  const [type, setType] = useState<'curves' | 'shapes' | 'text'>('curves');
 
   if (selectedElementAtoms.length === 0) return null;
 
@@ -58,7 +65,7 @@ export function UploadSelection() {
         disallowClose: true
       });
       setLoading(true);
-      await addTemplate({ id, selection }, 'selections');
+      await addTemplate({ id, selection, type }, 'selections');
     } catch (err) {
       console.error(err);
     } finally {
@@ -76,9 +83,64 @@ export function UploadSelection() {
 
   return (
     <>
-      <Button size="xs" leftIcon={<CloudUpload />} onClick={handleTemplateUpload} loading={loading}>
+      <Button size="xs" leftIcon={<CloudUpload />} onClick={() => setOpened(true)}>
         Upload Selection
       </Button>
+
+      <Modal size="auto" opened={opened} onClose={() => setOpened(false)} title="Upload Selection">
+        <Box
+          sx={(theme) => ({
+            background: 'white',
+            // margin: 25,
+            width: dimension.width * SCALE,
+            height: dimension.height * SCALE,
+            position: 'relative'
+          })}
+        >
+          {selectedElementAtoms.map((elementAtom) => (
+            <Element
+              canvasPosition={position}
+              key={elementAtom.toString()}
+              elementAtom={elementAtom}
+            />
+          ))}
+        </Box>
+        <Group position="right">
+          <SegmentedControl
+            value={type}
+            onChange={(val) => setType(val as 'shapes' | 'curves' | 'text')}
+            size="xs"
+            data={['text', 'shapes', 'curves']}
+          />
+          <Button size="xs" variant="outline" color="red" onClick={() => setOpened(false)}>
+            Cancel
+          </Button>
+
+          <Button size="xs" variant="light" onClick={handleTemplateUpload} loading={loading}>
+            Upload
+          </Button>
+        </Group>
+      </Modal>
     </>
+  );
+}
+
+function Element({
+  elementAtom,
+  canvasPosition
+}: {
+  elementAtom: ElementType;
+  canvasPosition: Draggable;
+}) {
+  const [element, setElement] = useAtom(elementAtom);
+  const ElementComponent = elementCompMap[element.type];
+
+  return (
+    <ElementComponent
+      element={{ ...element, x: element.x - canvasPosition.x, y: element.y - canvasPosition.y }}
+      setElement={setElement}
+      onSelect={() => {}}
+      isSelected={false}
+    />
   );
 }
