@@ -38,8 +38,6 @@ export function RenderPoint({
   useEventListener('pointerup', handleMouseUp, documentRef);
   useEventListener('pointermove', handleMouseMove, documentRef, [isMoving]);
 
-  console.log('position: ', position);
-
   return (
     <div
       onMouseDown={handleMouseDown}

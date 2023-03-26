@@ -2,13 +2,12 @@ import { Button } from '@mantine/core';
 import { addTemplate } from '../api/template';
 import { atom, useAtomValue } from 'jotai';
 import React, { useState } from 'react';
-import { firestore, storage } from '../utils/firebase';
+import { storage } from '../utils/firebase';
 import domToImage from 'dom-to-image-more';
 import { Check, CloudUpload, X } from 'tabler-icons-react';
-import { elementAtomsAtom } from './canvas/store';
+import { CanvasElement, CanvasElementWithPointAtoms, elementAtomsAtom } from './canvas/store';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { showNotification, updateNotification } from '@mantine/notifications';
-import { addDoc } from 'firebase/firestore';
 
 function serialize(obj: any): string {
   return JSON.stringify(obj, (key, value) => {
@@ -30,10 +29,10 @@ function uuid(): string {
 const templateAtom = atom((get) => {
   const allElementAtoms = get(elementAtomsAtom);
   const elements = allElementAtoms.map((a) => {
-    let el = get(a);
+    let el: CanvasElement | CanvasElementWithPointAtoms = get(a);
 
     if (el.type === 'svg-curve') {
-      el = { ...el, points: el.points.map((p) => get(p)) };
+      el = { ...el, points: el.points.map((p) => get(p)) } as CanvasElement;
     }
 
     return el;
@@ -52,7 +51,7 @@ export function UploadTemplate() {
   if (allElementAtoms.length === 0) return null;
 
   const handleTemplateUpload = async () => {
-    const dataURL = await domToImage.toBlob(document.getElementById('canvas'));
+    const dataURL = await domToImage.toBlob(document.getElementById('canvas')!);
     const filename = `template-${Date.now()}.png`;
     const storageRef = ref(storage, `images/${filename}`);
     const uploadTask = uploadBytesResumable(storageRef, dataURL);

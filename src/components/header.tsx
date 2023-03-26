@@ -35,7 +35,7 @@ import { selectedElementAtomsAtom } from './canvas/store';
 export function HeaderComponent() {
   const isSelected = useAtomValue(selectedElementAtomsAtom).length > 0;
   const handleDownloadClick = () => {
-    domToImage.toBlob(document.getElementById('canvas')).then(function (blob: any) {
+    domToImage.toBlob(document.getElementById('canvas')!).then(function (blob: any) {
       saveAs(blob, 'my-image.png');
     });
   };

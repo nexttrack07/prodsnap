@@ -1,4 +1,4 @@
-import React, { SVGAttributes } from 'react';
+import React from 'react';
 import {
   ActionIcon,
   ColorPicker,
@@ -10,14 +10,7 @@ import {
   SegmentedControl,
   Box
 } from '@mantine/core';
-import {
-  MoveableElement,
-  SVGPathType,
-  SVGStrokeProps,
-  selectedElementAtomsAtom,
-  CanvasElement
-} from '@/components/canvas/store';
-import { atom, useAtom } from 'jotai';
+import { MoveableElement, SVGPathType } from '@/components/canvas/store';
 import { BorderAll, BorderNone, BorderRadius, BorderStyle2 } from 'tabler-icons-react';
 
 type Props = {

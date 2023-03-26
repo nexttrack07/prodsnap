@@ -11,13 +11,7 @@ import {
   Slider,
   DEFAULT_THEME
 } from '@mantine/core';
-import {
-  MoveableElement,
-  selectedElementAtomsAtom,
-  selectedItemsAtom,
-  TextType
-} from '../canvas/store';
-import { atom, useAtom } from 'jotai';
+import { MoveableElement, TextType } from '../canvas/store';
 import React, { useRef } from 'react';
 import {
   AlignCenter,
@@ -30,27 +24,6 @@ import {
   Underline
 } from 'tabler-icons-react';
 import FontPicker from 'font-picker-react';
-
-const textPropsAtom = atom(
-  (get) => {
-    const selectedElementAtoms = get(selectedElementAtomsAtom);
-    if (selectedElementAtoms.length === 1) {
-      const selectedElement = get(selectedElementAtoms[0]);
-      return (selectedElement as MoveableElement & TextType).props;
-    }
-  },
-  (get, set, update: React.CSSProperties) => {
-    const selectedElementAtoms = get(selectedElementAtomsAtom);
-    if (selectedElementAtoms.length === 1) {
-      set(selectedElementAtoms[0], (el) => {
-        if (el.type === 'text') {
-          return { ...el, props: { ...el.props, ...update } };
-        }
-        return el;
-      });
-    }
-  }
-);
 
 type Props = {
   element: MoveableElement & TextType;
@@ -128,7 +101,8 @@ export function TextToolbar({ element, setElement }: Props) {
             setTextProps({
               fontWeight: element.props.fontWeight === 'bolder' ? 'normal' : 'bolder'
             })
-          }>
+          }
+        >
           <Bold />
         </ActionIcon>
         <ActionIcon
@@ -139,7 +113,8 @@ export function TextToolbar({ element, setElement }: Props) {
             setTextProps({
               fontStyle: element.props.fontStyle === 'italic' ? 'normal' : 'italic'
             })
-          }>
+          }
+        >
           <Italic />
         </ActionIcon>
         <ActionIcon
@@ -150,7 +125,8 @@ export function TextToolbar({ element, setElement }: Props) {
             setTextProps({
               textDecoration: element.props.textDecoration === 'underline' ? 'none' : 'underline'
             })
-          }>
+          }
+        >
           <Underline />
         </ActionIcon>
         <ActionIcon
@@ -161,7 +137,8 @@ export function TextToolbar({ element, setElement }: Props) {
             setTextProps({
               textTransform: element.props.textTransform === 'uppercase' ? 'none' : 'uppercase'
             })
-          }>
+          }
+        >
           <TextSize />
         </ActionIcon>
       </Group>

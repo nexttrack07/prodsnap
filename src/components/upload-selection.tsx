@@ -75,7 +75,7 @@ export function UploadSelection() {
   console.log('position - selection: ', position);
 
   const handleTemplateUpload = async () => {
-    const dataURL = await domToImage.toBlob(document.getElementById('canvas-selection'));
+    const dataURL = await domToImage.toBlob(document.getElementById('canvas-selection')!);
     const filename = `template-${Date.now()}.png`;
     const storageRef = ref(storage, `images/${filename}`);
     const uploadTask = uploadBytesResumable(storageRef, dataURL);
@@ -205,8 +205,6 @@ export function RenderElement({
 }) {
   const [element, setElement] = useAtom(elementAtom);
   const ElementComponent = elementCompMap[element.type];
-
-  console.log('position - render element: ', canvasPosition);
 
   if (element.type === 'svg-curve') {
     return (

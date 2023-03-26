@@ -1,23 +1,19 @@
 import React, { useCallback } from 'react';
 import { Box } from '@mantine/core';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { createElement, ReactNode } from 'react';
 import {
   activeElementAtomAtom,
   canvasAtom,
-  CanvasElement,
+  CanvasElementWithPointAtoms,
   elementAtomsAtom,
   ElementType,
   groupsByIdAtom,
   selectedElementAtomsAtom,
-  selectedItemsAtom,
-  SVGType
+  selectedItemsAtom
 } from './store';
 import { RenderImage } from './render-image';
-import { RenderSvg } from './render-svg';
 import { RenderText } from './render-text';
 import { RenderPath } from './render-path';
-import { RenderLine } from './render-line';
 import { RenderCurve } from './render-curve';
 import { useShiftKeyPressed } from '../../utils';
 import { atomFamily } from 'jotai/utils';
@@ -154,22 +150,14 @@ export function Canvas() {
   );
 }
 
-export function renderElement(item: SVGType['elements'][number], i: number): ReactNode {
-  const { tag, props } = item;
-
-  return createElement(tag, { ...props, key: i }, null);
-}
-
-export const elementCompMap: Record<CanvasElement['type'], React.FC<any>> = {
-  svg: RenderSvg,
+export const elementCompMap: Record<CanvasElementWithPointAtoms['type'], React.FC<any>> = {
   image: RenderImage,
   text: RenderText,
   'svg-path': RenderPath,
-  'svg-line': RenderLine,
   'svg-curve': RenderCurve
 };
 
-const groupFromElementAtom = atomFamily((element: CanvasElement) =>
+const groupFromElementAtom = atomFamily((element: CanvasElementWithPointAtoms) =>
   atom((get) => {
     if (!element.group) return null;
 
@@ -198,7 +186,7 @@ export function Element({ elementAtom }: { elementAtom: ElementType }) {
     });
   };
 
-  const handleSetElement = useCallback((element: CanvasElement) => {
+  const handleSetElement = useCallback((element: CanvasElementWithPointAtoms) => {
     setElement(element);
   }, []);
 

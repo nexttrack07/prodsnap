@@ -2,7 +2,13 @@ import { createStyles, useMantineTheme } from '@mantine/core';
 import { atom, SetStateAction, useSetAtom, useAtomValue } from 'jotai';
 import { atomFamily } from 'jotai/utils';
 import React, { useCallback, useRef, useState, useEffect } from 'react';
-import { CanvasElement, MoveableElement, SVGCurveType, SVGPointAtom } from './store';
+import {
+  CanvasElement,
+  CanvasElementWithPointAtoms,
+  MoveableElement,
+  SVGCurveWithPointAtoms,
+  SVGPointAtom
+} from './store';
 import { RenderPoint } from './render-point';
 
 const START_MARKERS = {
@@ -53,14 +59,12 @@ const END_MARKERS = {
   )
 } as const;
 
-type SVGCanvasElement = MoveableElement & SVGCurveType;
-
 type Props = {
-  element: SVGCanvasElement;
+  element: SVGCurveWithPointAtoms;
   isSelected: boolean;
   position?: { x: number; y: number };
   onSelect: (e: React.MouseEvent) => void;
-  setElement: (update: SetStateAction<CanvasElement>) => void;
+  setElement: (update: SetStateAction<CanvasElementWithPointAtoms>) => void;
 };
 
 const getPointsAtom = atomFamily((atoms: SVGPointAtom[]) =>
@@ -128,6 +132,7 @@ export function RenderCurve({
   const [moving, setMoving] = useState(false);
   const lastPos = useRef({ x: 0, y: 0 });
   // const updatePoints = useSetAtom(updatePointsAtom(element.points));
+  const { strokeWidth, stroke } = element;
 
   console.log('position', position);
 
@@ -174,7 +179,9 @@ export function RenderCurve({
       document.removeEventListener('mousemove', handleMouseMove);
     };
   }, [moving]);
-
+  const markerSize = Math.max(4, strokeWidth ?? 0 * 2);
+  const refX = markerSize * 0.8;
+  const pathD = `M0,0 L${markerSize},${markerSize / 2} L0,${markerSize}`;
   return (
     <>
       <svg
@@ -189,6 +196,38 @@ export function RenderCurve({
         }}
         vectorEffect="non-scaling-stroke"
       >
+        <defs>
+          <marker
+            id="arrow"
+            viewBox="0 0 10 10"
+            refX="5"
+            refY="5"
+            markerWidth={element.strokeWidth}
+            markerHeight={element.strokeWidth}
+            orient="auto-start-reverse"
+          >
+            {START_MARKERS[element.startMarker]}
+          </marker>
+          <marker
+            id="circle-marker"
+            viewBox="0 0 10 10"
+            markerWidth="6"
+            markerHeight="6"
+            refX="3"
+            refY="3"
+          >
+            <circle cx="3" cy="3" r="3" fill="currentColor" />
+          </marker>
+          <marker
+            id="outline-arrow-marker"
+            viewBox={`0 0 ${markerSize} ${markerSize}`}
+            refX={refX}
+            refY={markerSize / 2}
+            orient="auto"
+          >
+            <path d={pathD} fill="none" stroke={stroke} />
+          </marker>
+        </defs>
         <g>
           <g style={{ userSelect: 'none' }}>
             <path
@@ -218,14 +257,14 @@ export function RenderCurve({
               strokeWidth={element.strokeWidth}
               stroke={element.stroke}
               strokeDasharray={element.strokeDasharray}
+              markerEnd="url(#outline-arrow-marker)"
             />
           </g>
-          <g
+          {/* <g
             // style={{ position: 'absolute', left: points.at(0)!.x, top: points.at(-1)!.y }}
             // transform="translate(0 3.5) scale(7)"
             color={element.stroke}
-            style={{ transformOrigin: 'left top' }}
-            transform={`translate(${points.at(0)!.x - 7} ${points.at(0)!.y}) scale(5) rotate(15)`}
+            transform={`translate(${points.at(0)!.x - 7} ${points.at(0)!.y}) scale(5)`}
           >
             {START_MARKERS[element.startMarker]}
           </g>
@@ -236,7 +275,7 @@ export function RenderCurve({
             transform={`translate(${points.at(-1)!.x + 7} ${points.at(-1)!.y}) scale(5)`}
           >
             {END_MARKERS[element.endMarker]}
-          </g>
+          </g> */}
         </g>
       </svg>
       {isSelected &&
@@ -244,7 +283,7 @@ export function RenderCurve({
           <RenderPoint
             position={position}
             key={`${pointAtom}`}
-            width={element.strokeWidth}
+            width={element.strokeWidth ?? 0}
             pointAtom={pointAtom}
           />
         ))}

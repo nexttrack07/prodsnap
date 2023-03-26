@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Group, ActionIcon, Menu, SegmentedControl, Button } from '@mantine/core';
-import { FaFirstOrder, FaRegObjectUngroup } from 'react-icons/fa';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import {
   elementAtomsAtom,
@@ -9,10 +8,10 @@ import {
   canvasAtom,
   isPath,
   activeElementAtomAtom,
-  CanvasElement,
   isCurve,
   isText,
-  isImage
+  isImage,
+  CanvasElementWithPointAtoms
 } from '../canvas/store';
 import { SvgPathToolbar } from './svg-path-toolbar';
 import { ImageToolbar } from './image-toolbar';
@@ -124,7 +123,7 @@ const activeElementAtom = atom(
     }
     return null;
   },
-  (get, set, element: CanvasElement) => {
+  (get, set, element: CanvasElementWithPointAtoms) => {
     const activeElementAtom = get(activeElementAtomAtom);
     if (activeElementAtom) {
       set(activeElementAtom, element);

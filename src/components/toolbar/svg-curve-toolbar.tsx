@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import {
   ActionIcon,
   ColorPicker,
@@ -6,16 +6,14 @@ import {
   Popover,
   DEFAULT_THEME,
   NumberInput,
-  NumberInputHandlers,
-  Box,
   SegmentedControl,
-  Grid
+  NumberInputHandlers,
+  Box
 } from '@mantine/core';
-import { MoveableElement, selectedElementAtomsAtom, SVGCurveType } from '@/components/canvas/store';
-import { atom } from 'jotai';
+import { SVGCurveWithPointAtoms } from '@/components/canvas/store';
 import { Line, LineDashed, LineDotted, VectorBezier } from 'tabler-icons-react';
 
-type Marker = Record<SVGCurveType['startMarker'], React.ReactNode>;
+type Marker = Record<SVGCurveWithPointAtoms['startMarker'], React.ReactNode>;
 
 export const START_MARKERS: Marker = {
   none: (
@@ -126,8 +124,8 @@ export const END_MARKERS: Marker = {
 };
 
 type Props = {
-  element: MoveableElement & SVGCurveType;
-  setElement: (element: MoveableElement & SVGCurveType) => void;
+  element: SVGCurveWithPointAtoms;
+  setElement: (element: SVGCurveWithPointAtoms) => void;
 };
 
 export function SvgCurveToolbar({ element, setElement }: Props) {
@@ -156,12 +154,7 @@ export function SvgCurveToolbar({ element, setElement }: Props) {
           <ColorPicker
             format="rgba"
             value={element.stroke}
-            onChange={(val) =>
-              setElement({
-                ...element,
-                stroke: val
-              })
-            }
+            onChange={(val) => setElement({ ...element, stroke: val })}
             swatches={[
               ...DEFAULT_THEME.colors.red,
               ...DEFAULT_THEME.colors.yellow,
@@ -193,6 +186,7 @@ export function SvgCurveToolbar({ element, setElement }: Props) {
       </Group>
 
       <SegmentedControl
+        size="xs"
         value={element.strokeDasharray ?? ''}
         onChange={(val) => setElement({ ...element, strokeDasharray: val ?? '' })}
         data={[
@@ -211,20 +205,19 @@ export function SvgCurveToolbar({ element, setElement }: Props) {
           </ActionIcon>
         </Popover.Target>
         <Popover.Dropdown>
-          <Grid gutter="xs" justify="center" align="center">
+          <Group spacing={1}>
             {Object.entries(START_MARKERS).map(([id, comp]) => (
-              <Grid.Col key={id} span="content">
-                <ActionIcon
-                  onClick={() => setElement({ ...element, startMarker: id as keyof Marker })}
-                  size={36}
-                >
-                  <svg width={24} height={24}>
-                    {comp}
-                  </svg>
-                </ActionIcon>
-              </Grid.Col>
+              <ActionIcon
+                key={id}
+                onClick={() => setElement({ ...element, startMarker: id as keyof Marker })}
+                size={36}
+              >
+                <svg width={24} height={24}>
+                  {comp}
+                </svg>
+              </ActionIcon>
             ))}
-          </Grid>
+          </Group>
         </Popover.Dropdown>
       </Popover>
 
@@ -237,23 +230,24 @@ export function SvgCurveToolbar({ element, setElement }: Props) {
           </ActionIcon>
         </Popover.Target>
         <Popover.Dropdown>
-          <Grid gutter="xs" justify="center" align="center">
+          <Group spacing={1}>
             {Object.entries(END_MARKERS).map(([id, comp]) => (
-              <Grid.Col key={id} span="content">
-                <ActionIcon
-                  onClick={() => setElement({ ...element, endMarker: id as keyof Marker })}
-                  size={36}
-                >
-                  <svg width={24} height={24}>
-                    {comp}
-                  </svg>
-                </ActionIcon>
-              </Grid.Col>
+              <ActionIcon
+                key={id}
+                onClick={() => setElement({ ...element, endMarker: id as keyof Marker })}
+                size={36}
+                variant={element.endMarker === id ? 'outline' : 'light'}
+              >
+                <svg width={24} height={24}>
+                  {comp}
+                </svg>
+              </ActionIcon>
             ))}
-          </Grid>
+          </Group>
         </Popover.Dropdown>
       </Popover>
       <SegmentedControl
+        size="xs"
         value={element.isQuadratic ? 'curved' : 'straight'}
         onChange={(val) => setElement({ ...element, isQuadratic: val === 'curved' })}
         data={[

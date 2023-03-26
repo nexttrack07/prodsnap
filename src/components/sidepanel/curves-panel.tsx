@@ -1,13 +1,7 @@
 import { Text, Space, createStyles, SimpleGrid } from '@mantine/core';
 import React from 'react';
 import { atom, useSetAtom } from 'jotai';
-import {
-  addElementAtom,
-  CanvasElement,
-  MoveableElement,
-  SVGCurveType,
-  SVGLineType
-} from '../../components/canvas/store';
+import { addElementAtom, MoveableElement, SVGCurveType } from '../../components/canvas/store';
 
 const useStyles = createStyles(() => ({
   shape: {
@@ -20,7 +14,9 @@ const useStyles = createStyles(() => ({
   }
 }));
 
-const data: { id: number; prev: string; data: MoveableElement & SVGCurveType }[] = [
+type PointCurveType = MoveableElement & SVGCurveType;
+
+const data: { id: number; prev: string; data: PointCurveType }[] = [
   {
     id: 0,
     prev: 'M 0 0 L 50 0',
@@ -105,7 +101,7 @@ export function CurvesPanel() {
   const addElement = useSetAtom(addElementAtom);
   const { classes } = useStyles();
 
-  const handleAddElement = (newEl: CanvasElement) => {
+  const handleAddElement = (newEl: PointCurveType) => {
     addElement({ ...newEl, points: newEl.points.map((p) => atom(p)) });
   };
 

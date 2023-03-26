@@ -2,6 +2,9 @@ import { atom, WritableAtom } from 'jotai';
 import React, { SetStateAction, SVGAttributes } from 'react';
 
 export type Action<T> = SetStateAction<T>;
+export type Atom<T> = WritableAtom<T, Action<T>>;
+
+
 export type Draggable = {
   x: number;
   y: number;
@@ -12,50 +15,35 @@ export type Resizable = {
   height: number;
 };
 
-export type MoveableElement = Draggable &
-  Resizable & {
-    group?: string;
-    opacity?: number;
-  };
-export type SVGType = {
-  type: 'svg';
-  props?: SVGAttributes<SVGSVGElement>;
-  elements: Array<{
-    tag: string;
-    props: SVGAttributes<SVGCircleElement | SVGRectElement | SVGEllipseElement | SVGPolygonElement>;
-  }>;
+export type MoveableElement = Draggable & Resizable & {
+  group?: string;
+  opacity?: number;
 };
+
 export type SVGStrokeProps = {
   clipPathId: string;
   stroke: string;
   strokeWidth: number;
-  strokeLinecap: 'inherit' | 'butt' | 'round' | 'square' | undefined;
-  strokeDasharray: string;
-};
-export type SVGLineType = {
-  type: 'svg-line';
-  start: SVGPointAtom;
-  end: SVGPointAtom;
-  strokeProps: Partial<SVGStrokeProps>;
-};
-export type SVGPointType = {
-  type: 'svg-point';
+  strokeLinecap?: 'inherit' | 'butt' | 'round' | 'square';
+  strokeDasharray?: string;
 };
 
-export type SVGPointAtom = WritableAtom<SVGPointType & Draggable, Action<SVGPointType & Draggable>>;
+export type SVGPointAtom = Atom<SVGPointType>;
+export type SVGPointType = Draggable & { type: 'svg-point' };
+
+export type SVGCurveWithPointAtoms = Omit<SVGCurveType, 'points'> & {
+  points: SVGPointAtom[];
+};
 
 export type SVGCurveType = {
   type: 'svg-curve';
-  points: SVGPointAtom[];
+  points: SVGPointType[];
   isQuadratic?: boolean;
-  clipPathId?: string;
-  stroke: string;
-  strokeWidth: number;
-  strokeLinecap?: 'inherit' | 'butt' | 'round' | 'square' | undefined;
-  strokeDasharray?: string;
+} & Partial<SVGStrokeProps> & {
   startMarker: 'none' | 'fill-arrow' | 'outline-arrow' | 'outline-circle';
   endMarker: 'none' | 'fill-arrow' | 'outline-arrow' | 'outline-circle';
-};
+} & MoveableElement;
+
 export type SVGPathType = {
   type: 'svg-path';
   getViewBox: (w: number, h: number) => string;
@@ -63,29 +51,32 @@ export type SVGPathType = {
   props: SVGAttributes<SVGSVGElement>;
   path: SVGAttributes<SVGPathElement>;
   strokeProps: SVGStrokeProps;
-};
+} & MoveableElement;
+
 export type TextType = {
   type: 'text';
   content: string;
   props: React.CSSProperties;
-};
+} & MoveableElement;
+
 export enum ImageState {
   Loading,
   Normal,
-  Cropping
+  Cropping,
 }
+
 export type ImageType = {
   type: 'image';
   url: string;
   state: ImageState;
   thumbnail?: string;
   currentUrl?: string;
-};
+} & MoveableElement;
 
-export type CanvasElement = MoveableElement &
-  (SVGType | ImageType | TextType | SVGPathType | SVGLineType | SVGCurveType);
-export type ElementType = WritableAtom<CanvasElement, Action<CanvasElement>>;
-export type GroupType = WritableAtom<ElementType[], Action<ElementType[]>>;
+export type CanvasElement = ImageType | TextType | SVGPathType | SVGCurveType;
+export type CanvasElementWithPointAtoms = Exclude<CanvasElement, SVGCurveType> | SVGCurveWithPointAtoms;
+export type ElementType = Atom<CanvasElementWithPointAtoms>;
+export type GroupType = Atom<ElementType[]>;
 
 // [atom([atom(), atom()]), atom([atom(), atom()])]
 export const elementAtomsAtom = atom<ElementType[]>([]);
@@ -121,11 +112,11 @@ export const selectedItemsAtom = atom((get) => {
   };
 });
 
-export const addElementAtom = atom(null, (_, set, newEl: CanvasElement) => {
+export const addElementAtom = atom(null, (_, set, newEl: CanvasElementWithPointAtoms) => {
   set(elementAtomsAtom, (elementAtoms) => [...elementAtoms, atom(newEl)]);
 });
 
-export const addElementsAtom = atom(null, (_, set, newEls: CanvasElement[]) => {
+export const addElementsAtom = atom(null, (_, set, newEls: CanvasElementWithPointAtoms[]) => {
   set(elementAtomsAtom, (elementAtoms) => [...elementAtoms, ...newEls.map((newEl) => atom(newEl))]);
 });
 
@@ -139,7 +130,6 @@ export const canvasAtom = atom({
 
 export const createAtom = (element: CanvasElement): ElementType => {
   if (element.type === 'svg-curve') {
-    console.log('createAtom curve: ', element);
     return atom({
       ...element,
       points: element.points.map((point) => atom(point))
@@ -149,11 +139,11 @@ export const createAtom = (element: CanvasElement): ElementType => {
   return atom(element) as any as ElementType;
 };
 
-export const isPath = (element: CanvasElement): element is SVGPathType & MoveableElement =>
+export const isPath = (element: CanvasElementWithPointAtoms): element is SVGPathType =>
   element && element.type === 'svg-path';
-export const isImage = (element: CanvasElement): element is ImageType & MoveableElement =>
+export const isImage = (element: CanvasElementWithPointAtoms): element is ImageType =>
   element && element.type === 'image';
-export const isText = (element: CanvasElement): element is TextType & MoveableElement =>
+export const isText = (element: CanvasElementWithPointAtoms): element is TextType =>
   element && element.type === 'text';
-export const isCurve = (element: CanvasElement): element is SVGCurveType & MoveableElement =>
+export const isCurve = (element: CanvasElementWithPointAtoms): element is SVGCurveWithPointAtoms =>
   element && element.type === 'svg-curve';

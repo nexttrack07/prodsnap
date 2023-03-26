@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, useRef, useState } from 'react';
 import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
-import { atom, SetStateAction, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { atom, SetStateAction, useAtomValue, useSetAtom } from 'jotai';
 import { CanvasElement, ImageState, ImageType, MoveableElement } from './store';
 import { getImageDimensions } from '../../utils';
 import { Center, Box, Image, Loader, useMantineTheme } from '@mantine/core';
@@ -99,7 +99,8 @@ export function RenderImage({
         position: 'absolute',
         border: isSelected ? `2px solid ${theme.colors.blue[7]}` : '',
         borderRadius: 3
-      }}>
+      }}
+    >
       {element.state === ImageState.Loading && <Loader></Loader>}
       {element.state === ImageState.Normal && (
         <>
@@ -177,7 +178,8 @@ export function CropImage({ element }: { element: ImageType & MoveableElement })
               }
             }
           : {}
-      }>
+      }
+    >
       <Cropper
         ref={cropperRef}
         style={{ width: element.width, height: element.height }}

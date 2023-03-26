@@ -1,27 +1,27 @@
-import React from 'react'
-import { Text, Space, createStyles, SimpleGrid, Button, DEFAULT_THEME } from "@mantine/core";
-import { atom, useSetAtom } from "jotai";
-import { useQuery } from "@tanstack/react-query";
-import { getShapes } from "../../api";
-import { CanvasElement, addElementAtom, addElementsAtom, MoveableElement, SVGType, SVGCurveType, SVGPointType, Draggable } from "../../components/canvas/store";
+import React from 'react';
+import { Text, Space, createStyles, SimpleGrid } from '@mantine/core';
+import { useSetAtom } from 'jotai';
+import { useQuery } from '@tanstack/react-query';
+import { getShapes } from '../../api';
+import { addElementAtom, CanvasElementWithPointAtoms } from '../../components/canvas/store';
 
 const useStyles = createStyles(() => ({
   shape: {
-    cursor: "pointer",
-    "&:hover": {
+    cursor: 'pointer',
+    '&:hover': {
       opacity: 0.7,
-      transform: "scale(1.1)",
-      transition: "transform 0.3s",
-    },
-  },
+      transform: 'scale(1.1)',
+      transition: 'transform 0.3s'
+    }
+  }
 }));
 
 export function ShapesPanel() {
-  const query = useQuery(["shapes"], getShapes);
+  const query = useQuery(['shapes'], getShapes);
   const addElement = useSetAtom(addElementAtom);
   const { classes } = useStyles();
 
-  const handleAddElement = (newEl: CanvasElement) => {
+  const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
     addElement(newEl);
   };
 

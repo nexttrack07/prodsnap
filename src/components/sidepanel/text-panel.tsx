@@ -9,15 +9,14 @@ import {
   Image
 } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import React from 'react';
 import {
   addElementAtom,
   CanvasElement,
+  CanvasElementWithPointAtoms,
   createAtom,
-  Draggable,
   elementAtomsAtom,
-  ElementType,
   selectedElementAtomsAtom
 } from '../../components/canvas/store';
 import { getSelections } from '@/api/template';
@@ -83,7 +82,7 @@ export function TextPanel() {
   const addGroup = useSetAtom(addGroupAtom);
   const query = useQuery(['selections'], getSelections);
 
-  const handleAddElement = (newEl: CanvasElement) => {
+  const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
     addElement(newEl);
   };
 

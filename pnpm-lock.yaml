@@ -15,6 +15,7 @@ importers:
       '@mantine/notifications': ^5.3.3
       '@supabase/supabase-js': ^2.0.0-rc.10
       '@tanstack/react-query': ^4.28.0
+      '@types/dom-to-image': ^2.6.4
       '@types/file-saver': ^2.0.5
       '@types/react': ^18.0.17
       '@types/react-beautiful-dnd': ^13.1.4
@@ -66,6 +67,7 @@ importers:
       '@mantine/notifications': 5.3.3_kf3fyxgaphdbmkg3vjncjrjyhy
       '@supabase/supabase-js': 2.0.0-rc.10
       '@tanstack/react-query': 4.28.0_biqbaboplfbrettd7655fr4n2y
+      '@types/dom-to-image': 2.6.4
       '@types/react-beautiful-dnd': 13.1.4
       axios: 0.27.2
       clsx: 1.2.1
@@ -1526,6 +1528,10 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       use-sync-external-store: 1.2.0_react@18.2.0
+    dev: false
+
+  /@types/dom-to-image/2.6.4:
+    resolution: {integrity: sha512-UddUdGF1qulrSDulkz3K2Ypq527MR6ixlgAzqLbxSiQ0icx0XDlIV+h4+edmjq/1dqn0KgN0xGSe1kI9t+vGuw==}
     dev: false
 
   /@types/file-saver/2.0.5:
