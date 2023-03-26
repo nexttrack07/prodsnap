@@ -3,8 +3,15 @@ import { addTemplate } from '../api/template';
 import { atom, useAtom, useAtomValue } from 'jotai';
 import React, { useState } from 'react';
 import { Check, CloudUpload, X } from 'tabler-icons-react';
-import { selectedElementAtomsAtom, ElementType, Draggable, elementAtomsAtom } from './canvas/store';
-import { dimensionAtom, positionAtom, elementCompMap } from './canvas';
+import {
+  selectedElementAtomsAtom,
+  ElementType,
+  Draggable,
+  elementAtomsAtom,
+  dimensionAtom,
+  positionAtom
+} from '@/components/canvas/store';
+import { elementCompMap } from '@/components/canvas';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import domToImage from 'dom-to-image-more';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';

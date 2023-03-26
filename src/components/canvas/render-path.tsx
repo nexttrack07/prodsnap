@@ -8,7 +8,6 @@ import {
   Resizable,
   SVGPathType
 } from '@/components/canvas/store';
-import { AnimatePresence, motion } from 'framer-motion';
 import { DragHandler } from './drag-handler';
 import { ResizeHandler } from './resize-handler';
 
@@ -94,43 +93,31 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
   };
 
   return (
-    <AnimatePresence>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-        <DragHandler
-          onClick={handleClick}
-          position={{ x, y }}
-          dimension={{ width, height }}
-          onMove={handleMouseMove}
-        >
-          <svg
-            opacity={element.opacity}
-            {...element.props}
-            viewBox={element.getViewBox(width, height)}
-          >
-            <path {...element.path} d={element.getPath(width, height)} />
-          </svg>
-          <svg
-            opacity={element.opacity}
-            {...element.props}
-            viewBox={element.getViewBox(width, height)}
-          >
-            <clipPath id={element.strokeProps.clipPathId}>
-              <path d={element.getPath(width, height)} />
-            </clipPath>
-            <path
-              d={element.getPath(width, height)}
-              stroke={element.strokeProps.stroke}
-              strokeWidth={element.strokeProps.strokeWidth}
-              strokeLinecap={element.strokeProps.strokeLinecap}
-              strokeDasharray={element.strokeProps.strokeDasharray}
-              clipPath={element.strokeProps.clipPathId}
-              fill="none"
-              vectorEffect="non-scaling-stroke"
-            />
-          </svg>
-          {isSelected && <ResizeHandler dimension={{ width, height }} onResize={handleResize} />}
-        </DragHandler>
-      </motion.div>
-    </AnimatePresence>
+    <DragHandler
+      onClick={handleClick}
+      position={{ x, y }}
+      dimension={{ width, height }}
+      onMove={handleMouseMove}
+    >
+      <svg opacity={element.opacity} {...element.props} viewBox={element.getViewBox(width, height)}>
+        <path {...element.path} d={element.getPath(width, height)} />
+      </svg>
+      <svg opacity={element.opacity} {...element.props} viewBox={element.getViewBox(width, height)}>
+        <clipPath id={element.strokeProps.clipPathId}>
+          <path d={element.getPath(width, height)} />
+        </clipPath>
+        <path
+          d={element.getPath(width, height)}
+          stroke={element.strokeProps.stroke}
+          strokeWidth={element.strokeProps.strokeWidth}
+          strokeLinecap={element.strokeProps.strokeLinecap}
+          strokeDasharray={element.strokeProps.strokeDasharray}
+          clipPath={element.strokeProps.clipPathId}
+          fill="none"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+      {isSelected && <ResizeHandler dimension={{ width, height }} onResize={handleResize} />}
+    </DragHandler>
   );
 }
