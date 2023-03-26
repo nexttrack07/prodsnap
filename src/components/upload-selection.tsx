@@ -72,8 +72,6 @@ export function UploadSelection() {
 
   if (selectedElementAtoms.length === 0) return null;
 
-  console.log('position - selection: ', position);
-
   const handleTemplateUpload = async () => {
     const dataURL = await domToImage.toBlob(document.getElementById('canvas-selection')!);
     const filename = `template-${Date.now()}.png`;

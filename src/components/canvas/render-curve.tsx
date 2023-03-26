@@ -134,8 +134,6 @@ export function RenderCurve({
   // const updatePoints = useSetAtom(updatePointsAtom(element.points));
   const { strokeWidth, stroke } = element;
 
-  console.log('position', position);
-
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();

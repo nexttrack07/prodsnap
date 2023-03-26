@@ -23,10 +23,8 @@ export function TemplatesPanel() {
       try {
         setLoading(true);
         const data = await getTemplates();
-        console.log('data: ', data);
         setData(data);
       } catch (err) {
-        console.log(err);
       } finally {
         setLoading(false);
       }
@@ -36,9 +34,7 @@ export function TemplatesPanel() {
   }, []);
 
   const handleAddTemplate = (newEls: CanvasElement[]) => {
-    // console.log('new els: ', newEls)
     const newElAtoms = newEls.map((el) => createAtom(el));
-    console.log('new atoms: ', newElAtoms);
     setElementAtoms((elAtoms) => [...elAtoms, ...newElAtoms]);
     setSelectedAtoms(newElAtoms);
     addGroup();

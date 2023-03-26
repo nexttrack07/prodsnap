@@ -174,7 +174,6 @@ export function Element({ elementAtom }: { elementAtom: ElementType }) {
   const setActiveElementAtom = useSetAtom(activeElementAtomAtom);
 
   const handleSelectElement = (e: React.MouseEvent) => {
-    console.log('Hello from onSelect');
     e.stopPropagation();
     setSelectedElementAtoms((selectedItems) => {
       setActiveElementAtom(elementAtom);

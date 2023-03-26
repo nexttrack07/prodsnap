@@ -73,10 +73,8 @@ export function ImageToolbar() {
     if (url) {
       setSelectedImage({ state: ImageState.Loading });
       removeBackground({ url })
-        .then((result) => {
-          console.log(result);
-        })
-        .catch(console.log)
+        .then()
+        .catch()
         .finally(() => {
           setSelectedImage({ state: ImageState.Normal });
         });

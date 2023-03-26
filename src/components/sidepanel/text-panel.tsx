@@ -87,9 +87,7 @@ export function TextPanel() {
   };
 
   const handleAddTemplate = (newEls: CanvasElement[]) => {
-    // console.log('new els: ', newEls)
     const newElAtoms = newEls.map((el) => createAtom(el));
-    console.log('new atoms: ', newElAtoms);
     setElementAtoms((elAtoms) => [...elAtoms, ...newElAtoms]);
     setSelectedAtoms(newElAtoms);
     addGroup();

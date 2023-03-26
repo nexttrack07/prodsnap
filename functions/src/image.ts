@@ -8,7 +8,6 @@ admin.initializeApp();
 
 export const removeBackground = functions.https.onCall(async (data) => {
   try {
-    console.log('data image: ', data);
     const formData = new FormData();
     formData.append('size', 'auto');
     formData.append('image_url', data.url);
