@@ -2,10 +2,9 @@ import React from 'react';
 import { ActionIcon, Button, Group, SegmentedControl } from '@mantine/core';
 import {
   activeElementAtomAtom,
-  CanvasElement,
+  CanvasElementWithPointAtoms,
   ImageState,
-  ImageType,
-  MoveableElement
+  ImageType
 } from '@/components/canvas/store';
 import { httpsCallable } from 'firebase/functions';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
@@ -24,7 +23,7 @@ const selectedImageAtom = atom(
     }
     return null;
   },
-  (get, set, update: Partial<MoveableElement & ImageType>) => {
+  (get, set, update: Partial<ImageType>) => {
     const activeElementAtom = get(activeElementAtomAtom);
     if (activeElementAtom) {
       set(activeElementAtom, (el) =>
@@ -32,7 +31,7 @@ const selectedImageAtom = atom(
           ? ({
               ...el,
               ...update
-            } as CanvasElement)
+            } as CanvasElementWithPointAtoms)
           : el
       );
     }

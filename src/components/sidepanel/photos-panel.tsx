@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, Space, createStyles, SimpleGrid, Image } from '@mantine/core';
 import { useSetAtom } from 'jotai';
 import {
-  CanvasElement,
+  CanvasElementWithPointAtoms,
   MoveableElement,
   ImageType,
   ImageState,
@@ -54,7 +54,7 @@ export function PhotosPanel() {
   const addElement = useSetAtom(addElementAtom);
   const { classes } = useStyles();
 
-  const handleAddElement = (newEl: CanvasElement) => {
+  const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
     addElement(newEl);
   };
 

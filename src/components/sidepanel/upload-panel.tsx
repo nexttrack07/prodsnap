@@ -1,32 +1,25 @@
-import React, { useEffect, useState } from "react";
-import {
-  FileButton,
-  createStyles,
-  Button,
-  Space,
-  SimpleGrid,
-  Image,
-} from "@mantine/core";
-import { useSetAtom } from "jotai";
-import { addElementAtom, CanvasElement, defaultImage } from "../canvas/store";
-import { firestore, storage } from "../../utils/firebase";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { addDoc, collection, getDocs } from "firebase/firestore";
-import { showNotification, updateNotification } from "@mantine/notifications";
-import { Check, X } from "tabler-icons-react";
+import React, { useEffect, useState } from 'react';
+import { FileButton, createStyles, Button, Space, SimpleGrid, Image } from '@mantine/core';
+import { useSetAtom } from 'jotai';
+import { addElementAtom, CanvasElementWithPointAtoms, defaultImage } from '../canvas/store';
+import { firestore, storage } from '../../utils/firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { addDoc, collection, getDocs } from 'firebase/firestore';
+import { showNotification, updateNotification } from '@mantine/notifications';
+import { Check, X } from 'tabler-icons-react';
 
 const useStyles = createStyles((theme) => ({
   shape: {
-    cursor: "pointer",
+    cursor: 'pointer',
     // border: `1px solid ${theme.colors.gray[2]}`,
     // boxShadow: "0 0 1px rgba(0,0,0,0.3)",
     // padding: 1,
-    "&:hover": {
+    '&:hover': {
       opacity: 0.7,
-      transform: "scale(1.1)",
-      transition: "transform 0.3s",
-    },
-  },
+      transform: 'scale(1.1)',
+      transition: 'transform 0.3s'
+    }
+  }
 }));
 
 type ImageFile = {
@@ -41,7 +34,7 @@ export function UploadPanel() {
   const [images, setImages] = useState<ImageFile[]>([]);
 
   useEffect(() => {
-    const docRef = collection(firestore, "images");
+    const docRef = collection(firestore, 'images');
 
     getDocs(docRef).then((snap) => {
       let newImages: ImageFile[] = [];
@@ -52,27 +45,27 @@ export function UploadPanel() {
     });
   }, []);
 
-  const handleAddElement = (newEl: CanvasElement) => {
+  const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
     addElement(newEl);
   };
 
   const handleUploadImage = (file: File) => {
     const storageRef = ref(storage, `images/${file.name}`);
-    const collectionRef = collection(firestore, "images");
+    const collectionRef = collection(firestore, 'images');
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
-      "state_changed",
+      'state_changed',
       () => {
         // const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         // setProgress(progress);
         showNotification({
-          id: "upload-photo",
+          id: 'upload-photo',
           loading: true,
-          title: "Uploading your photo",
-          message: "Your photo is being uploaded...",
+          title: 'Uploading your photo',
+          message: 'Your photo is being uploaded...',
           autoClose: false,
-          disallowClose: true,
+          disallowClose: true
         });
       },
       (err) => {
@@ -80,12 +73,12 @@ export function UploadPanel() {
         console.error(err);
         setError(err);
         updateNotification({
-          id: "upload-photo",
-          color: "red",
-          title: "Upload failed!",
+          id: 'upload-photo',
+          color: 'red',
+          title: 'Upload failed!',
           message: error!.message,
           icon: <X size={16} />,
-          autoClose: 2000,
+          autoClose: 2000
         });
       },
       () => {
@@ -95,12 +88,12 @@ export function UploadPanel() {
           await addDoc(collectionRef, { filename: file.name, url });
         });
         updateNotification({
-          id: "upload-photo",
-          color: "teal",
-          title: "Photo Uploaded Successfully",
-          message: "Your photo has been uploaded successfully",
+          id: 'upload-photo',
+          color: 'teal',
+          title: 'Photo Uploaded Successfully',
+          message: 'Your photo has been uploaded successfully',
           icon: <Check size={16} />,
-          autoClose: 2000,
+          autoClose: 2000
         });
       }
     );
@@ -119,21 +112,21 @@ export function UploadPanel() {
       <SimpleGrid cols={3}>
         {images.length > 0
           ? images.map((image) => (
-            <Image
-              key={image.url}
-              radius="md"
-              className={classes.shape}
-              src={image.url}
-              onClick={() => {
-                const el: CanvasElement = {
-                  ...defaultImage,
-                  url: image.url,
-                };
+              <Image
+                key={image.url}
+                radius="md"
+                className={classes.shape}
+                src={image.url}
+                onClick={() => {
+                  const el: CanvasElementWithPointAtoms = {
+                    ...defaultImage,
+                    url: image.url
+                  };
 
-                handleAddElement(el);
-              }}
-            />
-          ))
+                  handleAddElement(el);
+                }}
+              />
+            ))
           : null}
       </SimpleGrid>
     </>
