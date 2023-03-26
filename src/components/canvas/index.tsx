@@ -30,19 +30,46 @@ const unSelectAllAtom = atom(null, (_get, set) => {
 export const positionAtom = atom(
   (get) => {
     const selected = get(selectedItemsAtom);
-    const x = selected.elements.reduce((prev, el) => Math.min(prev, el.x), Infinity);
-    const y = selected.elements.reduce((prev, el) => Math.min(prev, el.y), Infinity);
+    const x = selected.elements.reduce((prev, el) => {
+      let x = el.x;
+      if (el.type === 'svg-curve') {
+        x = el.points.reduce((prev, point) => Math.min(prev, get(point).x), Infinity);
+      }
+      return Math.min(prev, x);
+    }, Infinity);
+    const y = selected.elements.reduce((prev, el) => {
+      let y = el.y;
+      if (el.type === 'svg-curve') {
+        y = el.points.reduce((prev, point) => Math.min(prev, get(point).y), Infinity);
+      }
+      return Math.min(prev, y);
+    }, Infinity);
 
     return { x, y };
   },
   (get, set, update: { x: number; y: number }) => {
     const selected = get(selectedItemsAtom);
     selected.atoms.forEach((elementAtom) => {
-      set(elementAtom, (el) => ({
-        ...el,
-        x: update.x + el.x,
-        y: update.y + el.y
-      }));
+      set(elementAtom, (el) => {
+        if (el.type === 'svg-curve') {
+          el.points.forEach((pointAtom) => {
+            set(pointAtom, (point) => {
+              return {
+                ...point,
+                x: update.x + point.x,
+                y: update.y + point.y
+              };
+            });
+          });
+
+          return el;
+        }
+        return {
+          ...el,
+          x: update.x + el.x,
+          y: update.y + el.y
+        };
+      });
     });
   }
 );
@@ -51,8 +78,21 @@ export const dimensionAtom = atom(
   (get) => {
     const selected = get(selectedItemsAtom);
     const { x, y } = get(positionAtom);
-    const width = selected.elements.reduce((prev, el) => Math.max(prev, el.x + el.width - x), 0);
-    const height = selected.elements.reduce((prev, el) => Math.max(prev, el.y + el.height - y), 0);
+    const width = selected.elements.reduce((prev, el) => {
+      let pX = el.x + el.width - x;
+      if (el.type === 'svg-curve') {
+        pX = el.points.reduce((prev, point) => Math.max(prev, get(point).x - x), 0);
+      }
+      return Math.max(prev, pX);
+    }, 0);
+    // const height = selected.elements.reduce((prev, el) => Math.max(prev, el.y + el.height - y), 0);
+    const height = selected.elements.reduce((prev, el) => {
+      let pY = el.y + el.height - y;
+      if (el.type === 'svg-curve') {
+        pY = el.points.reduce((prev, point) => Math.max(prev, get(point).y - y), 0);
+      }
+      return Math.max(prev, pY);
+    }, 0);
 
     return { width, height };
   },

@@ -1,10 +1,18 @@
-import React, { useRef, useState } from "react";
-import { useMantineTheme } from "@mantine/core";
-import { useAtom } from "jotai";
-import { SVGPointAtom } from "./store";
+import React, { useRef, useState } from 'react';
+import { useMantineTheme } from '@mantine/core';
+import { useAtom } from 'jotai';
+import { SVGPointAtom } from './store';
 import useEventListener from '../../utils/use-event';
 
-export function RenderPoint({ pointAtom, width }: { pointAtom: SVGPointAtom; width: number }) {
+export function RenderPoint({
+  pointAtom,
+  width,
+  position
+}: {
+  pointAtom: SVGPointAtom;
+  width: number;
+  position: { x: number; y: number };
+}) {
   const [point, setPoint] = useAtom(pointAtom);
   const documentRef = useRef<Document>(document);
   const [isMoving, setIsMoving] = useState(false);
@@ -30,13 +38,15 @@ export function RenderPoint({ pointAtom, width }: { pointAtom: SVGPointAtom; wid
   useEventListener('pointerup', handleMouseUp, documentRef);
   useEventListener('pointermove', handleMouseMove, documentRef, [isMoving]);
 
+  console.log('position: ', position);
+
   return (
     <div
       onMouseDown={handleMouseDown}
       style={{
         position: 'absolute',
-        left: point.x,
-        top: point.y,
+        left: point.x - position.x,
+        top: point.y - position.y,
         transform: `translate(-${4}px,-${4 + width / 2}px)`,
         width: 12,
         height: 12,
@@ -47,6 +57,7 @@ export function RenderPoint({ pointAtom, width }: { pointAtom: SVGPointAtom; wid
         borderWidth: 1,
         boxShadow: theme.shadows.sm,
         cursor: isMoving ? 'grabbing' : 'grab'
-      }}></div>
+      }}
+    ></div>
   );
 }

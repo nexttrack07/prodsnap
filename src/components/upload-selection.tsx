@@ -9,6 +9,7 @@ import { showNotification, updateNotification } from '@mantine/notifications';
 import domToImage from 'dom-to-image-more';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { storage } from '@/utils/firebase';
+import { RenderCurve } from './canvas/render-curve';
 
 function serialize(obj: any): string {
   return JSON.stringify(obj, (key, value) => {
@@ -70,6 +71,8 @@ export function UploadSelection() {
   const [type, setType] = useState<'curves' | 'shapes' | 'text'>('curves');
 
   if (selectedElementAtoms.length === 0) return null;
+
+  console.log('position - selection: ', position);
 
   const handleTemplateUpload = async () => {
     const dataURL = await domToImage.toBlob(document.getElementById('canvas-selection'));
@@ -202,6 +205,20 @@ export function RenderElement({
 }) {
   const [element, setElement] = useAtom(elementAtom);
   const ElementComponent = elementCompMap[element.type];
+
+  console.log('position - render element: ', canvasPosition);
+
+  if (element.type === 'svg-curve') {
+    return (
+      <RenderCurve
+        isSelected={false}
+        element={element}
+        setElement={setElement}
+        onSelect={() => {}}
+        position={canvasPosition}
+      />
+    );
+  }
 
   return (
     <ElementComponent

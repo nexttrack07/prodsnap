@@ -57,9 +57,10 @@ type SVGCanvasElement = MoveableElement & SVGCurveType;
 
 type Props = {
   element: SVGCanvasElement;
-  setElement: (update: SetStateAction<CanvasElement>) => void;
   isSelected: boolean;
+  position?: { x: number; y: number };
   onSelect: (e: React.MouseEvent) => void;
+  setElement: (update: SetStateAction<CanvasElement>) => void;
 };
 
 const getPointsAtom = atomFamily((atoms: SVGPointAtom[]) =>
@@ -115,13 +116,20 @@ const useStyles = createStyles((theme) => ({
   }
 }));
 
-export function RenderCurve({ element, setElement, onSelect, isSelected }: Props) {
+export function RenderCurve({
+  element,
+  setElement,
+  onSelect,
+  isSelected,
+  position = { x: 0, y: 0 }
+}: Props) {
   const points = useAtomValue(getPointsAtom(element.points));
-  console.log('points', element.points, typeof element.points);
   const { classes } = useStyles();
   const [moving, setMoving] = useState(false);
   const lastPos = useRef({ x: 0, y: 0 });
   // const updatePoints = useSetAtom(updatePointsAtom(element.points));
+
+  console.log('position', position);
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
@@ -186,7 +194,10 @@ export function RenderCurve({ element, setElement, onSelect, isSelected }: Props
             <path
               onMouseDown={handleMouseDown}
               className={classes.path}
-              d={getPathFromPoints(points, element.isQuadratic)}
+              d={getPathFromPoints(
+                points.map((p) => ({ ...p, x: p.x - position.x, y: p.y - position.y })),
+                element.isQuadratic
+              )}
               strokeWidth="32"
               fill="none"
               opacity={0}
@@ -200,7 +211,10 @@ export function RenderCurve({ element, setElement, onSelect, isSelected }: Props
               fill="none"
               strokeLinecap="butt"
               pointerEvents="auto"
-              d={getPathFromPoints(points, element.isQuadratic)}
+              d={getPathFromPoints(
+                points.map((p) => ({ ...p, x: p.x - position.x, y: p.y - position.y })),
+                element.isQuadratic
+              )}
               strokeWidth={element.strokeWidth}
               stroke={element.stroke}
               strokeDasharray={element.strokeDasharray}
@@ -227,7 +241,12 @@ export function RenderCurve({ element, setElement, onSelect, isSelected }: Props
       </svg>
       {isSelected &&
         element.points.map((pointAtom) => (
-          <RenderPoint key={`${pointAtom}`} width={element.strokeWidth} pointAtom={pointAtom} />
+          <RenderPoint
+            position={position}
+            key={`${pointAtom}`}
+            width={element.strokeWidth}
+            pointAtom={pointAtom}
+          />
         ))}
     </>
   );
