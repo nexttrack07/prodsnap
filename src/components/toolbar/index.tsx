@@ -5,7 +5,6 @@ import {
   elementAtomsAtom,
   selectedElementAtomsAtom,
   groupsByIdAtom,
-  canvasAtom,
   isPath,
   activeElementAtomAtom,
   isCurve,
@@ -31,19 +30,6 @@ import {
 } from 'tabler-icons-react';
 import { SvgCurveToolbar } from './svg-curve-toolbar';
 import { sidepanelAtom } from '../sidepanel';
-
-const getTypeAtom = atom((get) => {
-  const { isSelected } = get(canvasAtom);
-  if (isSelected) return 'canvas';
-  const selectedElementAtoms = get(selectedElementAtomsAtom);
-  const typesArr = selectedElementAtoms.map((a) => get(a).type);
-  const typesSet = new Set(typesArr);
-  if (typesSet.size === 1) {
-    return typesArr[0];
-  }
-
-  return 'mixed';
-});
 
 const deleteSelectedAtom = atom(null, (get, set) => {
   const selectedElementAtoms = get(selectedElementAtomsAtom);
@@ -189,14 +175,13 @@ const alignElementsAtom = atom(
 );
 
 export function Toolbar() {
-  const type = useAtomValue(getTypeAtom);
   const deletedSelectedElements = useSetAtom(deleteSelectedAtom);
   const selectedElements = useAtomValue(selectedElementAtomsAtom);
   const addGroup = useSetAtom(addGroupAtom);
   const removeGroup = useSetAtom(removeGroupAtom);
   const isGrouped = useAtomValue(isGroupedAtom);
   const copySelected = useSetAtom(copySelectedAtom);
-  const [activeElement, setActiveElement] = useAtom(activeElementAtom);
+  // const [activeElement, setActiveElement] = useAtom(activeElementAtom);
   const alignElements = useSetAtom(alignElementsAtom);
   const [position, setPosition] = useAtom(sidepanelAtom);
 
@@ -247,25 +232,20 @@ export function Toolbar() {
         justifyContent: 'space-between'
       }}
     >
-      {activeElement && isPath(activeElement) && (
-        <SvgPathToolbar element={activeElement} setElement={setActiveElement} />
-      )}
-      {activeElement && isCurve(activeElement) && (
+      <SvgPathToolbar />
+      {/* {activeElement && isCurve(activeElement) && (
         <SvgCurveToolbar element={activeElement} setElement={setActiveElement} />
       )}
       {activeElement && isText(activeElement) && (
         <TextToolbar element={activeElement} setElement={setActiveElement} />
       )}
       {activeElement && isImage(activeElement) && <ImageToolbar />}
-      {!activeElement && <CanvasToolbar />}
+      {!activeElement && <CanvasToolbar />} */}
       <div style={{ flex: 1 }} />
       <Group spacing="xs">
         {selectedElements.length > 1 && (
           <Menu closeOnItemClick={false}>
             <Menu.Target>
-              {/* <ActionIcon size={36} variant="default">
-                <LayoutDashboard />
-              </ActionIcon> */}
               <Button leftIcon={<LayoutDashboard size={18} />} variant="default" size="xs">
                 Alignment
               </Button>
@@ -303,27 +283,6 @@ export function Toolbar() {
             </Menu.Dropdown>
           </Menu>
         )}
-        {/* {!isGrouped && selectedElements.length > 1 ? (
-          <ActionIcon
-            onClick={handleGroupElements}
-            variant="outline"
-            color="dark"
-            style={{ borderRadius: 4, borderColor: '#ccc' }}
-            size={36}
-          >
-            <FaRegObjectUngroup />
-          </ActionIcon>
-        ) : selectedElements.length > 1 ? (
-          <ActionIcon
-            onClick={handleUngroupElements}
-            variant="default"
-            color="dark"
-            style={{ borderRadius: 4, borderColor: '#ccc' }}
-            size={36}
-          >
-            <FaRegObjectUngroup />
-          </ActionIcon>
-        ) : null} */}
         {!isGrouped && selectedElements.length > 1 ? (
           <Button onClick={handleGroupElements} variant="default" size="xs">
             Group
@@ -333,14 +292,6 @@ export function Toolbar() {
             Ungroup
           </Button>
         ) : null}
-        {/* <ActionIcon
-          size={36}
-          variant="default"
-          onClick={handleCopyClick}
-          disabled={selectedElements.length === 0}
-        >
-          <Copy />
-        </ActionIcon> */}
         <Button leftIcon={<Copy size={18} />} onClick={handleCopyClick} size="xs" variant="default">
           Copy
         </Button>

@@ -10,15 +10,38 @@ import {
   SegmentedControl,
   Box
 } from '@mantine/core';
-import { MoveableElement, SVGPathType } from '@/components/canvas/store';
+import {
+  activeElementAtomAtom,
+  CanvasElementWithPointAtoms,
+  MoveableElement,
+  SVGPathType
+} from '@/components/canvas/store';
 import { BorderAll, BorderNone, BorderRadius, BorderStyle2 } from 'tabler-icons-react';
+import { atom, useAtom } from 'jotai';
 
-type Props = {
-  element: MoveableElement & SVGPathType;
-  setElement: (element: MoveableElement & SVGPathType) => void;
-};
+const activeElementAtom = atom(
+  (get) => {
+    const activeElementAtom = get(activeElementAtomAtom);
+    if (activeElementAtom) {
+      return get(activeElementAtom);
+    }
+    return null;
+  },
+  (get, set, element: CanvasElementWithPointAtoms) => {
+    const activeElementAtom = get(activeElementAtomAtom);
+    if (activeElementAtom) {
+      set(activeElementAtom, element);
+    }
+  }
+);
 
-export function SvgPathToolbar({ element, setElement }: Props) {
+export function SvgPathToolbar() {
+  const [element, setElement] = useAtom(activeElementAtom);
+
+  if (!element || element.type !== 'svg-path') {
+    return null;
+  }
+
   return (
     <Group>
       <Popover>
