@@ -80,8 +80,6 @@ export function Element({ elementAtom }: { elementAtom: ElementType }) {
   const isShiftPressed = useShiftKeyPressed();
   const setActiveElementAtom = useSetAtom(activeElementAtomAtom);
 
-  console.log('hello');
-
   const handleSelectElement = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedElementAtoms((selectedItems) => {
