@@ -40,10 +40,8 @@ export function RenderImage({
       const { width, height } = await getImageDimensions(src);
       setElement((el) => ({
         ...el,
-        meta: {
-          ...el.meta,
-          dimensions: { width, height }
-        },
+        width,
+        height,
         attrs: { ...el.attrs, state: ImageState.Normal }
       }));
     }
@@ -52,8 +50,7 @@ export function RenderImage({
     }
   }, [element.type]);
 
-  const { left, top } = element.meta.position;
-  const { width, height } = element.meta.dimension;
+  const { left, top, width, height } = element;
 
   const handleClick = (e: React.MouseEvent) => {
     onSelect(e);
@@ -62,36 +59,24 @@ export function RenderImage({
   const handleMouseMove = useCallback((p: Draggable) => {
     setElement((prev) => ({
       ...prev,
-      meta: {
-        ...prev.meta,
-        position: {
-          left: p.x + prev.meta.position.left,
-          top: p.y + prev.meta.position.top
-        }
-      }
+      left: p.x + prev.left,
+      top: p.y + prev.top
     }));
   }, []);
 
   const handleResize = ({ x, y, width, height }: Draggable & Resizable) => {
     setElement((prev) => {
-      let newX = prev.meta.position.left + x;
-      let newY = prev.meta.position.top + y;
-      let newWidth = prev.meta.dimension.width + width;
-      let newHeight = prev.meta.dimension.height + height;
+      let newX = prev.left + x;
+      let newY = prev.top + y;
+      let newWidth = prev.width + width;
+      let newHeight = prev.height + height;
 
       return {
         ...prev,
-        meta: {
-          ...prev.meta,
-          position: {
-            left: newX,
-            top: newY
-          },
-          dimension: {
-            width: newWidth,
-            height: newHeight
-          }
-        }
+        left: newX,
+        top: newY,
+        width: newWidth,
+        height: newHeight
       };
     });
   };
@@ -158,7 +143,7 @@ export function CropImage({ element }: { element: IImage }) {
     >
       <Cropper
         ref={cropperRef}
-        style={{ width: element.meta.dimension.width, height: element.meta.dimension.height }}
+        style={{ width: element.width, height: element.height }}
         src={element.attrs.url}
         crop={handleCrop}
       />

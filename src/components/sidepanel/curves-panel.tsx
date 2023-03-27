@@ -1,7 +1,8 @@
 import { Text, Space, createStyles, SimpleGrid } from '@mantine/core';
 import React from 'react';
 import { atom, useSetAtom } from 'jotai';
-import { addElementAtom, MoveableElement, SVGCurveType } from '../../components/canvas/store';
+import { addElementAtom } from '../../components/canvas/element.store';
+import { CanvasItemType, ICurve } from '../canvas/types';
 
 const useStyles = createStyles(() => ({
   shape: {
@@ -14,36 +15,34 @@ const useStyles = createStyles(() => ({
   }
 }));
 
-type PointCurveType = MoveableElement & SVGCurveType;
-
-const data: { id: number; prev: string; data: PointCurveType }[] = [
+const data: { id: number; prev: string; data: ICurve }[] = [
   {
     id: 0,
     prev: 'M 0 0 L 50 0',
     data: {
-      type: 'svg-curve',
-      x: 200,
-      y: 200,
+      type: 'curve',
+      left: 200,
+      top: 200,
       width: 100,
       height: 3,
-      strokeWidth: 2,
-      stroke: 'black',
-      startMarker: 'none',
-      endMarker: 'none',
-      // TODO: DONT USE THIS - create atoms inside the component
+      attrs: {
+        path: {
+          strokeWidth: 2,
+          stroke: 'black'
+        },
+        startMarker: 'none',
+        endMarker: 'none'
+      },
       points: [
         {
-          type: 'svg-point',
           x: 100,
           y: 100
         },
         {
-          type: 'svg-point',
           x: 200,
           y: 200
         },
         {
-          type: 'svg-point',
           x: 500,
           y: 100
         }
@@ -54,34 +53,33 @@ const data: { id: number; prev: string; data: PointCurveType }[] = [
     id: 1,
     prev: 'M 0 0 L 50 0',
     data: {
-      type: 'svg-curve',
-      x: 200,
-      y: 200,
+      type: 'curve',
+      left: 200,
+      top: 200,
       width: 100,
       height: 3,
-      strokeWidth: 2,
-      stroke: 'black',
-      startMarker: 'none',
-      endMarker: 'none',
-      // TODO: DONT USE THIS - create atoms inside the component
+      attrs: {
+        path: {
+          strokeWidth: 2,
+          stroke: 'black'
+        },
+        startMarker: 'none',
+        endMarker: 'none'
+      },
       points: [
         {
-          type: 'svg-point',
           x: 100,
           y: 100
         },
         {
-          type: 'svg-point',
           x: 400,
           y: 400
         },
         {
-          type: 'svg-point',
           x: 200,
           y: 200
         },
         {
-          type: 'svg-point',
           x: 500,
           y: 100
         }
@@ -101,7 +99,7 @@ export function CurvesPanel() {
   const addElement = useSetAtom(addElementAtom);
   const { classes } = useStyles();
 
-  const handleAddElement = (newEl: PointCurveType) => {
+  const handleAddElement = (newEl: ICurve) => {
     addElement({ ...newEl, points: newEl.points.map((p) => atom(p)) });
   };
 

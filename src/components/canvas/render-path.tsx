@@ -25,8 +25,7 @@ function getSnap(num: number, d = 0, max = 1000) {
 }
 
 export function RenderPath({ element, onSelect, setElement, isSelected }: Props) {
-  const { left, top } = element.meta.position;
-  const { width, height } = element.meta.dimension;
+  const { left, top, width, height } = element;
 
   const canvasProps = useAtomValue(canvasAtom);
 
@@ -35,21 +34,8 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
       setElement((prev) => {
         return {
           ...prev,
-          meta: {
-            ...prev.meta,
-            position: {
-              left: getSnap(
-                p.x + prev.meta.position.left,
-                prev.meta.dimension.width,
-                canvasProps.width
-              ),
-              top: getSnap(
-                p.y + prev.meta.position.top,
-                prev.meta.dimension.height,
-                canvasProps.height
-              )
-            }
-          }
+          left: getSnap(p.x + prev.left, prev.width, canvasProps.width),
+          top: getSnap(p.y + prev.top, prev.height, canvasProps.height)
         };
       });
     },
@@ -61,10 +47,10 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
 
   const handleResize = ({ x, y, width, height }: Draggable & Resizable) => {
     setElement((prev) => {
-      let newX = prev.meta.position.left + x;
-      let newY = prev.meta.position.top + y;
-      let newWidth = prev.meta.dimension.width + width;
-      let newHeight = prev.meta.dimension.height + height;
+      let newX = prev.left + x;
+      let newY = prev.top + y;
+      let newWidth = prev.width + width;
+      let newHeight = prev.height + height;
 
       if (newX > -SNAP_TOLERANCE && newX < SNAP_TOLERANCE) {
         newX = 0;
@@ -90,17 +76,10 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
 
       return {
         ...prev,
-        meta: {
-          ...prev.meta,
-          position: {
-            left: newX,
-            top: newY
-          },
-          dimension: {
-            width: newWidth,
-            height: newHeight
-          }
-        }
+        left: newX,
+        top: newY,
+        width: newWidth,
+        height: newHeight
       };
     });
   };

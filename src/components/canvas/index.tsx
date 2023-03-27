@@ -54,13 +54,13 @@ export function Canvas() {
     >
       <MultipleSelect />
       {elements.map((el) => (
-        <Element key={el.atom.toString()} item={el} />
+        <Element key={el.toString()} item={el} />
       ))}
     </Box>
   );
 }
 
-export const elementCompMap: Record<CanvasElementType['type'], React.FC<any>> = {
+export const elementCompMap: Record<CanvasItemType['type'], React.FC<any>> = {
   path: RenderPath,
   curve: RenderCurve,
   text: RenderText,
@@ -68,8 +68,8 @@ export const elementCompMap: Record<CanvasElementType['type'], React.FC<any>> = 
 };
 
 export function Element({ item }: { item: CanvasElementType }) {
-  const element = useAtomValue<CanvasItemType>(item.atom);
-  const setElement = useSetAtom<CanvasItemType, SetStateAction<CanvasItemType>, void>(item.atom);
+  const element = useAtomValue(item);
+  const setElement = useSetAtom(item);
   const [selectedElementAtoms, setSelectedElementAtoms] = useAtom(selectedElementsAtom);
   // const atomGroup = useAtomValue(groupFromElementAtom(element));
   const isShiftPressed = useShiftKeyPressed();

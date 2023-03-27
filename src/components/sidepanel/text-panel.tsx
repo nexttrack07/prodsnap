@@ -15,7 +15,7 @@ import React from 'react';
 import { getSelections } from '@/api/template';
 import { addGroupAtom } from '../toolbar';
 import { deserialize } from '@/utils';
-import { IText } from '../canvas/types';
+import { CanvasItemType, IText } from '../canvas/types';
 import { addElementAtom, elementsAtom, selectedElementsAtom } from '../canvas/element.store';
 
 const elementData: {
@@ -34,16 +34,10 @@ const elementData: {
         },
         content: 'Heading'
       },
-      meta: {
-        position: {
-          left: 200,
-          top: 100
-        },
-        dimension: {
-          width: 300,
-          height: 50
-        }
-      }
+      left: 200,
+      top: 100,
+      width: 300,
+      height: 50
     }
   },
   {
@@ -58,16 +52,10 @@ const elementData: {
         },
         content: 'Subheading'
       },
-      meta: {
-        position: {
-          left: 200,
-          top: 100
-        },
-        dimension: {
-          width: 300,
-          height: 50
-        }
-      }
+      left: 200,
+      top: 100,
+      width: 300,
+      height: 50
     }
   },
   {
@@ -82,16 +70,10 @@ const elementData: {
         },
         content: 'A little bit of text'
       },
-      meta: {
-        position: {
-          left: 200,
-          top: 100
-        },
-        dimension: {
-          width: 300,
-          height: 50
-        }
-      }
+      left: 200,
+      top: 100,
+      width: 300,
+      height: 50
     }
   }
 ];
@@ -106,8 +88,8 @@ export function TextPanel() {
   // const addGroup = useSetAtom(addGroupAtom);
   // const query = useQuery(['selections'], getSelections);
 
-  const handleAddElement = (newEl: IText) => {
-    addElement({ type: 'text', atom: atom(newEl) });
+  const handleAddElement = (newEl: CanvasItemType) => {
+    addElement(newEl);
   };
 
   // const handleAddTemplate = (newEls: CanvasElement[]) => {

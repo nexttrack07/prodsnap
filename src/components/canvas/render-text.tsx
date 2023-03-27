@@ -69,31 +69,22 @@ export function RenderText({
 
       if (status === 'move') {
         // const deltaX = e.clientX - lastPos.current.x + element.x;
-        const deltaX = e.clientX - lastPos.current.x + element.meta.position.left;
-        const deltaY = e.clientY - lastPos.current.y + element.meta.position.top;
+        const deltaX = e.clientX - lastPos.current.x + element.left;
+        const deltaY = e.clientY - lastPos.current.y + element.top;
         // const deltaY = e.clientY - lastPos.current.y + element.y;
         setElement((el) => ({
           ...el,
-          meta: {
-            ...el.meta,
-            position: {
-              left: deltaX,
-              top: deltaY
-            }
-          }
+          left: deltaX,
+          top: deltaY
         }));
       } else if (status === 'resizing-br') {
         // const newWidth = e.clientX - lastPos.current.x + element.width;
-        const newWidth = e.clientX - lastPos.current.x + element.meta.dimension.width;
-        const newFontSize =
-          (newWidth / element.meta.dimension.width) * (element.attrs.style.fontSize as number);
+        const newWidth = e.clientX - lastPos.current.x + element.width;
+        const newFontSize = (newWidth / element.width) * (element.attrs.style.fontSize as number);
         // calculate new height based on new width
-        const newHeight = (newWidth / element.meta.dimension.width) * element.meta.dimension.height;
+        const newHeight = (newWidth / element.width) * element.height;
         setElement((el) => ({
           ...el,
-          // width: newWidth,
-          // height: newHeight,
-          // props: { ...el.props, fontSize: newFontSize }
           attrs: {
             ...el.attrs,
             style: {
@@ -101,14 +92,8 @@ export function RenderText({
               fontSize: newFontSize
             }
           },
-          meta: {
-            ...el.meta,
-            dimension: {
-              ...el.meta.dimension,
-              width: newWidth,
-              height: newHeight
-            }
-          }
+          width: newWidth,
+          height: newHeight
         }));
       }
     }
@@ -169,8 +154,8 @@ export function RenderText({
     <Center
       ref={ref}
       style={{
-        left: element.meta.position.left,
-        top: element.meta.position.top,
+        left: element.left,
+        top: element.top,
         userSelect: 'none',
         position: 'absolute',
         whiteSpace: 'pre-wrap',

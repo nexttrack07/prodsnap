@@ -7,16 +7,10 @@ const SHAPES: { id: number; data: IPath }[] = [
     id: 0,
     data: {
       type: 'path' as const,
-      meta: {
-        position: {
-          left: 0,
-          top: 0
-        },
-        dimension: {
-          width: 100,
-          height: 100
-        }
-      },
+      left: 0,
+      top: 0,
+      width: 100,
+      height: 100,
       attrs: {
         svgElement: {
           width: '100%',

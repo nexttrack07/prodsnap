@@ -3,6 +3,7 @@ import { atom, SetStateAction, useSetAtom, useAtomValue } from 'jotai';
 import { atomFamily } from 'jotai/utils';
 import React, { useCallback, useRef, useState, useEffect } from 'react';
 import {
+  Atom,
   CanvasElement,
   CanvasElementWithPointAtoms,
   MoveableElement,
@@ -10,6 +11,7 @@ import {
   SVGPointAtom
 } from './store';
 import { RenderPoint } from './render-point';
+import { IAtomCurve } from './types';
 
 const START_MARKERS = {
   none: null,
@@ -60,14 +62,14 @@ const END_MARKERS = {
 } as const;
 
 type Props = {
-  element: SVGCurveWithPointAtoms;
+  element: IAtomCurve;
   isSelected: boolean;
   position?: { x: number; y: number };
   onSelect: (e: React.MouseEvent) => void;
-  setElement: (update: SetStateAction<CanvasElementWithPointAtoms>) => void;
+  setElement: (update: SetStateAction<IAtomCurve>) => void;
 };
 
-const getPointsAtom = atomFamily((atoms: SVGPointAtom[]) =>
+const getPointsAtom = atomFamily((atoms: Atom<{ x: number; y: number }>[]) =>
   atom((get) => {
     return atoms.map((atom) => get(atom));
   })
@@ -132,7 +134,7 @@ export function RenderCurve({
   const [moving, setMoving] = useState(false);
   const lastPos = useRef({ x: 0, y: 0 });
   // const updatePoints = useSetAtom(updatePointsAtom(element.points));
-  const { strokeWidth, stroke } = element;
+  const { strokeWidth, stroke, strokeDasharray } = element.attrs.path;
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
@@ -177,7 +179,7 @@ export function RenderCurve({
       document.removeEventListener('mousemove', handleMouseMove);
     };
   }, [moving]);
-  const markerSize = Math.max(4, strokeWidth ?? 0 * 2);
+  const markerSize = Math.max(4, Number(strokeWidth) ?? 0 * 2);
   const refX = markerSize * 0.8;
   const pathD = `M0,0 L${markerSize},${markerSize / 2} L0,${markerSize}`;
   return (
@@ -200,11 +202,11 @@ export function RenderCurve({
             viewBox="0 0 10 10"
             refX="5"
             refY="5"
-            markerWidth={element.strokeWidth}
-            markerHeight={element.strokeWidth}
+            markerWidth={strokeWidth}
+            markerHeight={strokeWidth}
             orient="auto-start-reverse"
           >
-            {START_MARKERS[element.startMarker]}
+            {START_MARKERS[element.attrs.startMarker]}
           </marker>
           <marker
             id="circle-marker"
@@ -233,7 +235,7 @@ export function RenderCurve({
               className={classes.path}
               d={getPathFromPoints(
                 points.map((p) => ({ ...p, x: p.x - position.x, y: p.y - position.y })),
-                element.isQuadratic
+                element.attrs.isQuadratic
               )}
               strokeWidth="32"
               fill="none"
@@ -250,11 +252,11 @@ export function RenderCurve({
               pointerEvents="auto"
               d={getPathFromPoints(
                 points.map((p) => ({ ...p, x: p.x - position.x, y: p.y - position.y })),
-                element.isQuadratic
+                element.attrs.isQuadratic
               )}
-              strokeWidth={element.strokeWidth}
-              stroke={element.stroke}
-              strokeDasharray={element.strokeDasharray}
+              strokeWidth={strokeWidth}
+              stroke={stroke}
+              strokeDasharray={strokeDasharray}
               markerEnd="url(#outline-arrow-marker)"
             />
           </g>
@@ -281,7 +283,7 @@ export function RenderCurve({
           <RenderPoint
             position={position}
             key={`${pointAtom}`}
-            width={element.strokeWidth ?? 0}
+            width={Number(strokeWidth) ?? 0}
             pointAtom={pointAtom}
           />
         ))}

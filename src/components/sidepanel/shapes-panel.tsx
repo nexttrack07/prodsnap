@@ -4,7 +4,7 @@ import { useSetAtom, atom, PrimitiveAtom } from 'jotai';
 import { useQuery } from '@tanstack/react-query';
 import { getShapes } from '../../api';
 import { addElementAtom } from '@/components/canvas/element.store';
-import { Atom, CanvasElementType, IPath } from '../canvas/types';
+import { Atom, CanvasElementType, CanvasItemType, IPath } from '../canvas/types';
 
 const useStyles = createStyles(() => ({
   shape: {
@@ -22,9 +22,8 @@ export function ShapesPanel() {
   const addElement = useSetAtom(addElementAtom);
   const { classes } = useStyles();
 
-  const handleAddElement = (newEl: IPath) => {
-    const newAtom: Atom<IPath> = atom(newEl);
-    addElement({ type: 'path', atom: newAtom });
+  const handleAddElement = (newEl: CanvasItemType) => {
+    addElement(newEl);
   };
 
   return (

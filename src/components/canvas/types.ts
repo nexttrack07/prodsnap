@@ -1,9 +1,8 @@
-import { PrimitiveAtom, SetStateAction, WritableAtom } from 'jotai';
-import React, { SVGAttributes } from 'react';
+import {  WritableAtom } from 'jotai';
+import React, { SVGAttributes, SetStateAction } from 'react';
 
 export type Action<T> = SetStateAction<T>;
-// export type Atom<T> = WritableAtom<T, Action<T>, void>;
-export type Atom<T> = PrimitiveAtom<T>;
+export type Atom<T> = WritableAtom<T, SetStateAction<T>, void>;
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 type Position = {
@@ -23,7 +22,10 @@ type Meta = {
 
 export interface IElement {
   type: 'path' | 'text' | 'image' | 'curve';
-  meta: Meta;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
   attrs: unknown;
 }
 
@@ -64,34 +66,31 @@ export interface IImage extends IElement {
 export interface ICurve extends IElement {
   type: 'curve';
   attrs: {
-    points: {
-      x: number;
-      y: number;
-    }[];
+    path: SVGAttributes<SVGPathElement>;
+    startMarker: 'none' | 'outline-arrow' | 'fill-arrow' | 'outline-circle';
+    endMarker: 'none' | 'outline-arrow' | 'fill-arrow' | 'outline-circle';
+    isQuadratic?: boolean;
   };
+  points: {
+    x: number;
+    y: number;
+  }[];
 }
-
-type TransformToAtom<T> = {
-  [K in keyof T]: T[K] extends Array<infer U> ? Atom<U>[] : T[K];
-};
 
 // The derived IAtomCurve interface
 export interface IAtomCurve extends IElement {
   type: 'curve';
-  attrs: TransformToAtom<ICurve['attrs']>;
+  attrs: {
+    path: SVGAttributes<SVGPathElement>;
+    startMarker: 'none' | 'outline-arrow' | 'fill-arrow' | 'outline-circle';
+    endMarker: 'none' | 'outline-arrow' | 'fill-arrow' | 'outline-circle';
+    isQuadratic?: boolean;
+  };
+  points: Atom<{x: number; y: number}>[]
 }
 
-type AtomType<T extends IElement> = {
-  type: CanvasItemType['type'];
-  atom: Atom<T>;
-};
-
 export type CanvasItemType = IPath | IText | IImage | IAtomCurve;
-export type CanvasElementType =
-  | { type: 'path'; atom: Atom<IPath> }
-  | { type: 'text'; atom: Atom<IText> }
-  | { type: 'image'; atom: Atom<IImage> }
-  | { type: 'curve'; atom: Atom<IAtomCurve> };
+export type CanvasElementType = Atom<CanvasItemType>;
 
 export const defaultImage: IImage = {
   type: 'image',
@@ -100,14 +99,8 @@ export const defaultImage: IImage = {
     currentUrl: undefined,
     state: ImageState.Normal
   },
-  meta: {
-    position: {
-      left: 100,
-      top: 200
-    },
-    dimension: {
-      width: 400,
-      height: 400
-    }
-  }
+  left: 100,
+  top: 200,
+  width: 400,
+  height: 400
 };

@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { useMantineTheme } from '@mantine/core';
 import { useAtom } from 'jotai';
-import { SVGPointAtom } from './store';
+import { Atom, SVGPointAtom } from './store';
 import useEventListener from '../../utils/use-event';
 
 export function RenderPoint({
@@ -9,7 +9,7 @@ export function RenderPoint({
   width,
   position
 }: {
-  pointAtom: SVGPointAtom;
+  pointAtom: Atom<{ x: number; y: number }>;
   width: number;
   position: { x: number; y: number };
 }) {
