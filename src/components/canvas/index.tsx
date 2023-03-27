@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { SetStateAction, useCallback } from 'react';
 import { Box } from '@mantine/core';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import {
@@ -17,20 +17,23 @@ import { RenderCurve } from './render-curve';
 import { useShiftKeyPressed } from '../../utils';
 import { atomFamily } from 'jotai/utils';
 import { MultipleSelect } from './multiple-select';
+import { elementsAtom, selectedElementsAtom } from '@/components/canvas/element.store';
+import { Atom, CanvasElementType, CanvasItemType } from '@/components/canvas/types';
 
 const unSelectAllAtom = atom(null, (_get, set) => {
   set(selectedElementAtomsAtom, []);
 });
 
 export function Canvas() {
-  const elementAtoms = useAtomValue(elementAtomsAtom);
-  const unSelectAllElements = useSetAtom(unSelectAllAtom);
+  // const elementAtoms = useAtomValue(elementAtomsAtom);
+  const elements = useAtomValue(elementsAtom);
+  // const unSelectAllElements = useSetAtom(unSelectAllAtom);
   const { width, height, backgroundColor } = useAtomValue(canvasAtom);
   const selected = useAtomValue(selectedElementAtomsAtom);
 
-  const handleCanvasMouseDown = () => {
-    unSelectAllElements();
-  };
+  // const handleCanvasMouseDown = () => {
+  //   unSelectAllElements();
+  // };
 
   return (
     <Box
@@ -47,52 +50,44 @@ export function Canvas() {
         backgroundColor,
         overflow: 'hidden'
       })}
-      onMouseDown={handleCanvasMouseDown}
+      // onMouseDown={handleCanvasMouseDown}
     >
       <MultipleSelect />
-      {elementAtoms.map((elementAtom) => (
-        <Element key={elementAtom.toString()} elementAtom={elementAtom} />
+      {elements.map((el) => (
+        <Element key={el.atom.toString()} item={el} />
       ))}
     </Box>
   );
 }
 
-export const elementCompMap: Record<CanvasElementWithPointAtoms['type'], React.FC<any>> = {
-  image: RenderImage,
+export const elementCompMap: Record<CanvasElementType['type'], React.FC<any>> = {
+  path: RenderPath,
+  curve: RenderCurve,
   text: RenderText,
-  'svg-path': RenderPath,
-  'svg-curve': RenderCurve
+  image: RenderImage
 };
 
-const groupFromElementAtom = atomFamily((element: CanvasElementWithPointAtoms) =>
-  atom((get) => {
-    if (!element.group) return null;
-
-    const groupsById = get(groupsByIdAtom);
-    return groupsById[element.group];
-  })
-);
-
-export function Element({ elementAtom }: { elementAtom: ElementType }) {
-  const [element, setElement] = useAtom(elementAtom);
-  const [selectedElementAtoms, setSelectedElementAtoms] = useAtom(selectedElementAtomsAtom);
-  const atomGroup = useAtomValue(groupFromElementAtom(element));
+export function Element({ item }: { item: CanvasElementType }) {
+  const element = useAtomValue<CanvasItemType>(item.atom);
+  const setElement = useSetAtom<CanvasItemType, SetStateAction<CanvasItemType>, void>(item.atom);
+  const [selectedElementAtoms, setSelectedElementAtoms] = useAtom(selectedElementsAtom);
+  // const atomGroup = useAtomValue(groupFromElementAtom(element));
   const isShiftPressed = useShiftKeyPressed();
-  const setActiveElementAtom = useSetAtom(activeElementAtomAtom);
+  // const setActiveElementAtom = useSetAtom(activeElementAtomAtom);
 
   const handleSelectElement = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedElementAtoms((selectedItems) => {
-      setActiveElementAtom(elementAtom);
-      if (selectedItems.includes(elementAtom)) return selectedItems;
-      if (atomGroup) {
-        return isShiftPressed ? selectedItems.concat(atomGroup) : atomGroup;
-      }
-      return isShiftPressed ? selectedItems.concat(elementAtom) : [elementAtom];
+      // setActiveElementAtom(elementAtom);
+      if (selectedItems.includes(item)) return selectedItems;
+      // if (atomGroup) {
+      //   return isShiftPressed ? selectedItems.concat(atomGroup) : atomGroup;
+      // }
+      return isShiftPressed ? selectedItems.concat(item) : [item];
     });
   };
 
-  const handleSetElement = useCallback((element: CanvasElementWithPointAtoms) => {
+  const handleSetElement = useCallback((element: CanvasItemType) => {
     setElement(element);
   }, []);
 
@@ -103,7 +98,7 @@ export function Element({ elementAtom }: { elementAtom: ElementType }) {
       onSelect={handleSelectElement}
       element={element}
       setElement={handleSetElement}
-      isSelected={selectedElementAtoms.includes(elementAtom)}
+      isSelected={selectedElementAtoms.includes(item)}
     />
   );
 }

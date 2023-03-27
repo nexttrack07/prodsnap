@@ -11,6 +11,7 @@ export const useResizeStyles = createStyles((theme) => ({
     width: 12,
     height: 12,
     position: 'absolute',
+    opacity: 0.7,
     '&:hover': {
       backgroundColor: theme.colors.blue[6]
     }

@@ -9,89 +9,113 @@ import {
   Image
 } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import { useSetAtom } from 'jotai';
+import { atom, useSetAtom } from 'jotai';
 import React from 'react';
-import {
-  addElementAtom,
-  CanvasElement,
-  CanvasElementWithPointAtoms,
-  createAtom,
-  elementAtomsAtom,
-  selectedElementAtomsAtom
-} from '../../components/canvas/store';
+
 import { getSelections } from '@/api/template';
 import { addGroupAtom } from '../toolbar';
 import { deserialize } from '@/utils';
+import { IText } from '../canvas/types';
+import { addElementAtom, elementsAtom, selectedElementsAtom } from '../canvas/element.store';
 
 const elementData: {
   id: number;
-  data: CanvasElement;
+  data: IText;
 }[] = [
   {
     id: 0,
     data: {
-      x: 200,
-      y: 100,
-      type: 'text' as const,
-      width: 300,
-      height: 50,
-      content: 'Heading',
-      props: {
-        fontSize: 50,
-        color: '#000'
+      type: 'text',
+      attrs: {
+        style: {
+          fontSize: 50,
+          fontFamily: 'open sans',
+          color: '#000'
+        },
+        content: 'Heading'
+      },
+      meta: {
+        position: {
+          left: 200,
+          top: 100
+        },
+        dimension: {
+          width: 300,
+          height: 50
+        }
       }
     }
   },
   {
     id: 1,
     data: {
-      x: 200,
-      y: 100,
-      type: 'text' as const,
-      width: 300,
-      height: 50,
-      content: 'Subheading',
-      props: {
-        fontSize: 30,
-        color: '#000'
+      type: 'text',
+      attrs: {
+        style: {
+          fontSize: 30,
+          fontFamily: 'open sans',
+          color: '#000'
+        },
+        content: 'Subheading'
+      },
+      meta: {
+        position: {
+          left: 200,
+          top: 100
+        },
+        dimension: {
+          width: 300,
+          height: 50
+        }
       }
     }
   },
   {
     id: 2,
     data: {
-      x: 200,
-      y: 100,
-      type: 'text' as const,
-      width: 300,
-      height: 50,
-      content: 'A little bit of text',
-      props: {
-        fontSize: 20,
-        color: '#000'
+      type: 'text',
+      attrs: {
+        style: {
+          fontSize: 20,
+          fontFamily: 'open sans',
+          color: '#000'
+        },
+        content: 'A little bit of text'
+      },
+      meta: {
+        position: {
+          left: 200,
+          top: 100
+        },
+        dimension: {
+          width: 300,
+          height: 50
+        }
       }
     }
   }
 ];
 
+// create fake data of type { id: number, data: IText }[]
+
 export function TextPanel() {
   const addElement = useSetAtom(addElementAtom);
   const theme = useMantineTheme();
-  const setElementAtoms = useSetAtom(elementAtomsAtom);
-  const setSelectedAtoms = useSetAtom(selectedElementAtomsAtom);
-  const addGroup = useSetAtom(addGroupAtom);
-  const query = useQuery(['selections'], getSelections);
+  // const setElementAtoms = useSetAtom(elementsAtom);
+  // const setSelectedAtoms = useSetAtom(selectedElementsAtom);
+  // const addGroup = useSetAtom(addGroupAtom);
+  // const query = useQuery(['selections'], getSelections);
 
-  const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
-    addElement(newEl);
+  const handleAddElement = (newEl: IText) => {
+    addElement({ type: 'text', atom: atom(newEl) });
   };
 
-  const handleAddTemplate = (newEls: CanvasElement[]) => {
-    const newElAtoms = newEls.map((el) => createAtom(el));
-    setElementAtoms((elAtoms) => [...elAtoms, ...newElAtoms]);
-    setSelectedAtoms(newElAtoms);
-    addGroup();
-  };
+  // const handleAddTemplate = (newEls: CanvasElement[]) => {
+  //   const newElAtoms = newEls.map((el) => createAtom(el));
+  //   setElementAtoms((elAtoms) => [...elAtoms, ...newElAtoms]);
+  //   setSelectedAtoms(newElAtoms);
+  //   addGroup();
+  // };
 
   return (
     <>
@@ -107,7 +131,7 @@ export function TextPanel() {
                 key={item.id}
                 onClick={() => handleAddElement(item.data)}
                 style={{
-                  ...item.data.props,
+                  ...item.data.attrs.style,
                   backgroundColor: theme.colors.gray[1],
                   padding: '8px 16px',
                   borderRadius: 2,
@@ -118,7 +142,7 @@ export function TextPanel() {
                   display: 'block'
                 }}
               >
-                {item.data.content}
+                {item.data.attrs.content}
               </Text>
             );
           }
@@ -126,7 +150,7 @@ export function TextPanel() {
         })}
       </SimpleGrid>
       <Divider my="xl" variant="dotted" />
-      <SimpleGrid cols={2}>
+      {/* <SimpleGrid cols={2}>
         <LoadingOverlay
           loaderProps={{ size: 'sm', color: 'pink', variant: 'bars' }}
           visible={query.isLoading}
@@ -141,7 +165,7 @@ export function TextPanel() {
               <Image src={item.data.url} />
             </Box>
           ))}
-      </SimpleGrid>
+      </SimpleGrid> */}
     </>
   );
 }

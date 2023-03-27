@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { FileButton, createStyles, Button, Space, SimpleGrid, Image } from '@mantine/core';
-import { useSetAtom } from 'jotai';
-import { addElementAtom, CanvasElementWithPointAtoms, defaultImage } from '../canvas/store';
+import { atom, useSetAtom } from 'jotai';
+import { addElementAtom } from '../canvas/element.store';
+import { defaultImage, IImage } from '../canvas/types';
 import { firestore, storage } from '../../utils/firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { addDoc, collection, getDocs } from 'firebase/firestore';
@@ -45,8 +46,9 @@ export function UploadPanel() {
     });
   }, []);
 
-  const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
-    addElement(newEl);
+  const handleAddElement = (newEl: IImage) => {
+    const newAtom = atom(newEl);
+    addElement({ type: 'image', atom: newAtom });
   };
 
   const handleUploadImage = (file: File) => {
@@ -118,9 +120,12 @@ export function UploadPanel() {
                 className={classes.shape}
                 src={image.url}
                 onClick={() => {
-                  const el: CanvasElementWithPointAtoms = {
+                  const el: IImage = {
                     ...defaultImage,
-                    url: image.url
+                    attrs: {
+                      ...defaultImage.attrs,
+                      url: image.url
+                    }
                   };
 
                   handleAddElement(el);

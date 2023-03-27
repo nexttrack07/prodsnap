@@ -1,21 +1,13 @@
 import React, { useCallback } from 'react';
 import { SetStateAction, useAtomValue } from 'jotai';
-import {
-  canvasAtom,
-  CanvasElement,
-  Draggable,
-  MoveableElement,
-  Resizable,
-  SVGPathType
-} from '@/components/canvas/store';
+import { canvasAtom, Draggable, Resizable } from '@/components/canvas/store';
 import { DragHandler } from './drag-handler';
 import { ResizeHandler } from './resize-handler';
-
-type SVGCanvasElement = MoveableElement & SVGPathType;
+import { IPath } from './types';
 
 type Props = {
-  element: SVGCanvasElement;
-  setElement: (update: SetStateAction<CanvasElement>) => void;
+  element: IPath;
+  setElement: (update: SetStateAction<IPath>) => void;
   isSelected: boolean;
   onSelect: (e: React.MouseEvent) => void;
 };
@@ -33,32 +25,46 @@ function getSnap(num: number, d = 0, max = 1000) {
 }
 
 export function RenderPath({ element, onSelect, setElement, isSelected }: Props) {
-  const { x, y, width, height } = element;
+  const { left, top } = element.meta.position;
+  const { width, height } = element.meta.dimension;
+
   const canvasProps = useAtomValue(canvasAtom);
 
   const handleMouseMove = useCallback(
     (p: Draggable) => {
-      setElement((el) => {
+      setElement((prev) => {
         return {
-          ...el,
-          x: getSnap(p.x + el.x, el.width, canvasProps.width),
-          y: getSnap(p.y + el.y, el.height, canvasProps.height)
+          ...prev,
+          meta: {
+            ...prev.meta,
+            position: {
+              left: getSnap(
+                p.x + prev.meta.position.left,
+                prev.meta.dimension.width,
+                canvasProps.width
+              ),
+              top: getSnap(
+                p.y + prev.meta.position.top,
+                prev.meta.dimension.height,
+                canvasProps.height
+              )
+            }
+          }
         };
       });
     },
     [setElement]
   );
-
   const handleClick = (e: React.MouseEvent) => {
     onSelect(e);
   };
 
   const handleResize = ({ x, y, width, height }: Draggable & Resizable) => {
     setElement((prev) => {
-      let newX = prev.x + x;
-      let newY = prev.y + y;
-      let newWidth = prev.width + width;
-      let newHeight = prev.height + height;
+      let newX = prev.meta.position.left + x;
+      let newY = prev.meta.position.top + y;
+      let newWidth = prev.meta.dimension.width + width;
+      let newHeight = prev.meta.dimension.height + height;
 
       if (newX > -SNAP_TOLERANCE && newX < SNAP_TOLERANCE) {
         newX = 0;
@@ -84,10 +90,17 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
 
       return {
         ...prev,
-        x: newX,
-        y: newY,
-        width: newWidth,
-        height: newHeight
+        meta: {
+          ...prev.meta,
+          position: {
+            left: newX,
+            top: newY
+          },
+          dimension: {
+            width: newWidth,
+            height: newHeight
+          }
+        }
       };
     });
   };
@@ -95,24 +108,24 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
   return (
     <DragHandler
       onClick={handleClick}
-      position={{ x, y }}
+      position={{ x: left, y: top }}
       dimension={{ width, height }}
       onMove={handleMouseMove}
     >
-      <svg opacity={element.opacity} {...element.props} viewBox={element.getViewBox(width, height)}>
-        <path {...element.path} d={element.getPath(width, height)} />
+      <svg {...element.attrs.svgElement} viewBox={element.attrs.getViewBox(width, height)}>
+        <path {...element.attrs.pathElement} d={element.attrs.getPath(width, height)} />
       </svg>
-      <svg opacity={element.opacity} {...element.props} viewBox={element.getViewBox(width, height)}>
-        <clipPath id={element.strokeProps.clipPathId}>
-          <path d={element.getPath(width, height)} />
+      <svg {...element.attrs.svgElement} viewBox={element.attrs.getViewBox(width, height)}>
+        <clipPath id={element.attrs.clipPathId}>
+          <path d={element.attrs.getPath(width, height)} />
         </clipPath>
         <path
-          d={element.getPath(width, height)}
-          stroke={element.strokeProps.stroke}
-          strokeWidth={element.strokeProps.strokeWidth}
-          strokeLinecap={element.strokeProps.strokeLinecap}
-          strokeDasharray={element.strokeProps.strokeDasharray}
-          clipPath={element.strokeProps.clipPathId}
+          d={element.attrs.getPath(width, height)}
+          stroke={element.attrs.pathElement.stroke}
+          strokeWidth={element.attrs.pathElement.strokeWidth}
+          strokeLinecap={element.attrs.pathElement.strokeLinecap}
+          strokeDasharray={element.attrs.pathElement.strokeDasharray}
+          clipPath={element.attrs.clipPathId}
           fill="none"
           vectorEffect="non-scaling-stroke"
         />

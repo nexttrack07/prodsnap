@@ -1,41 +1,53 @@
-import { DEFAULT_THEME } from "@mantine/core";
-import { MoveableElement, SVGPathType } from "components/canvas/store";
+import { IPath } from '@/components/canvas/types';
+import { DEFAULT_THEME } from '@mantine/core';
+import { MoveableElement, SVGPathType } from 'components/canvas/store';
 
-const SHAPES: { id: number; data: MoveableElement & SVGPathType}[] = [
+const SHAPES: { id: number; data: IPath }[] = [
   {
     id: 0,
     data: {
-      type: "svg-path" as const,
-      width: 250,
-      height: 250,
-      x: 100,
-      y: 10,
-      getViewBox: function (w: number, h: number) { return `0 0 ${w / 3.7} ${h / 3.7}` },
-      props: {
-        width: "100%",
-        height: "100%",
-        viewBox: "0 0 64 64",
-        fill: DEFAULT_THEME.colors.blue[5],
-        style: {
-          top: 0,
+      type: 'path' as const,
+      meta: {
+        position: {
           left: 0,
-          position: "absolute",
-          overflow: "hidden",
-          pointerEvents: "none"
+          top: 0
+        },
+        dimension: {
+          width: 100,
+          height: 100
         }
       },
-      path: { d: "M0,0L64,0L64,64L0,64L0,0", },
-      // d="M0,0L54,0L54,24L0,24L0,0"
-      getPath: function (w: number, h: number) { return `M0,0L${w / 3.7},0L${w / 3.7},${h / 3.7}L0,${h / 3.7}L0,0` },
-      strokeProps: {
-        clipPathId: "001",
-        stroke: DEFAULT_THEME.colors.blue[8],
-        strokeWidth: 10,
-        strokeDasharray: "none",
-        strokeLinecap: "butt"
+      attrs: {
+        svgElement: {
+          width: '100%',
+          height: '100%',
+          viewBox: '0 0 64 64',
+          fill: DEFAULT_THEME.colors.blue[5],
+          style: {
+            top: 0,
+            left: 0,
+            position: 'absolute',
+            overflow: 'hidden',
+            pointerEvents: 'none'
+          },
+          stroke: DEFAULT_THEME.colors.blue[8],
+          strokeWidth: 10,
+          strokeDasharray: 'none',
+          strokeLinecap: 'butt'
+        },
+        pathElement: {
+          d: 'M0,0L64,0L64,64L0,64L0,0'
+        },
+        getPath: function (w: number, h: number) {
+          return `M0,0L${w / 3.7},0L${w / 3.7},${h / 3.7}L0,${h / 3.7}L0,0`;
+        },
+        getViewBox: function (w: number, h: number) {
+          return `0 0 ${w / 3.7} ${h / 3.7}`;
+        },
+        clipPathId: '001'
       }
-    },
-  },
+    }
+  }
 ];
 
 export async function getShapes() {

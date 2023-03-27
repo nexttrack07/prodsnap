@@ -4,6 +4,7 @@ import { Box, Center, useMantineTheme } from '@mantine/core';
 import { useWindowEvent } from '@mantine/hooks';
 import clsx from 'clsx';
 import { useResizeStyles } from './resize-handler';
+import { IText } from './types';
 
 type Status =
   | 'none'
@@ -34,8 +35,8 @@ export function RenderText({
   onSelect,
   setElement
 }: {
-  element: MoveableElement & TextType;
-  setElement: (update: SetStateAction<MoveableElement & TextType>) => void;
+  element: IText;
+  setElement: (update: SetStateAction<IText>) => void;
   isSelected: boolean;
   onSelect: (e: React.MouseEvent) => void;
 }) {
@@ -67,19 +68,47 @@ export function RenderText({
       setEditable(false);
 
       if (status === 'move') {
-        const deltaX = e.clientX - lastPos.current.x + element.x;
-        const deltaY = e.clientY - lastPos.current.y + element.y;
-        setElement((el) => ({ ...el, x: deltaX, y: deltaY }));
-      } else if (status === 'resizing-br') {
-        const newWidth = e.clientX - lastPos.current.x + element.width;
-        const newFontSize = (newWidth / element.width) * (element.props.fontSize as number);
-        // calculate new height based on new width
-        const newHeight = (newWidth / element.width) * element.height;
+        // const deltaX = e.clientX - lastPos.current.x + element.x;
+        const deltaX = e.clientX - lastPos.current.x + element.meta.position.left;
+        const deltaY = e.clientY - lastPos.current.y + element.meta.position.top;
+        // const deltaY = e.clientY - lastPos.current.y + element.y;
         setElement((el) => ({
           ...el,
-          width: newWidth,
-          height: newHeight,
-          props: { ...el.props, fontSize: newFontSize }
+          meta: {
+            ...el.meta,
+            position: {
+              left: deltaX,
+              top: deltaY
+            }
+          }
+        }));
+      } else if (status === 'resizing-br') {
+        // const newWidth = e.clientX - lastPos.current.x + element.width;
+        const newWidth = e.clientX - lastPos.current.x + element.meta.dimension.width;
+        const newFontSize =
+          (newWidth / element.meta.dimension.width) * (element.attrs.style.fontSize as number);
+        // calculate new height based on new width
+        const newHeight = (newWidth / element.meta.dimension.width) * element.meta.dimension.height;
+        setElement((el) => ({
+          ...el,
+          // width: newWidth,
+          // height: newHeight,
+          // props: { ...el.props, fontSize: newFontSize }
+          attrs: {
+            ...el.attrs,
+            style: {
+              ...el.attrs.style,
+              fontSize: newFontSize
+            }
+          },
+          meta: {
+            ...el.meta,
+            dimension: {
+              ...el.meta.dimension,
+              width: newWidth,
+              height: newHeight
+            }
+          }
         }));
       }
     }
@@ -140,15 +169,15 @@ export function RenderText({
     <Center
       ref={ref}
       style={{
-        left: element.x,
-        top: element.y,
+        left: element.meta.position.left,
+        top: element.meta.position.top,
         userSelect: 'none',
         position: 'absolute',
         whiteSpace: 'pre-wrap',
         // width: element.width,
         // height: element.height,
         cursor,
-        ...element.props
+        ...element.attrs.style
       }}
       className={clsx({ [classes.borders]: isSelected })}
     >
@@ -160,7 +189,7 @@ export function RenderText({
         suppressContentEditableWarning={true}
         ref={textRef}
       >
-        {element.content}
+        {element.attrs.content}
       </div>
       {isSelected && (
         <>
@@ -184,8 +213,4 @@ export function RenderText({
       )}
     </Center>
   );
-}
-
-function reverseString(str: string): string {
-  return str.split('').reverse().join('');
 }

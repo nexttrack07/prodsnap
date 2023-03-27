@@ -1,9 +1,10 @@
 import React from 'react';
 import { Text, Space, createStyles, SimpleGrid } from '@mantine/core';
-import { useSetAtom } from 'jotai';
+import { useSetAtom, atom, PrimitiveAtom } from 'jotai';
 import { useQuery } from '@tanstack/react-query';
 import { getShapes } from '../../api';
-import { addElementAtom, CanvasElementWithPointAtoms } from '../../components/canvas/store';
+import { addElementAtom } from '@/components/canvas/element.store';
+import { Atom, CanvasElementType, IPath } from '../canvas/types';
 
 const useStyles = createStyles(() => ({
   shape: {
@@ -21,8 +22,9 @@ export function ShapesPanel() {
   const addElement = useSetAtom(addElementAtom);
   const { classes } = useStyles();
 
-  const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
-    addElement(newEl);
+  const handleAddElement = (newEl: IPath) => {
+    const newAtom: Atom<IPath> = atom(newEl);
+    addElement({ type: 'path', atom: newAtom });
   };
 
   return (
@@ -38,12 +40,12 @@ export function ShapesPanel() {
             className={classes.shape}
             width={75}
             onClick={() => handleAddElement(item.data)}
-            fill={item.data.props?.fill}
-            stroke={item.data.strokeProps.stroke}
-            strokeWidth={item.data.strokeProps.strokeWidth}
-            viewBox={item.data.props?.viewBox}
+            fill={item.data.attrs.svgElement.fill}
+            stroke={item.data.attrs.svgElement.stroke}
+            strokeWidth={item.data.attrs.svgElement.strokeWidth}
+            viewBox={item.data.attrs.svgElement.viewBox}
           >
-            <path {...item.data.path} />
+            <path {...item.data.attrs.pathElement} />
           </svg>
         ))}
       </SimpleGrid>
