@@ -34,7 +34,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <MantineProvider
       theme={{
         colorScheme: 'light',
-        primaryColor: 'blue',
+        primaryColor: 'dark',
         primaryShade: 9,
         defaultRadius: 'xs',
         components: { Button: { defaultProps: { size: 'sm', variant: 'default' } } }
