@@ -64,11 +64,16 @@ export const isCroppingAtom = atom(false);
 
 export function ImageToolbar() {
   const url = useAtomValue(imageUrlAtom);
-  const [_, setSelectedImage] = useAtom(selectedImageAtom);
+  const [selectedImage, setSelectedImage] = useAtom(selectedImageAtom);
   const imageState = useAtomValue(imageStateAtom);
   const [circleCrop, setCircleCrop] = useAtom(circleCropAtom);
   const cropper = useAtomValue(cropperAtom);
   const setIsCropping = useSetAtom(isCroppingAtom);
+
+  if (!selectedImage) {
+    return null;
+  }
+
   const handleRemoveBg = () => {
     if (url) {
       setSelectedImage({ state: ImageState.Loading });

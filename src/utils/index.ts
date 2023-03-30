@@ -66,3 +66,16 @@ export function calculateAnglesOfRightTriangle(A: Point, B: Point, C: Point): [n
 
   return [alpha, beta, gamma];
 }
+
+
+export const SNAP_TOLERANCE = 5;
+
+export function getSnap(num: number, d = 0, max = 1000) {
+  if (num > -SNAP_TOLERANCE && num < SNAP_TOLERANCE) {
+    return 0;
+  } else if (num + d > max - SNAP_TOLERANCE && num + d < max + SNAP_TOLERANCE) {
+    return max - d;
+  }
+
+  return num;
+}

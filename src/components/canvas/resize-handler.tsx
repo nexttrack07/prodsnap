@@ -81,6 +81,7 @@ export const useResizeStyles = createStyles((theme) => ({
 }));
 
 type Props = {
+  show?: boolean;
   dimension: Resizable;
   withSEResize?: boolean;
   withSWResize?: boolean;
@@ -106,6 +107,7 @@ export type Status =
 
 export function ResizeHandler({
   dimension,
+  show = true,
   withBMResize = true,
   withLMResize = true,
   withNEResize = true,
@@ -173,6 +175,8 @@ export function ResizeHandler({
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [status]);
+
+  if (!show) return null;
 
   return (
     <div

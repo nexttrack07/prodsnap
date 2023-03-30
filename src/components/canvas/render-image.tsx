@@ -2,11 +2,21 @@ import React, { useEffect, useCallback, useRef, useState } from 'react';
 import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 import { atom, SetStateAction, useAtomValue, useSetAtom } from 'jotai';
-import { CanvasElement, ImageState, ImageType, MoveableElement } from './store';
-import { getImageDimensions } from '../../utils';
+import {
+  CanvasElement,
+  ImageState,
+  ImageType,
+  MoveableElement,
+  Resizable,
+  Draggable,
+  canvasAtom
+} from './store';
+import { getImageDimensions, getSnap } from '../../utils';
 import { Center, Box, Image, Loader, useMantineTheme } from '@mantine/core';
 import 'react-image-crop/dist/ReactCrop.css';
 import { circleCropAtom } from '../../components/toolbar/image-toolbar';
+import { ResizeHandler } from './resize-handler';
+import { DragHandler } from './drag-handler';
 
 export const cropperAtom = atom<Cropper | null>(null);
 
@@ -23,9 +33,7 @@ export function RenderImage({
   isSelected: boolean;
   onSelect: (e: React.MouseEvent) => void;
 }) {
-  const [status, setStatus] = useState<Status>('none');
-  const lastPos = useRef({ x: 0, y: 0 });
-  const theme = useMantineTheme();
+  const canvasProps = useAtomValue(canvasAtom);
 
   useEffect(() => {
     async function setImageDimensions(src: string) {
@@ -43,63 +51,48 @@ export function RenderImage({
     }
   }, [element.type]);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    lastPos.current = { x: e.clientX, y: e.clientY };
-    setStatus('move');
-    onSelect(e);
-  }, []);
+  const handleResize = ({ x, y, width, height }: Draggable & Resizable) => {
+    setElement((prev) => {
+      let newX = prev.x + x;
+      let newY = prev.y + y;
+      let newWidth = prev.width + width;
+      let newHeight = prev.height + height;
 
-  const handleResizeMouseDown = (e: React.MouseEvent, stat: Status) => {
-    e.stopPropagation();
-    setStatus(stat);
-    lastPos.current = { x: e.clientX, y: e.clientY };
+      return {
+        ...prev,
+        x: newX,
+        y: newY,
+        width: newWidth,
+        height: newHeight
+      };
+    });
   };
 
-  useEffect(() => {
-    function handleMouseMove(e: MouseEvent) {
-      if (status === 'move') {
-        const deltaX = e.clientX - lastPos.current.x + element.x;
-        const deltaY = e.clientY - lastPos.current.y + element.y;
-        setElement((el) => ({ ...el, x: deltaX, y: deltaY }));
-      } else if (status === 'resize-br') {
-        const newWidth = e.clientX - lastPos.current.x + element.width;
-        const newHeight = (newWidth / element.width) * element.height;
-
-        setElement((el) => ({
+  const handleMouseMove = useCallback(
+    (p: Draggable) => {
+      setElement((el) => {
+        return {
           ...el,
-          width: newWidth,
-          height: newHeight
-        }));
-      }
-    }
+          x: getSnap(p.x + el.x, el.width, canvasProps.width),
+          y: getSnap(p.y + el.y, el.height, canvasProps.height)
+        };
+      });
+    },
+    [setElement]
+  );
 
-    const handleMouseUp = (e: MouseEvent) => {
-      e.stopPropagation();
-      setStatus('none');
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [status]);
+  const handleClick = (e: React.MouseEvent) => {
+    onSelect(e);
+  };
 
   const { width, height, x, y } = element;
 
   return (
-    <Center
-      onMouseDown={handleMouseDown}
-      style={{
-        left: x,
-        top: y,
-        userSelect: 'none',
-        position: 'absolute',
-        border: isSelected ? `2px solid ${theme.colors.blue[7]}` : '',
-        borderRadius: 3
-      }}
+    <DragHandler
+      position={{ x, y }}
+      dimension={{ width, height }}
+      onMove={handleMouseMove}
+      onClick={handleClick}
     >
       {element.state === ImageState.Loading && <Loader></Loader>}
       {element.state === ImageState.Normal && (
@@ -110,43 +103,19 @@ export function RenderImage({
             height={height}
             src={element.currentUrl ?? element.url}
           />
-          {/* <div
-            style={{
-              width,
-              height,
-              background: `url(${element.currentUrl ?? element.url})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat'
-            }}
-          /> */}
-          {isSelected && (
-            <Box
-              onMouseDown={(e) => handleResizeMouseDown(e, 'resize-br')}
-              onMouseUp={(e) => e.stopPropagation()}
-              component="span"
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              sx={{
-                position: 'absolute',
-                right: 0,
-                bottom: 0,
-                height: 15,
-                width: 15,
-                borderRadius: '50%',
-                transform: 'translate(50%,50%)',
-                backgroundColor: theme.colors.gray[2],
-                boxShadow: '0 0 1px rgba(0,0,0,0.4)',
-                border: '1px solid rgba(0,0,0,0.3)',
-                cursor: 'grab'
-              }}
-            />
-          )}
+          <ResizeHandler
+            withBMResize={false}
+            withTMResize={false}
+            withLMResize={false}
+            withRMResize={false}
+            show={isSelected}
+            dimension={{ width, height }}
+            onResize={handleResize}
+          />
         </>
       )}
       {element.state === ImageState.Cropping && <CropImage element={element} />}
-    </Center>
+    </DragHandler>
   );
 }
 

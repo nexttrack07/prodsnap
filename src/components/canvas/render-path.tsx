@@ -10,6 +10,7 @@ import {
 } from '@/components/canvas/store';
 import { DragHandler } from './drag-handler';
 import { ResizeHandler } from './resize-handler';
+import { getSnap, SNAP_TOLERANCE } from '@/utils';
 
 type SVGCanvasElement = MoveableElement & SVGPathType;
 
@@ -19,18 +20,6 @@ type Props = {
   isSelected: boolean;
   onSelect: (e: React.MouseEvent) => void;
 };
-
-const SNAP_TOLERANCE = 5;
-
-function getSnap(num: number, d = 0, max = 1000) {
-  if (num > -SNAP_TOLERANCE && num < SNAP_TOLERANCE) {
-    return 0;
-  } else if (num + d > max - SNAP_TOLERANCE && num + d < max + SNAP_TOLERANCE) {
-    return max - d;
-  }
-
-  return num;
-}
 
 export function RenderPath({ element, onSelect, setElement, isSelected }: Props) {
   const { x, y, width, height } = element;
@@ -117,7 +106,7 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
           vectorEffect="non-scaling-stroke"
         />
       </svg>
-      {isSelected && <ResizeHandler dimension={{ width, height }} onResize={handleResize} />}
+      <ResizeHandler show={isSelected} dimension={{ width, height }} onResize={handleResize} />
     </DragHandler>
   );
 }
