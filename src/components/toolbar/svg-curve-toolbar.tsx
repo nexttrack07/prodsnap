@@ -10,8 +10,9 @@ import {
   NumberInputHandlers,
   Box
 } from '@mantine/core';
-import { SVGCurveWithPointAtoms } from '@/components/canvas/store';
+import { activeElementAtom, SVGCurveWithPointAtoms } from '@/components/canvas/store';
 import { Line, LineDashed, LineDotted, VectorBezier } from 'tabler-icons-react';
+import { atom, useAtom } from 'jotai';
 
 type Marker = Record<SVGCurveWithPointAtoms['startMarker'], React.ReactNode>;
 
@@ -123,13 +124,22 @@ export const END_MARKERS: Marker = {
   )
 };
 
-type Props = {
-  element: SVGCurveWithPointAtoms;
-  setElement: (element: SVGCurveWithPointAtoms) => void;
-};
+const elementAtom = atom(
+  (get) => {
+    const element = get(activeElementAtom);
+    if (element && element.type === 'svg-curve') {
+      return element;
+    }
+    return null;
+  },
+  (get, set, element: SVGCurveWithPointAtoms) => {
+    set(activeElementAtom, element);
+  }
+);
 
-export function SvgCurveToolbar({ element, setElement }: Props) {
+export function SvgCurveToolbar() {
   const handlers = useRef<NumberInputHandlers>();
+  const [element, setElement] = useAtom(elementAtom);
 
   if (!element) return null;
 

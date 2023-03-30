@@ -235,11 +235,8 @@ export function Toolbar() {
       <SvgPathToolbar />
       <TextToolbar />
       <ImageToolbar />
-      {/* {activeElement && isCurve(activeElement) && (
-        <SvgCurveToolbar element={activeElement} setElement={setActiveElement} />
-      )}
-      {activeElement && isImage(activeElement) && <ImageToolbar />}
-      {!activeElement && <CanvasToolbar />} */}
+      <SvgCurveToolbar />
+      {/* {!activeElement && <CanvasToolbar />} */}
       <div style={{ flex: 1 }} />
       <Group spacing="xs">
         {selectedElements.length > 1 && (

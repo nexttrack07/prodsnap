@@ -121,10 +121,10 @@ export function ImageToolbar() {
     <Group>
       {imageState === ImageState.Normal && (
         <>
-          <Button variant="outline" onClick={handleRemoveBg}>
+          <Button size="xs" variant="outline" onClick={handleRemoveBg}>
             Remove Background
           </Button>
-          <Button variant="outline" onClick={handleCropImage}>
+          <Button size="xs" variant="outline" onClick={handleCropImage}>
             Crop
           </Button>
         </>
