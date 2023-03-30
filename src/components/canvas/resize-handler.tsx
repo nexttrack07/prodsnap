@@ -5,14 +5,14 @@ import { Resizable } from '@/components/canvas/store';
 
 export const useResizeStyles = createStyles((theme) => ({
   resize: {
-    backgroundColor: theme.colors.blue[0],
-    border: `1px solid ${theme.colors.blue[4]}`,
+    backgroundColor: theme.colors.gray[0],
+    border: `1px solid ${theme.colors.gray[5]}`,
     borderRadius: '25%',
     width: 12,
     height: 12,
     position: 'absolute',
     '&:hover': {
-      backgroundColor: theme.colors.blue[6]
+      backgroundColor: theme.colors.gray[6]
     }
   },
   resize_br: {
@@ -76,7 +76,7 @@ export const useResizeStyles = createStyles((theme) => ({
     transform: `translate(50%, -50%)`
   },
   borders: {
-    border: `1px solid ${theme.colors.blue[4]}`
+    border: `1px solid ${theme.colors.gray[5]}`
   }
 }));
 

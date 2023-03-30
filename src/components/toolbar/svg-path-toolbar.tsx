@@ -11,6 +11,7 @@ import {
   Box
 } from '@mantine/core';
 import {
+  activeElementAtom,
   activeElementAtomAtom,
   CanvasElementWithPointAtoms,
   MoveableElement,
@@ -19,26 +20,43 @@ import {
 import { BorderAll, BorderNone, BorderRadius, BorderStyle2 } from 'tabler-icons-react';
 import { atom, useAtom } from 'jotai';
 
-const activeElementAtom = atom(
+const propsAtom = atom(
   (get) => {
-    const activeElementAtom = get(activeElementAtomAtom);
-    if (activeElementAtom) {
-      return get(activeElementAtom);
+    const element = get(activeElementAtom);
+    if (element && element.type === 'svg-path') {
+      return element.props;
     }
     return null;
   },
-  (get, set, element: CanvasElementWithPointAtoms) => {
-    const activeElementAtom = get(activeElementAtomAtom);
-    if (activeElementAtom) {
-      set(activeElementAtom, element);
+  (get, set, props: SVGPathType['props']) => {
+    const element = get(activeElementAtom);
+    if (element && element.type === 'svg-path') {
+      set(activeElementAtom, { ...element, props });
+    }
+  }
+);
+
+const strokePropsAtom = atom(
+  (get) => {
+    const element = get(activeElementAtom);
+    if (element && element.type === 'svg-path') {
+      return element.strokeProps;
+    }
+    return null;
+  },
+  (get, set, strokeProps: SVGPathType['strokeProps']) => {
+    const element = get(activeElementAtom);
+    if (element && element.type === 'svg-path') {
+      set(activeElementAtom, { ...element, strokeProps });
     }
   }
 );
 
 export function SvgPathToolbar() {
-  const [element, setElement] = useAtom(activeElementAtom);
+  const [svgProps, setProps] = useAtom(propsAtom);
+  const [strokeProps, setStrokeProps] = useAtom(strokePropsAtom);
 
-  if (!element || element.type !== 'svg-path') {
+  if (!svgProps || !strokeProps) {
     return null;
   }
 
@@ -51,7 +69,7 @@ export function SvgPathToolbar() {
               sx={{
                 width: '100%',
                 height: '100%',
-                borderColor: element.strokeProps.stroke,
+                borderColor: strokeProps.stroke,
                 borderWidth: 8,
                 borderStyle: 'solid'
               }}
@@ -61,19 +79,12 @@ export function SvgPathToolbar() {
         <Popover.Dropdown>
           <ColorPicker
             format="rgba"
-            value={element.strokeProps.stroke}
+            value={strokeProps.stroke}
             onChange={(val) =>
-              // setStrokeProps({
-              //   stroke: val,
-              //   strokeWidth: strokeProps.strokeWidth ?? 10
-              // })
-              setElement({
-                ...element,
-                strokeProps: {
-                  ...element.strokeProps,
-                  stroke: val,
-                  strokeWidth: element.strokeProps.strokeWidth ?? 10
-                }
+              setStrokeProps({
+                ...strokeProps,
+                stroke: val,
+                strokeWidth: strokeProps.strokeWidth ?? 10
               })
             }
             swatches={[
@@ -92,7 +103,7 @@ export function SvgPathToolbar() {
               sx={{
                 width: '100%',
                 height: '100%',
-                backgroundColor: element.props.fill
+                backgroundColor: svgProps.fill
               }}
             />
           </ActionIcon>
@@ -100,8 +111,8 @@ export function SvgPathToolbar() {
         <Popover.Dropdown>
           <ColorPicker
             format="rgba"
-            value={element.props.fill}
-            onChange={(val) => setElement({ ...element, props: { ...element.props, fill: val } })}
+            value={svgProps.fill}
+            onChange={(val) => setProps({ ...svgProps, fill: val })}
             swatches={[
               ...DEFAULT_THEME.colors.red,
               ...DEFAULT_THEME.colors.yellow,
@@ -129,16 +140,15 @@ export function SvgPathToolbar() {
                     strokeWidth = 0;
                   case 'dashed':
                     strokeDasharray = '5,10';
-                    strokeWidth =
-                      element.strokeProps.strokeWidth === 0 ? 10 : element.strokeProps.strokeWidth;
+                    strokeWidth = strokeProps.strokeWidth === 0 ? 10 : strokeProps.strokeWidth;
                   case 'all':
                     strokeDasharray = '0';
-                    strokeWidth =
-                      element.strokeProps.strokeWidth === 0 ? 10 : element.strokeProps.strokeWidth;
+                    strokeWidth = strokeProps.strokeWidth === 0 ? 10 : strokeProps.strokeWidth;
                 }
-                setElement({
-                  ...element,
-                  strokeProps: { ...element.strokeProps, strokeWidth, strokeDasharray }
+                setStrokeProps({
+                  ...strokeProps,
+                  strokeWidth,
+                  strokeDasharray
                 });
               }}
               data={[
@@ -151,10 +161,8 @@ export function SvgPathToolbar() {
           <Menu.Label>Border Width</Menu.Label>
           <Menu.Item>
             <Slider
-              value={element.strokeProps.strokeWidth}
-              onChange={(strokeWidth) =>
-                setElement({ ...element, strokeProps: { ...element.strokeProps, strokeWidth } })
-              }
+              value={strokeProps.strokeWidth}
+              onChange={(strokeWidth) => setStrokeProps({ ...strokeProps, strokeWidth })}
             />
           </Menu.Item>
           <Menu.Label>Rounded Corner</Menu.Label>

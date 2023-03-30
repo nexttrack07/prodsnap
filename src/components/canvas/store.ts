@@ -120,6 +120,28 @@ export const addElementsAtom = atom(null, (_, set, newEls: CanvasElementWithPoin
   set(elementAtomsAtom, (elementAtoms) => [...elementAtoms, ...newEls.map((newEl) => atom(newEl))]);
 });
 
+
+export const activeElementAtom = atom(
+  (get) => {
+    const activeElementAtom = get(activeElementAtomAtom);
+    if (activeElementAtom) {
+      const el = get(activeElementAtom);
+      return el;
+    }
+    return null;
+  },
+  (
+    get,
+    set,
+    element: CanvasElementWithPointAtoms | SetStateAction<CanvasElementWithPointAtoms>
+  ) => {
+    const activeElementAtom = get(activeElementAtomAtom);
+    if (activeElementAtom) {
+      set(activeElementAtom, element);
+    }
+  }
+);
+
 export const canvasAtom = atom({
   width: 800,
   height: 650,

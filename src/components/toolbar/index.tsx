@@ -233,11 +233,9 @@ export function Toolbar() {
       }}
     >
       <SvgPathToolbar />
+      <TextToolbar />
       {/* {activeElement && isCurve(activeElement) && (
         <SvgCurveToolbar element={activeElement} setElement={setActiveElement} />
-      )}
-      {activeElement && isText(activeElement) && (
-        <TextToolbar element={activeElement} setElement={setActiveElement} />
       )}
       {activeElement && isImage(activeElement) && <ImageToolbar />}
       {!activeElement && <CanvasToolbar />} */}

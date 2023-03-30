@@ -11,7 +11,7 @@ import {
   Slider,
   DEFAULT_THEME
 } from '@mantine/core';
-import { MoveableElement, TextType } from '../canvas/store';
+import { activeElementAtom, MoveableElement, TextType } from '../canvas/store';
 import React, { useRef } from 'react';
 import {
   AlignCenter,
@@ -24,25 +24,40 @@ import {
   Underline
 } from 'tabler-icons-react';
 import FontPicker from 'font-picker-react';
+import { atom, useAtom } from 'jotai';
 
-type Props = {
-  element: MoveableElement & TextType;
-  setElement: (element: MoveableElement & TextType) => void;
-};
+const textPropsAtom = atom(
+  (get) => {
+    const element = get(activeElementAtom);
+    if (element && element.type === 'text') {
+      return element.props;
+    }
+    return null;
+  },
+  (get, set, props: TextType['props']) => {
+    const element = get(activeElementAtom);
+    if (element && element.type === 'text') {
+      set(activeElementAtom, { ...element, props });
+    }
+  }
+);
 
-export function TextToolbar({ element, setElement }: Props) {
+export function TextToolbar() {
   const handlers = useRef<NumberInputHandlers>();
+  const [textProps, setTextProps] = useAtom(textPropsAtom);
 
-  const setTextProps = (props: React.CSSProperties) => {
-    setElement({ ...element, props: { ...element.props, ...props } });
-  };
+  if (!textProps) {
+    return null;
+  }
 
   return (
     <Group>
       <FontPicker
         apiKey={import.meta.env.VITE_GOOGLE_FONTS_API_KEY}
-        activeFontFamily={element.props.fontFamily}
-        onChange={(font) => setTextProps({ fontFamily: font.family ?? '' })}
+        activeFontFamily={textProps.fontFamily}
+        onChange={(font) =>
+          setTextProps({ ...textProps, ...textProps, fontFamily: font.family ?? '' })
+        }
       />
       <Popover>
         <Popover.Target>
@@ -51,7 +66,7 @@ export function TextToolbar({ element, setElement }: Props) {
               sx={{
                 width: '100%',
                 height: '100%',
-                backgroundColor: element.props.color,
+                backgroundColor: textProps.color,
                 borderRadius: 3,
                 border: '1px solid #ccc'
               }}
@@ -61,8 +76,8 @@ export function TextToolbar({ element, setElement }: Props) {
         <Popover.Dropdown>
           <ColorPicker
             format="rgba"
-            value={element.props.color}
-            onChange={(val) => setTextProps({ color: val })}
+            value={textProps.color}
+            onChange={(val) => setTextProps({ ...textProps, color: val })}
             swatches={[
               ...DEFAULT_THEME.colors.red,
               ...DEFAULT_THEME.colors.yellow,
@@ -79,8 +94,8 @@ export function TextToolbar({ element, setElement }: Props) {
 
         <NumberInput
           hideControls
-          value={element.props.fontSize ? +element.props.fontSize : 0}
-          onChange={(val) => setTextProps({ fontSize: val })}
+          value={textProps.fontSize ? +textProps.fontSize : 0}
+          onChange={(val) => setTextProps({ ...textProps, fontSize: val })}
           handlersRef={handlers}
           max={200}
           min={10}
@@ -96,10 +111,11 @@ export function TextToolbar({ element, setElement }: Props) {
         <ActionIcon
           size={36}
           color="dark"
-          variant={element.props.fontWeight === 'bolder' ? 'light' : 'subtle'}
+          variant={textProps.fontWeight === 'bolder' ? 'light' : 'subtle'}
           onClick={() =>
             setTextProps({
-              fontWeight: element.props.fontWeight === 'bolder' ? 'normal' : 'bolder'
+              ...textProps,
+              fontWeight: textProps.fontWeight === 'bolder' ? 'normal' : 'bolder'
             })
           }
         >
@@ -108,10 +124,11 @@ export function TextToolbar({ element, setElement }: Props) {
         <ActionIcon
           size={36}
           color="dark"
-          variant={element.props.fontStyle === 'italic' ? 'light' : 'subtle'}
+          variant={textProps.fontStyle === 'italic' ? 'light' : 'subtle'}
           onClick={() =>
             setTextProps({
-              fontStyle: element.props.fontStyle === 'italic' ? 'normal' : 'italic'
+              ...textProps,
+              fontStyle: textProps.fontStyle === 'italic' ? 'normal' : 'italic'
             })
           }
         >
@@ -120,10 +137,11 @@ export function TextToolbar({ element, setElement }: Props) {
         <ActionIcon
           size={36}
           color="dark"
-          variant={element.props.textDecoration === 'underline' ? 'light' : 'subtle'}
+          variant={textProps.textDecoration === 'underline' ? 'light' : 'subtle'}
           onClick={() =>
             setTextProps({
-              textDecoration: element.props.textDecoration === 'underline' ? 'none' : 'underline'
+              ...textProps,
+              textDecoration: textProps.textDecoration === 'underline' ? 'none' : 'underline'
             })
           }
         >
@@ -132,10 +150,11 @@ export function TextToolbar({ element, setElement }: Props) {
         <ActionIcon
           size={36}
           color="dark"
-          variant={element.props.textTransform === 'uppercase' ? 'light' : 'subtle'}
+          variant={textProps.textTransform === 'uppercase' ? 'light' : 'subtle'}
           onClick={() =>
             setTextProps({
-              textTransform: element.props.textTransform === 'uppercase' ? 'none' : 'uppercase'
+              ...textProps,
+              textTransform: textProps.textTransform === 'uppercase' ? 'none' : 'uppercase'
             })
           }
         >
@@ -154,6 +173,7 @@ export function TextToolbar({ element, setElement }: Props) {
             <SegmentedControl
               onChange={(val) =>
                 setTextProps({
+                  ...textProps,
                   textAlign: val as React.CSSProperties['textAlign']
                 })
               }
@@ -168,8 +188,8 @@ export function TextToolbar({ element, setElement }: Props) {
           <Menu.Label>Letter Spacing</Menu.Label>
           <Menu.Item>
             <Slider
-              onChange={(val) => setTextProps({ letterSpacing: val })}
-              value={element.props.letterSpacing as number}
+              onChange={(val) => setTextProps({ ...textProps, letterSpacing: val })}
+              value={textProps.letterSpacing as number}
               min={0}
               max={50}
               step={0.5}
@@ -180,8 +200,8 @@ export function TextToolbar({ element, setElement }: Props) {
           <Menu.Item>
             <Slider
               disabled
-              onChange={(val) => setTextProps({ lineHeight: val })}
-              value={element.props.lineHeight as number}
+              onChange={(val) => setTextProps({ ...textProps, lineHeight: val })}
+              value={textProps.lineHeight as number}
             />
           </Menu.Item>
         </Menu.Dropdown>
