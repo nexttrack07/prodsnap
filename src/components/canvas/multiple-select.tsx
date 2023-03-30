@@ -3,9 +3,25 @@ import React from 'react';
 import { positionAtom, dimensionAtom } from '@/components/canvas/store';
 import { DragHandler } from './drag-handler';
 
-export function MultipleSelect() {
+type Props = {
+  show: boolean;
+};
+
+export function MultipleSelect({ show }: Props) {
   const [position, setPosition] = useAtom(positionAtom);
   const dimension = useAtomValue(dimensionAtom);
 
-  return <DragHandler dimension={dimension} position={position} onMove={setPosition} />;
+  if (!show) {
+    return null;
+  }
+
+  return (
+    <DragHandler
+      withMoveHandle
+      withBorders
+      dimension={dimension}
+      position={position}
+      onMove={setPosition}
+    />
+  );
 }

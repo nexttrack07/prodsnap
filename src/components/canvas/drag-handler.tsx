@@ -37,7 +37,7 @@ export function DragHandler({
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
     lastPos.current = { x: e.clientX, y: e.clientY };
-    setMoving(true);
+    setMoving(true && !hide);
   };
 
   useEffect(() => {
@@ -73,8 +73,6 @@ export function DragHandler({
 
   if (width === 0) return null;
 
-  if (hide) return null;
-
   return (
     <div
       style={{
@@ -101,19 +99,19 @@ export function DragHandler({
             transform: 'translateX(-50%)',
             boxShadow: '0 0 4px rbga(0,0,0,0.5)',
             borderRadius: '50%',
-            border: `1px solid ${theme.colors.blue[4]}`,
-            backgroundColor: theme.colors.blue[0],
+            border: `1px solid ${theme.colors.dark[4]}`,
+            backgroundColor: theme.colors.gray[1],
             padding: 2
           }}
         >
-          <ArrowsMove color={theme.colors.blue[7]} size={14} />
+          <ArrowsMove color={theme.colors.dark[7]} size={14} />
         </Center>
       )}
       {withBorders && (
         <div
           style={{
             position: 'absolute',
-            border: `2px dashed ${theme.colors.blue[3]}`,
+            border: `2px dashed ${theme.colors.dark[2]}`,
             top: 0,
             left: 0,
             bottom: 0,

@@ -150,6 +150,7 @@ export function RenderText({
         cursor,
         ...element.props
       }}
+      onClick={onSelect}
       className={clsx({ [classes.borders]: isSelected })}
     >
       <div
