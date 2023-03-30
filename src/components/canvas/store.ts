@@ -251,3 +251,10 @@ export const isText = (element: CanvasElementWithPointAtoms): element is TextTyp
   element && element.type === 'text';
 export const isCurve = (element: CanvasElementWithPointAtoms): element is SVGCurveWithPointAtoms =>
   element && element.type === 'svg-curve';
+
+
+
+export const unSelectAllAtom = atom(null, (_get, set) => {
+  set(selectedElementAtomsAtom, []);
+  set(activeElementAtomAtom, null);
+});

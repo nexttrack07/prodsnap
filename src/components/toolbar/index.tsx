@@ -42,6 +42,7 @@ const deleteSelectedAtom = atom(null, (get, set) => {
     );
     set(selectedElementAtomsAtom, []);
   }
+  set(activeElementAtomAtom, null);
 });
 
 const isGroupedAtom = atom((get) => {
@@ -100,22 +101,6 @@ const copySelectedAtom = atom(null, (get, set) => {
 function getRandomNumber(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-
-const activeElementAtom = atom(
-  (get) => {
-    const activeElementAtom = get(activeElementAtomAtom);
-    if (activeElementAtom) {
-      return get(activeElementAtom);
-    }
-    return null;
-  },
-  (get, set, element: CanvasElementWithPointAtoms) => {
-    const activeElementAtom = get(activeElementAtomAtom);
-    if (activeElementAtom) {
-      set(activeElementAtom, element);
-    }
-  }
-);
 
 const alignElementsAtom = atom(
   null,
@@ -177,11 +162,11 @@ const alignElementsAtom = atom(
 export function Toolbar() {
   const deletedSelectedElements = useSetAtom(deleteSelectedAtom);
   const selectedElements = useAtomValue(selectedElementAtomsAtom);
+  const allElements = useAtomValue(elementAtomsAtom);
   const addGroup = useSetAtom(addGroupAtom);
   const removeGroup = useSetAtom(removeGroupAtom);
   const isGrouped = useAtomValue(isGroupedAtom);
   const copySelected = useSetAtom(copySelectedAtom);
-  // const [activeElement, setActiveElement] = useAtom(activeElementAtom);
   const alignElements = useSetAtom(alignElementsAtom);
   const [position, setPosition] = useAtom(sidepanelAtom);
 
@@ -236,7 +221,7 @@ export function Toolbar() {
       <TextToolbar />
       <ImageToolbar />
       <SvgCurveToolbar />
-      {/* {!activeElement && <CanvasToolbar />} */}
+      <CanvasToolbar />
       <div style={{ flex: 1 }} />
       <Group spacing="xs">
         {selectedElements.length > 1 && (
@@ -288,17 +273,31 @@ export function Toolbar() {
             Ungroup
           </Button>
         ) : null}
-        <Button leftIcon={<Copy size={18} />} onClick={handleCopyClick} size="xs" variant="default">
-          Copy
-        </Button>
+        {selectedElements.length > 1 && (
+          <Button
+            leftIcon={<Copy size={18} />}
+            onClick={handleCopyClick}
+            size="xs"
+            variant="default"
+          >
+            Copy
+          </Button>
+        )}
         <Button
           onClick={handlePositionClick}
           size="xs"
           variant={position === 'position' ? 'light' : 'default'}
+          disabled={allElements.length === 0}
         >
           Position
         </Button>
-        <ActionIcon size={36} variant="outline" onClick={handleDeleteClick} color="red">
+        <ActionIcon
+          disabled={allElements.length === 0}
+          size={36}
+          variant="outline"
+          onClick={handleDeleteClick}
+          color="red"
+        >
           <Trash />
         </ActionIcon>
       </Group>

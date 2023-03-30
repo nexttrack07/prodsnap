@@ -8,7 +8,8 @@ import {
   elementAtomsAtom,
   ElementType,
   groupsByIdAtom,
-  selectedElementAtomsAtom
+  selectedElementAtomsAtom,
+  unSelectAllAtom
 } from './store';
 import { RenderImage } from './render-image';
 import { RenderText } from './render-text';
@@ -18,18 +19,15 @@ import { useShiftKeyPressed } from '../../utils';
 import { atomFamily } from 'jotai/utils';
 import { MultipleSelect } from './multiple-select';
 
-const unSelectAllAtom = atom(null, (_get, set) => {
-  set(selectedElementAtomsAtom, []);
-});
-
 export function Canvas() {
   const elementAtoms = useAtomValue(elementAtomsAtom);
   const unSelectAllElements = useSetAtom(unSelectAllAtom);
-  const { width, height, backgroundColor } = useAtomValue(canvasAtom);
+  const [{ width, height, backgroundColor }, setCanvas] = useAtom(canvasAtom);
   const selected = useAtomValue(selectedElementAtomsAtom);
 
   const handleCanvasMouseDown = () => {
     unSelectAllElements();
+    setCanvas((c) => ({ ...c, isSelected: true }));
   };
 
   return (
