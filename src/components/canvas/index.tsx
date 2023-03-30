@@ -47,7 +47,7 @@ export function Canvas() {
       })}
       onMouseDown={handleCanvasMouseDown}
     >
-      <MultipleSelect />
+      <MultipleSelect show={selected.length > 1} />
       {elementAtoms.map((elementAtom) => (
         <Element key={elementAtom.toString()} elementAtom={elementAtom} />
       ))}
@@ -71,10 +71,18 @@ const groupFromElementAtom = atomFamily((element: CanvasElementWithPointAtoms) =
   })
 );
 
+const isGroupedAtom = atomFamily((element: CanvasElementWithPointAtoms) =>
+  atom((get) => {
+    const group = get(groupFromElementAtom(element));
+    return !!group;
+  })
+);
+
 export function Element({ elementAtom }: { elementAtom: ElementType }) {
   const [element, setElement] = useAtom(elementAtom);
   const [selectedElementAtoms, setSelectedElementAtoms] = useAtom(selectedElementAtomsAtom);
   const atomGroup = useAtomValue(groupFromElementAtom(element));
+  const isGrouped = useAtomValue(isGroupedAtom(element));
   const isShiftPressed = useShiftKeyPressed();
   const setActiveElementAtom = useSetAtom(activeElementAtomAtom);
 
@@ -101,7 +109,7 @@ export function Element({ elementAtom }: { elementAtom: ElementType }) {
       onSelect={handleSelectElement}
       element={element}
       setElement={handleSetElement}
-      isSelected={selectedElementAtoms.includes(elementAtom)}
+      isSelected={selectedElementAtoms.includes(elementAtom) && !isGrouped}
     />
   );
 }

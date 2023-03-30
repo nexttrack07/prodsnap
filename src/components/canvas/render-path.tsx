@@ -39,6 +39,7 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
   );
 
   const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     onSelect(e);
   };
 
@@ -87,6 +88,7 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
       position={{ x, y }}
       dimension={{ width, height }}
       onMove={handleMouseMove}
+      hide={!isSelected}
     >
       <svg opacity={element.opacity} {...element.props} viewBox={element.getViewBox(width, height)}>
         <path {...element.path} d={element.getPath(width, height)} />
