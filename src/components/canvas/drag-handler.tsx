@@ -94,17 +94,17 @@ export function DragHandler({
           onMouseDown={handleMouseDown}
           style={{
             position: 'absolute',
-            top: -50,
+            top: -30,
             left: '50%',
             transform: 'translateX(-50%)',
-            boxShadow: '0 0 4px rbga(0,0,0,0.5)',
-            borderRadius: '50%',
-            border: `1px solid ${theme.colors.dark[4]}`,
-            backgroundColor: theme.colors.gray[1],
+            boxShadow: theme.shadows.md,
+            borderRadius: '20%',
+            border: `1px solid ${theme.colors.gray[5]}`,
+            backgroundColor: theme.colors.gray[0],
             padding: 2
           }}
         >
-          <ArrowsMove color={theme.colors.dark[7]} size={14} />
+          <ArrowsMove color={theme.colors.gray[6]} size={14} />
         </Center>
       )}
       {withBorders && (
@@ -116,7 +116,7 @@ export function DragHandler({
             left: 0,
             bottom: 0,
             right: 0,
-            transform: 'scale(1.03)',
+            transform: 'scale(1.02)',
             borderRadius: 3
           }}
         ></div>
