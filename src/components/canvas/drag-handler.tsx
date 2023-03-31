@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useAtomValue, useAtom } from 'jotai';
+import { useAtomValue, useAtom, useSetAtom } from 'jotai';
 import { Draggable, Resizable, isMovingAtom } from '@/components/canvas/store';
 import { isCroppingAtom } from '@/components/toolbar/image-toolbar';
 import { useRef, useState } from 'react';
@@ -30,6 +30,7 @@ export function DragHandler({
   const { x, y } = position;
   const { width, height } = dimension;
   const [moving, setMoving] = useState(false);
+  const setIsMoving = useSetAtom(isMovingAtom);
   const isCropping = useAtomValue(isCroppingAtom);
   const theme = useMantineTheme();
   const lastPos = useRef({ x: 0, y: 0 });
@@ -38,12 +39,14 @@ export function DragHandler({
     e.stopPropagation();
     lastPos.current = { x: e.clientX, y: e.clientY };
     setMoving(true && !hide);
+    setIsMoving(true);
   };
 
   useEffect(() => {
     const handleMouseUp = (e: MouseEvent) => {
       e.stopPropagation();
       setMoving(false);
+      setIsMoving(false);
     };
 
     const handleMouseMove = (e: MouseEvent) => {
