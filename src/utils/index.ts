@@ -1,6 +1,6 @@
-export * from "./use-shiftkey";
-export { default as useEventListener } from "./use-event";
-export * from "./use-click-outside"
+export * from './use-shiftkey';
+export { default as useEventListener } from './use-event';
+export * from './use-click-outside';
 
 export const getImageDimensions = (src: string, w: number = Infinity, h: number = Infinity) => {
   return new Promise<{ width: number; height: number }>((resolve, reject) => {
@@ -15,13 +15,11 @@ export const getImageDimensions = (src: string, w: number = Infinity, h: number 
   });
 };
 
-
 export function getRandomInt(min: number = 100, max: number = 500) {
   const n = Math.ceil(min);
   const x = Math.floor(max);
   return Math.floor(Math.random() * (x - n + 1)) + n;
 }
-
 
 export function deserialize(serializedObj: string): any {
   return JSON.parse(serializedObj, (key, value) => {
@@ -38,7 +36,11 @@ type Point = {
   y: number;
 };
 
-export function calculateAnglesOfRightTriangle(A: Point, B: Point, C: Point): [number, number, number] {
+export function calculateAnglesOfRightTriangle(
+  A: Point,
+  B: Point,
+  C: Point
+): [number, number, number] {
   function distance(p1: Point, p2: Point): number {
     return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
   }
@@ -67,15 +69,33 @@ export function calculateAnglesOfRightTriangle(A: Point, B: Point, C: Point): [n
   return [alpha, beta, gamma];
 }
 
-
 export const SNAP_TOLERANCE = 5;
 
-export function getSnap(num: number, d = 0, max = 1000) {
-  if (num > -SNAP_TOLERANCE && num < SNAP_TOLERANCE) {
+export function calculatePosition(
+  position: number,
+  delta: number,
+  size: number,
+  max: number,
+  snapTolerance: number = 0
+): number {
+  // if the position is already zero, don't snap
+  if (position === 0) {
+    return position + delta;
+  }
+  // if the position + delta is between -snapTolerance and snapTolerance, snap to zero
+  if (position + delta > -snapTolerance && position + delta < snapTolerance) {
     return 0;
-  } else if (num + d > max - SNAP_TOLERANCE && num + d < max + SNAP_TOLERANCE) {
-    return max - d;
   }
 
-  return num;
+  // if position + size is already max, don't snap
+  if (position + size === max) {
+    return position + delta;
+  }
+
+  // if position + size + delta is between max - snapTolerance and max + snapTolerance, snap to max
+  if (position + size + delta > max - snapTolerance && position + size + delta < max + snapTolerance) {
+    return max - size;
+  }
+  
+  return position + delta;
 }

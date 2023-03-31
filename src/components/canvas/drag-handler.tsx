@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { useAtomValue } from 'jotai';
-import { Draggable, Resizable, selectedItemsAtom } from '@/components/canvas/store';
+import { useAtomValue, useAtom } from 'jotai';
+import { Draggable, Resizable, isMovingAtom } from '@/components/canvas/store';
 import { isCroppingAtom } from '@/components/toolbar/image-toolbar';
 import { useRef, useState } from 'react';
 import { Center, useMantineTheme } from '@mantine/core';
@@ -29,9 +29,9 @@ export function DragHandler({
 }: Props) {
   const { x, y } = position;
   const { width, height } = dimension;
+  const [moving, setMoving] = useState(false);
   const isCropping = useAtomValue(isCroppingAtom);
   const theme = useMantineTheme();
-  const [moving, setMoving] = useState(false);
   const lastPos = useRef({ x: 0, y: 0 });
 
   const handleMouseDown = (e: React.MouseEvent) => {

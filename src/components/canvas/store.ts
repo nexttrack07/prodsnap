@@ -252,7 +252,7 @@ export const isText = (element: CanvasElementWithPointAtoms): element is TextTyp
 export const isCurve = (element: CanvasElementWithPointAtoms): element is SVGCurveWithPointAtoms =>
   element && element.type === 'svg-curve';
 
-
+export const isMovingAtom = atom(false);
 
 export const unSelectAllAtom = atom(null, (_get, set) => {
   set(selectedElementAtomsAtom, []);

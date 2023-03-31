@@ -193,6 +193,7 @@ export function RenderCurve({
           position: 'absolute'
         }}
         vectorEffect="non-scaling-stroke"
+        onClick={(e) => e.stopPropagation()}
       >
         <defs>
           <marker

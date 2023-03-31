@@ -11,7 +11,7 @@ import {
   Draggable,
   canvasAtom
 } from './store';
-import { getImageDimensions, getSnap } from '../../utils';
+import { calculatePosition, getImageDimensions, SNAP_TOLERANCE } from '../../utils';
 import { Center, Box, Image, Loader, useMantineTheme } from '@mantine/core';
 import 'react-image-crop/dist/ReactCrop.css';
 import { circleCropAtom } from '../../components/toolbar/image-toolbar';
@@ -73,8 +73,8 @@ export function RenderImage({
       setElement((el) => {
         return {
           ...el,
-          x: getSnap(p.x + el.x, el.width, canvasProps.width),
-          y: getSnap(p.y + el.y, el.height, canvasProps.height)
+          x: calculatePosition(el.x, p.x, el.width, canvasProps.width, SNAP_TOLERANCE),
+          y: calculatePosition(el.y, p.y, el.height, canvasProps.height, SNAP_TOLERANCE)
         };
       });
     },
