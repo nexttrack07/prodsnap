@@ -19,19 +19,10 @@ import { atom, useAtom } from 'jotai';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PositionPanel } from './position-panel';
 import { TemplatesPanel } from './templates-panel';
+import { NavState, sidepanelAtom } from '../canvas/store';
 
 export const SIDEBAR_SIZE = 60;
 export const SIDEPANEL_SIZE = 350 + SIDEBAR_SIZE;
-
-type NavState =
-  | 'templates'
-  | 'upload'
-  | 'photos'
-  | 'text'
-  | 'curves'
-  | 'shapes'
-  | 'graphics'
-  | 'position';
 
 const navItems: { icon: Icon; label: string; id: NavState }[] = [
   { icon: Template, label: 'Template', id: 'templates' },
@@ -125,8 +116,6 @@ const panelMap: Record<NavState, JSX.Element> = {
     </motion.div>
   )
 };
-
-export const sidepanelAtom = atom<NavState>('shapes');
 
 export function Sidepanel() {
   const [active, setActive] = useAtom(sidepanelAtom);

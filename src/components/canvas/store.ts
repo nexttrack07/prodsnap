@@ -258,3 +258,16 @@ export const unSelectAllAtom = atom(null, (_get, set) => {
   set(selectedElementAtomsAtom, []);
   set(activeElementAtomAtom, null);
 });
+
+
+export type NavState =
+  | 'templates'
+  | 'upload'
+  | 'photos'
+  | 'text'
+  | 'curves'
+  | 'shapes'
+  | 'graphics'
+  | 'position';
+
+export const sidepanelAtom = atom<NavState>('shapes');
