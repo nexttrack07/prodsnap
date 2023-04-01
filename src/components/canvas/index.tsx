@@ -17,34 +17,10 @@ import { RenderImage } from './render-image';
 import { RenderText } from './render-text';
 import { RenderPath } from './render-path';
 import { RenderCurve } from './render-curve';
+import { RenderGuide } from './render-guides';
 import { useShiftKeyPressed } from '../../utils';
 import { atomFamily } from 'jotai/utils';
 import { MultipleSelect } from './multiple-select';
-
-function RenderGuide() {
-  const canvasState = useAtomValue(canvasAtom);
-  const isMoving = useAtomValue(isMovingAtom);
-  const element = useAtomValue(activeElementAtom);
-
-  if (!element) return null;
-
-  const left = canvasState.width / 2;
-  const elementMiddle = element.x + element.width / 2;
-
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        top: 0,
-        left,
-        width: 1,
-        height: canvasState.height,
-        backgroundColor: 'red',
-        opacity: isMoving && Math.abs(elementMiddle - left) < 5 ? 1 : 0
-      }}
-    />
-  );
-}
 
 export function Canvas() {
   const elementAtoms = useAtomValue(elementAtomsAtom);
@@ -54,8 +30,8 @@ export function Canvas() {
 
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // unSelectAllElements();
-    // setCanvas((c) => ({ ...c, isSelected: true }));
+    unSelectAllElements();
+    setCanvas((c) => ({ ...c, isSelected: true }));
   };
 
   return (

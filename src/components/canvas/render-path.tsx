@@ -27,7 +27,6 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
 
   const handleMouseMove = useCallback(
     (p: Draggable) => {
-      console.log('p: ', p);
       setElement((el) => {
         return {
           ...el,
