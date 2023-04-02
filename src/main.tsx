@@ -37,7 +37,8 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         primaryColor: 'dark',
         primaryShade: 4,
         defaultRadius: 'xs',
-        components: { Button: { defaultProps: { size: 'sm', variant: 'default' } } }
+        components: { Button: { defaultProps: { size: 'sm', variant: 'default' } } },
+        defaultGradient: { deg: 45, from: 'dark', to: 'gray.7' }
       }}
     >
       <Global

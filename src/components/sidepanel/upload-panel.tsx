@@ -6,7 +6,8 @@ import {
   Space,
   SimpleGrid,
   Image,
-  LoadingOverlay
+  LoadingOverlay,
+  Divider
 } from '@mantine/core';
 import { useSetAtom } from 'jotai';
 import { addElementAtom, CanvasElementWithPointAtoms, defaultImage } from '../canvas/store';
@@ -14,7 +15,7 @@ import { firestore, storage } from '../../utils/firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { addDoc, collection, getDocs } from 'firebase/firestore';
 import { showNotification, updateNotification } from '@mantine/notifications';
-import { Check, X } from 'tabler-icons-react';
+import { Check, CloudUpload, X } from 'tabler-icons-react';
 import { useQuery } from '@tanstack/react-query';
 
 const useStyles = createStyles((theme) => ({
@@ -110,18 +111,24 @@ export function UploadPanel() {
     <>
       <FileButton onChange={handleUploadImage} accept="image/png,image/jpeg">
         {(props) => (
-          <Button fullWidth {...props}>
+          <Button
+            size="md"
+            leftIcon={<CloudUpload />}
+            variant="gradient"
+            uppercase
+            fullWidth
+            {...props}
+          >
             Upload image
           </Button>
         )}
       </FileButton>
-      <Space h="xl" />
+      <Divider my="xl" />
       <LoadingOverlay visible={query.isLoading} />
       <SimpleGrid cols={3}>
         {query.data?.map((image) => (
           <Image
             key={image.url}
-            radius="md"
             className={classes.shape}
             src={image.url}
             onClick={() => {

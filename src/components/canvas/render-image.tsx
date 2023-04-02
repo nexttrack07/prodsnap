@@ -112,7 +112,7 @@ export function RenderImage({
             y="0"
             xmlSpace="preserve"
             style={{ position: 'absolute' }}
-            enableBackground={`new 0 0 ${width + 6} ${height + 6}`}
+            enableBackground={`new -6 -6 ${width + 12} ${height + 12}`}
           >
             <defs>
               <clipPath id="001">

@@ -71,6 +71,7 @@ export type ImageType = {
   state: ImageState;
   thumbnail?: string;
   currentUrl?: string;
+  mask?: 'none' | 'circle' | 'pentagon' | 'star' | 'rectangle';
 } & MoveableElement;
 
 export type CanvasElement = ImageType | TextType | SVGPathType | SVGCurveType;
@@ -99,7 +100,8 @@ export const defaultImage: ImageType & MoveableElement = {
   y: 200,
   state: ImageState.Normal,
   width: 400,
-  height: 400
+  height: 400,
+  mask: 'none'
 };
 
 export const selectedItemsAtom = atom((get) => {
