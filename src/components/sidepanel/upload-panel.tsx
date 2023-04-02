@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { FileButton, createStyles, Button, Space, SimpleGrid, Image } from '@mantine/core';
+import {
+  FileButton,
+  createStyles,
+  Button,
+  Space,
+  SimpleGrid,
+  Image,
+  LoadingOverlay
+} from '@mantine/core';
 import { useSetAtom } from 'jotai';
 import { addElementAtom, CanvasElementWithPointAtoms, defaultImage } from '../canvas/store';
 import { firestore, storage } from '../../utils/firebase';
@@ -7,6 +15,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { addDoc, collection, getDocs } from 'firebase/firestore';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import { Check, X } from 'tabler-icons-react';
+import { useQuery } from '@tanstack/react-query';
 
 const useStyles = createStyles((theme) => ({
   shape: {
@@ -27,23 +36,21 @@ type ImageFile = {
   url: string;
 };
 
+async function fetchImages() {
+  const docRef = collection(firestore, 'images');
+  const snap = await getDocs(docRef);
+  let newImages: ImageFile[] = [];
+  snap.forEach((doc) => {
+    newImages.push(doc.data() as ImageFile);
+  });
+  return newImages;
+}
+
 export function UploadPanel() {
   const addElement = useSetAtom(addElementAtom);
   const { classes } = useStyles();
   const [error, setError] = useState<Error | null>(null);
-  const [images, setImages] = useState<ImageFile[]>([]);
-
-  useEffect(() => {
-    const docRef = collection(firestore, 'images');
-
-    getDocs(docRef).then((snap) => {
-      let newImages: ImageFile[] = [];
-      snap.forEach((doc) => {
-        newImages.push(doc.data() as ImageFile);
-      });
-      setImages(newImages);
-    });
-  }, []);
+  const query = useQuery(['images'], fetchImages);
 
   const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
     addElement(newEl);
@@ -109,25 +116,24 @@ export function UploadPanel() {
         )}
       </FileButton>
       <Space h="xl" />
+      <LoadingOverlay visible={query.isLoading} />
       <SimpleGrid cols={3}>
-        {images.length > 0
-          ? images.map((image) => (
-              <Image
-                key={image.url}
-                radius="md"
-                className={classes.shape}
-                src={image.url}
-                onClick={() => {
-                  const el: CanvasElementWithPointAtoms = {
-                    ...defaultImage,
-                    url: image.url
-                  };
+        {query.data?.map((image) => (
+          <Image
+            key={image.url}
+            radius="md"
+            className={classes.shape}
+            src={image.url}
+            onClick={() => {
+              const el: CanvasElementWithPointAtoms = {
+                ...defaultImage,
+                url: image.url
+              };
 
-                  handleAddElement(el);
-                }}
-              />
-            ))
-          : null}
+              handleAddElement(el);
+            }}
+          />
+        ))}
       </SimpleGrid>
     </>
   );

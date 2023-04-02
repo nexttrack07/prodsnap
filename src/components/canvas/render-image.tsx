@@ -97,15 +97,47 @@ export function RenderImage({
       {element.state === ImageState.Loading && <Loader></Loader>}
       {element.state === ImageState.Normal && (
         <>
-          <Image
+          {/* <Image
             style={{
               userSelect: 'none',
-              pointerEvents: 'none'
+              pointerEvents: 'none',
+              border: '4px solid #39f'
             }}
             width={width}
             height={height}
             src={element.currentUrl ?? element.url}
-          />
+          /> */}
+          <svg
+            x="0"
+            y="0"
+            xmlSpace="preserve"
+            style={{ position: 'absolute' }}
+            enableBackground={`new 0 0 ${width + 6} ${height + 6}`}
+          >
+            <defs>
+              <clipPath id="001">
+                <circle
+                  fill="none"
+                  stroke="black"
+                  strokeWidth={6}
+                  id="circle"
+                  cx={width / 2}
+                  cy={width / 2}
+                  r={width / 2}
+                />
+              </clipPath>
+            </defs>
+          </svg>
+          <svg viewBox={`-6 -6 ${width + 12} ${height + 12}`}>
+            <use href="#circle" />
+            <image
+              clipPath="url(#001)"
+              preserveAspectRatio="xMidYMid slice"
+              href={element.currentUrl ?? element.url}
+              width={width}
+              height={height}
+            />
+          </svg>
           <ResizeHandler
             withBMResize={false}
             withTMResize={false}
