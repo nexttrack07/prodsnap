@@ -35,7 +35,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       theme={{
         colorScheme: 'light',
         primaryColor: 'dark',
-        primaryShade: 9,
+        primaryShade: 4,
         defaultRadius: 'xs',
         components: { Button: { defaultProps: { size: 'sm', variant: 'default' } } }
       }}

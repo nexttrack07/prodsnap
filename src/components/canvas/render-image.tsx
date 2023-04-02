@@ -98,7 +98,10 @@ export function RenderImage({
       {element.state === ImageState.Normal && (
         <>
           <Image
-            style={{ userSelect: 'none', pointerEvents: 'none' }}
+            style={{
+              userSelect: 'none',
+              pointerEvents: 'none'
+            }}
             width={width}
             height={height}
             src={element.currentUrl ?? element.url}

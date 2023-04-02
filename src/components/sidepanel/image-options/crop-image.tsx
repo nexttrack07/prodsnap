@@ -77,12 +77,7 @@ export const ImageCropper = () => {
     <Group>
       {imageState === ImageState.Normal && (
         <>
-          <Button
-            sx={(theme) => ({ boxShadow: theme.shadows.sm })}
-            size="xs"
-            variant="outline"
-            onClick={handleRemoveBg}
-          >
+          <Button size="xs" variant="outline" onClick={handleRemoveBg}>
             Remove Background
           </Button>
           <Button size="xs" variant="outline" onClick={handleCropImage}>
