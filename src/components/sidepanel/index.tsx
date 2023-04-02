@@ -15,11 +15,12 @@ import { PhotosPanel } from './photos-panel';
 import { TextPanel } from './text-panel';
 import { UploadPanel } from './upload-panel';
 import { CurvesPanel } from './curves-panel';
-import { atom, useAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PositionPanel } from './position-panel';
 import { TemplatesPanel } from './templates-panel';
 import { NavState, sidepanelAtom } from '../canvas/store';
+import { ImageCropper } from './image-options/crop-image';
 
 export const SIDEBAR_SIZE = 60;
 export const SIDEPANEL_SIZE = 350 + SIDEBAR_SIZE;
@@ -35,86 +36,15 @@ const navItems: { icon: Icon; label: string; id: NavState }[] = [
 ];
 
 const panelMap: Record<NavState, JSX.Element> = {
-  templates: (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <TemplatesPanel />
-    </motion.div>
-  ),
-  upload: (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <UploadPanel />
-    </motion.div>
-  ),
-  photos: (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <PhotosPanel />
-    </motion.div>
-  ),
-  text: (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <TextPanel />
-    </motion.div>
-  ),
-  curves: (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <CurvesPanel />
-    </motion.div>
-  ),
-  shapes: (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <ShapesPanel />
-    </motion.div>
-  ),
-  graphics: (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      Graphics
-    </motion.div>
-  ),
-  position: (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <PositionPanel />
-    </motion.div>
-  )
+  templates: <TemplatesPanel />,
+  upload: <UploadPanel />,
+  photos: <PhotosPanel />,
+  text: <TextPanel />,
+  curves: <CurvesPanel />,
+  shapes: <ShapesPanel />,
+  graphics: <>Graphics</>,
+  position: <PositionPanel />,
+  'image-editing': <ImageCropper />
 };
 
 export function Sidepanel() {
@@ -147,7 +77,16 @@ export function Sidepanel() {
         ))}
       </Stack>
       <Box sx={{ width: '100%', borderRight: `1px solid ${theme.colors.gray[4]}` }} p="lg">
-        <AnimatePresence>{panelMap[active]}</AnimatePresence>
+        <AnimatePresence>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            {panelMap[active]}
+          </motion.div>
+        </AnimatePresence>
       </Box>
     </div>
   );

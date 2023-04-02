@@ -5,12 +5,8 @@ import {
   elementAtomsAtom,
   selectedElementAtomsAtom,
   groupsByIdAtom,
-  isPath,
-  activeElementAtomAtom,
-  isCurve,
-  isText,
-  isImage,
-  CanvasElementWithPointAtoms
+  sidepanelAtom,
+  activeElementAtomAtom
 } from '../canvas/store';
 import { SvgPathToolbar } from './svg-path-toolbar';
 import { ImageToolbar } from './image-toolbar';
@@ -29,7 +25,6 @@ import {
   Trash
 } from 'tabler-icons-react';
 import { SvgCurveToolbar } from './svg-curve-toolbar';
-import { sidepanelAtom } from '../sidepanel';
 
 const deleteSelectedAtom = atom(null, (get, set) => {
   const selectedElementAtoms = get(selectedElementAtomsAtom);

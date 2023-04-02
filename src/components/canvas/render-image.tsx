@@ -9,12 +9,12 @@ import {
   MoveableElement,
   Resizable,
   Draggable,
-  canvasAtom
+  canvasAtom,
+  circleCropAtom
 } from './store';
 import { calculatePosition, getImageDimensions, SNAP_TOLERANCE } from '../../utils';
 import { Center, Box, Image, Loader, useMantineTheme } from '@mantine/core';
 import 'react-image-crop/dist/ReactCrop.css';
-import { circleCropAtom } from '../../components/toolbar/image-toolbar';
 import { ResizeHandler } from './resize-handler';
 import { DragHandler } from './drag-handler';
 

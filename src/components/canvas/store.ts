@@ -268,6 +268,53 @@ export type NavState =
   | 'curves'
   | 'shapes'
   | 'graphics'
-  | 'position';
+  | 'position'
+  | 'image-editing';
 
 export const sidepanelAtom = atom<NavState>('shapes');
+export const circleCropAtom = atom(false);
+export const imageUrlAtom = atom((get) => {
+  return get(selectedImageAtom)?.url ?? '';
+});
+
+export const imageStateAtom = atom((get) => {
+  return get(selectedImageAtom)?.state ?? ImageState.Normal;
+});
+
+export const imageDimensionsAtom = atom((get) => {
+  const image = get(selectedImageAtom);
+  if (image) {
+    return {
+      width: image.width,
+      height: image.height
+    };
+  }
+
+  return { width: 0, height: 0 };
+});
+
+export const isCroppingAtom = atom(false);
+
+export const selectedImageAtom = atom(
+  (get) => {
+    const activeElementAtom = get(activeElementAtomAtom);
+    if (activeElementAtom) {
+      const selectedElement = get(activeElementAtom);
+      return selectedElement.type === 'image' ? selectedElement : null;
+    }
+    return null;
+  },
+  (get, set, update: Partial<ImageType>) => {
+    const activeElementAtom = get(activeElementAtomAtom);
+    if (activeElementAtom) {
+      set(activeElementAtom, (el) =>
+        el.type === 'image'
+          ? ({
+              ...el,
+              ...update
+            } as CanvasElementWithPointAtoms)
+          : el
+      );
+    }
+  }
+);

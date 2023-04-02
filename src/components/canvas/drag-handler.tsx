@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useAtomValue, useAtom, useSetAtom } from 'jotai';
-import { Draggable, Resizable, isMovingAtom } from '@/components/canvas/store';
-import { isCroppingAtom } from '@/components/toolbar/image-toolbar';
+import { Draggable, Resizable, isMovingAtom, isCroppingAtom } from '@/components/canvas/store';
 import { useRef, useState } from 'react';
 import { Center, useMantineTheme } from '@mantine/core';
 import { ArrowsMove } from 'tabler-icons-react';
@@ -71,8 +70,6 @@ export function DragHandler({
     e.stopPropagation();
     onClick && onClick(e);
   };
-
-  if (isCropping) return null;
 
   if (width === 0) return null;
 
