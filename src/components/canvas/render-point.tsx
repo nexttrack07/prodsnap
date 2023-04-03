@@ -1,8 +1,25 @@
 import React, { useRef, useState } from 'react';
-import { useMantineTheme } from '@mantine/core';
+import { createStyles } from '@mantine/core';
 import { useAtom } from 'jotai';
 import { SVGPointAtom } from './store';
 import useEventListener from '../../utils/use-event';
+
+const useStyles = createStyles((theme) => ({
+  point: {
+    width: 12,
+    height: 12,
+    borderRadius: '50%',
+    backgroundColor: theme.colors.gray[1],
+    borderColor: theme.colors.gray[6],
+    borderStyle: 'solid',
+    borderWidth: 1,
+    boxShadow: theme.shadows.sm,
+    '&:hover': {
+      // stroke: theme.colors.blue[6]
+      filter: 'drop-shadow(0 0 3px rgba(0, 0, 0, 0.5))'
+    }
+  }
+}));
 
 export function RenderPoint({
   pointAtom,
@@ -16,7 +33,7 @@ export function RenderPoint({
   const [point, setPoint] = useAtom(pointAtom);
   const documentRef = useRef<Document>(document);
   const [isMoving, setIsMoving] = useState(false);
-  const theme = useMantineTheme();
+  const { classes } = useStyles();
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -46,16 +63,9 @@ export function RenderPoint({
         left: point.x - position.x,
         top: point.y - position.y,
         transform: `translate(-${4}px,-${4 + width / 2}px)`,
-        width: 12,
-        height: 12,
-        borderRadius: '50%',
-        backgroundColor: theme.colors.blue[1],
-        borderColor: theme.colors.blue[6],
-        borderStyle: 'solid',
-        borderWidth: 1,
-        boxShadow: theme.shadows.sm,
-        cursor: isMoving ? 'grabbing' : 'grab'
+        cursor: isMoving ? 'grabbing' : 'pointer'
       }}
+      className={classes.point}
     ></div>
   );
 }

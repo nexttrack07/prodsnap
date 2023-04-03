@@ -115,7 +115,8 @@ const getPathFromPoints = (points: { x: number; y: number }[], isQuadratic = fal
 const useStyles = createStyles((theme) => ({
   path: {
     '&:hover + path': {
-      stroke: theme.colors.blue[6]
+      // stroke: theme.colors.blue[6]
+      filter: 'drop-shadow(0 0 3px rgba(0, 0, 0, 0.5))'
     }
   }
 }));

@@ -12,7 +12,7 @@ export const useResizeStyles = createStyles((theme) => ({
     height: 12,
     position: 'absolute',
     '&:hover': {
-      backgroundColor: theme.colors.gray[6]
+      filter: 'drop-shadow(0 0 3px rgba(0, 0, 0, 0.5))'
     }
   },
   resize_br: {
