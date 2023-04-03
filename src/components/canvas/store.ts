@@ -317,6 +317,7 @@ export const selectedImageAtom = atom(
   (get, set, update: Partial<ImageType>) => {
     const activeElementAtom = get(activeElementAtomAtom);
     if (activeElementAtom) {
+      console.log('activeElementAtom', activeElementAtom, update)
       set(activeElementAtom, (el) =>
         el.type === 'image'
           ? ({
