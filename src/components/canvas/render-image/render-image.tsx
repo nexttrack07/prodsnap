@@ -17,7 +17,7 @@ import { Center, Box, Image, Loader, useMantineTheme } from '@mantine/core';
 import 'react-image-crop/dist/ReactCrop.css';
 import { ResizeHandler } from '../resize-handler';
 import { DragHandler } from '../drag-handler';
-import { RenderMask } from './render-mask';
+import { RenderBorder } from './render-border';
 
 export const cropperAtom = atom<Cropper | null>(null);
 
@@ -88,7 +88,7 @@ export function RenderImage({
 
   const { width, height, x, y } = element;
   const id = uuid();
-  const s = element.mask.strokeWidth;
+  const s = element.border.strokeWidth;
 
   return (
     <DragHandler
@@ -109,12 +109,12 @@ export function RenderImage({
           >
             <defs>
               <clipPath id={id}>
-                <RenderMask width={width} height={height} mask={element.mask} uid={id} />
+                <RenderBorder width={width} height={height} border={element.border} uid={id} />
               </clipPath>
             </defs>
           </svg>
           <svg viewBox={`${-s} ${-s} ${width + s * 2} ${height + s * 2}`}>
-            <use href={`#${element.mask.id}-${id}`} />
+            <use href={`#${element.border.id}-${id}`} />
             <image
               clipPath={id}
               preserveAspectRatio="xMidYMid slice"

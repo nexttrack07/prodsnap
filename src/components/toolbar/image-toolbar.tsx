@@ -10,27 +10,18 @@ import {
   Group,
   Popover
 } from '@mantine/core';
-import { ImageType, selectedImageAtom, sidepanelAtom } from '@/components/canvas/store';
+import {
+  imageBorderAtom,
+  ImageType,
+  selectedImageAtom,
+  sidepanelAtom
+} from '@/components/canvas/store';
 import { atom, useAtom, useAtomValue } from 'jotai';
-
-const imageMaskAtom = atom(
-  (get) => {
-    const image = get(selectedImageAtom);
-    if (!image) return null;
-    return image.mask;
-  },
-  (get, set, mask: Partial<ImageType['mask']>) => {
-    const image = get(selectedImageAtom);
-    if (!image) return;
-    console.log('mask: ', mask);
-    set(selectedImageAtom, { ...image, mask: { ...image.mask, ...mask } });
-  }
-);
 
 export function ImageToolbar() {
   const [sidepanel, setSidepanel] = useAtom(sidepanelAtom);
   const selectedImage = useAtomValue(selectedImageAtom);
-  const [mask, setMask] = useAtom(imageMaskAtom);
+  const [border, setMask] = useAtom(imageBorderAtom);
   const handlers = useRef<NumberInputHandlers>();
 
   if (!selectedImage) {
@@ -38,7 +29,7 @@ export function ImageToolbar() {
   }
 
   const renderMaskProperties = () => {
-    if (!mask || mask.id === 'none') return null;
+    if (!border || border.id === 'none') return null;
 
     return (
       <Group>
@@ -49,7 +40,7 @@ export function ImageToolbar() {
                 sx={{
                   width: '100%',
                   height: '100%',
-                  borderColor: mask.stroke,
+                  borderColor: border.stroke,
                   borderWidth: 8,
                   borderStyle: 'solid',
                   borderRadius: 3
@@ -60,7 +51,7 @@ export function ImageToolbar() {
           <Popover.Dropdown>
             <ColorPicker
               format="rgba"
-              value={mask.stroke}
+              value={border.stroke}
               onChange={(val) => setMask({ stroke: val })}
               swatches={[
                 ...DEFAULT_THEME.colors.red,
@@ -78,8 +69,8 @@ export function ImageToolbar() {
 
           <NumberInput
             hideControls
-            value={mask.strokeWidth}
-            onChange={(val) => setMask({ strokeWidth: val ?? mask.strokeWidth })}
+            value={border.strokeWidth}
+            onChange={(val) => setMask({ strokeWidth: val ?? border.strokeWidth })}
             handlersRef={handlers}
             max={50}
             min={1}

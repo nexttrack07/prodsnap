@@ -71,7 +71,7 @@ export type ImageType = {
   state: ImageState;
   thumbnail?: string;
   currentUrl?: string;
-  mask: {
+  border: {
     id: 'none' | 'circle' | 'rectangle';
     stroke: string;
     strokeWidth: number;
@@ -105,7 +105,7 @@ export const defaultImage: ImageType & MoveableElement = {
   state: ImageState.Normal,
   width: 400,
   height: 400,
-  mask: {
+  border: {
     id: 'none',
     stroke: 'black',
     strokeWidth: 1
@@ -327,5 +327,20 @@ export const selectedImageAtom = atom(
           : el
       );
     }
+  }
+);
+
+
+export const imageBorderAtom = atom(
+  (get) => {
+    const image = get(selectedImageAtom);
+    if (!image) return null;
+    return image.border;
+  },
+  (get, set, border: Partial<ImageType['border']>) => {
+    const image = get(selectedImageAtom);
+    if (!image) return;
+    console.log('border: ', border);
+    set(selectedImageAtom, { ...image, border: { ...image.border, ...border } });
   }
 );

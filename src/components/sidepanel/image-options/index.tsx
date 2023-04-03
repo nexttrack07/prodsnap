@@ -1,17 +1,23 @@
 import React from 'react';
-import { ActionIcon, Button, SimpleGrid, Stack, Title } from '@mantine/core';
+import { ActionIcon, Button, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { WashDrycleanOff } from 'tabler-icons-react';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '@/utils/firebase';
-import { ImageState, imageUrlAtom, selectedImageAtom } from '@/components/canvas/store';
+import {
+  imageBorderAtom,
+  ImageState,
+  imageUrlAtom,
+  selectedImageAtom
+} from '@/components/canvas/store';
 import { useAtom, useAtomValue } from 'jotai';
 import { ImageCropper } from './crop-image';
-import { MASKS } from './image-masks';
+import { BORDERS } from './image-borders';
 
 const removeBackground = httpsCallable(functions, 'removeBackground');
 
 export function ImageOptions() {
   const [selectedImage, setSelectedImage] = useAtom(selectedImageAtom);
+  const [border, setBorder] = useAtom(imageBorderAtom);
   const url = useAtomValue(imageUrlAtom);
 
   if (!selectedImage) {
@@ -43,16 +49,19 @@ export function ImageOptions() {
       </Button>
       <ImageCropper />
       <br />
-      <Title order={6}>Image Masks</Title>
+      <Title order={6}>Image Borders</Title>
+      <Text size="sm" color="gray">
+        Make sure to crop the image to a circle before using circle border
+      </Text>
       <SimpleGrid cols={4}>
-        {MASKS.map((b) => (
+        {BORDERS.map((b) => (
           <ActionIcon
             color="dark"
-            variant={selectedImage.mask.id === b.id ? 'light' : 'default'}
+            variant={border?.id === b.id ? 'light' : 'default'}
             size={70}
             key={b.id}
             onClick={() => {
-              setSelectedImage({ mask: { id: b.id, stroke: 'black', strokeWidth: 4 } });
+              setBorder({ id: b.id });
             }}
           >
             {b.icon}

@@ -4,80 +4,83 @@ import { ImageType } from '../store';
 type Props = {
   width: number;
   height: number;
-  mask: ImageType['mask'];
+  border: ImageType['border'];
   uid: string;
 };
 
-const MaskMap: Record<ImageType['mask']['id'], React.FC<any>> = {
+const BorderMap: Record<ImageType['border']['id'], React.FC<any>> = {
   none: () => null,
-  circle: RenderCircleMask,
-  rectangle: RenderRectangleMask
-  // pentagon: RenderPentagonMask,
-  // star: RenderStarMask
+  circle: RenderCircleBorder,
+  rectangle: RenderRectangleBorder
+  // pentagon: RenderPentagonBorder,
+  // star: RenderStarBorder
 };
 
-export const RenderMask = ({ width, height, mask, uid }: Props) => {
-  return MaskMap[mask.id]({ width, height, mask, uid });
+export const RenderBorder = ({ width, height, border, uid }: Props) => {
+  return BorderMap[border.id]({ width, height, border, uid });
 };
 
-function RenderCircleMask({
+function RenderCircleBorder({
   width,
-  mask,
+  height,
+  border,
   uid
 }: {
   width: number;
-  mask: ImageType['mask'];
+  height: number;
+  border: ImageType['border'];
   uid: string;
 }) {
+  const radius = Math.max(width, height) / 2;
   return (
     <circle
-      cx={width / 2}
-      cy={width / 2}
-      r={width / 2}
+      cx={radius}
+      cy={radius}
+      r={radius}
       fill="none"
-      stroke={mask.stroke}
-      strokeWidth={mask.strokeWidth}
+      stroke={border.stroke}
+      strokeWidth={border.strokeWidth}
       id={`circle-${uid}`}
     />
   );
 }
 
-function RenderRectangleMask({
+function RenderRectangleBorder({
   width,
   height,
-  mask,
+  border,
   uid
 }: {
   width: number;
   height: number;
-  mask: ImageType['mask'];
+  border: ImageType['border'];
   uid: string;
 }) {
-  console.log('helo', mask);
+  console.log('helo', border);
   return (
     <rect
       width={width}
       height={height}
       fill="none"
-      stroke={mask.stroke}
-      strokeWidth={mask.strokeWidth}
+      stroke={border.stroke}
+      strokeWidth={border.strokeWidth}
       id={`rectangle-${uid}`}
     />
   );
 }
 
-function RenderPentagonMask({
+function RenderPentagonBorder({
   width,
   height,
-  mask,
+  border,
   uid
 }: {
   width: number;
   height: number;
-  mask: ImageType['mask'];
+  border: ImageType['border'];
   uid: string;
 }) {
-  console.log('hello', mask);
+  console.log('hello', border);
 
   const radius = Math.min(width, height) / 2;
   const centerX = width / 2;
@@ -100,25 +103,25 @@ function RenderPentagonMask({
     <polygon
       points={points}
       fill="none"
-      stroke={mask.stroke}
-      strokeWidth={mask.strokeWidth}
+      stroke={border.stroke}
+      strokeWidth={border.strokeWidth}
       id={`pentagon-${uid}`}
     />
   );
 }
 
-function RenderStarMask({
+function RenderStarBorder({
   width,
   height,
-  mask,
+  border,
   uid
 }: {
   width: number;
   height: number;
-  mask: ImageType['mask'];
+  border: ImageType['border'];
   uid: string;
 }) {
-  console.log('hello', mask);
+  console.log('hello', border);
 
   const outerRadius = Math.min(width, height) / 2;
   const innerRadius = outerRadius * 0.381966; // Golden ratio approximation
@@ -145,8 +148,8 @@ function RenderStarMask({
     <polygon
       points={points}
       fill="none"
-      stroke={mask.stroke}
-      strokeWidth={mask.strokeWidth}
+      stroke={border.stroke}
+      strokeWidth={border.strokeWidth}
       id={`star-${uid}`}
     />
   );
