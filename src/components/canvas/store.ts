@@ -71,6 +71,11 @@ export type ImageType = {
   state: ImageState;
   thumbnail?: string;
   currentUrl?: string;
+  mask: {
+    id: 'none' | 'circle' | 'rectangle';
+    stroke: string;
+    strokeWidth: number;
+  }
 } & MoveableElement;
 
 export type CanvasElement = ImageType | TextType | SVGPathType | SVGCurveType;
@@ -99,7 +104,12 @@ export const defaultImage: ImageType & MoveableElement = {
   y: 200,
   state: ImageState.Normal,
   width: 400,
-  height: 400
+  height: 400,
+  mask: {
+    id: 'none',
+    stroke: 'black',
+    strokeWidth: 1
+  }
 };
 
 export const selectedItemsAtom = atom((get) => {
@@ -307,6 +317,7 @@ export const selectedImageAtom = atom(
   (get, set, update: Partial<ImageType>) => {
     const activeElementAtom = get(activeElementAtomAtom);
     if (activeElementAtom) {
+      console.log('activeElementAtom', activeElementAtom, update)
       set(activeElementAtom, (el) =>
         el.type === 'image'
           ? ({

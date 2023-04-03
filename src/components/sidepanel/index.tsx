@@ -20,7 +20,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PositionPanel } from './position-panel';
 import { TemplatesPanel } from './templates-panel';
 import { NavState, sidepanelAtom } from '../canvas/store';
-import { ImageCropper } from './image-options/crop-image';
+import { ImageOptions } from './image-options';
 
 export const SIDEBAR_SIZE = 60;
 export const SIDEPANEL_SIZE = 350 + SIDEBAR_SIZE;
@@ -44,7 +44,7 @@ const panelMap: Record<NavState, JSX.Element> = {
   shapes: <ShapesPanel />,
   graphics: <>Graphics</>,
   position: <PositionPanel />,
-  'image-editing': <ImageCropper />
+  'image-editing': <ImageOptions />
 };
 
 export function Sidepanel() {
@@ -69,7 +69,6 @@ export function Sidepanel() {
             key={item.label}
             onClick={() => setActive(item.id)}
             variant={active === item.id ? 'light' : 'subtle'}
-            color={active === item.id ? 'blue' : 'dark.8'}
             sx={{ margin: 1, padding: 4 }}
           >
             <item.icon strokeWidth={1.2} />

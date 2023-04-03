@@ -1,26 +1,20 @@
 import React from 'react';
-import { cropperAtom } from '@/components/canvas/render-image';
+import { cropperAtom } from '@/components/canvas/render-image/render-image';
 import {
   circleCropAtom,
   ImageState,
   isCroppingAtom,
   selectedImageAtom,
   sidepanelAtom,
-  imageUrlAtom,
   imageStateAtom
 } from '@/components/canvas/store';
-import { functions } from '@/utils/firebase';
 import { Group, SegmentedControl, Button, ActionIcon } from '@mantine/core';
-import { httpsCallable } from 'firebase/functions';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { Check, Circle, Rectangle, X } from 'tabler-icons-react';
-
-const removeBackground = httpsCallable(functions, 'removeBackground');
+import { Check, Circle, Crop, Rectangle, X } from 'tabler-icons-react';
 
 export const ImageCropper = () => {
   const [sidepanel, setSidepanel] = useAtom(sidepanelAtom);
   const imageState = useAtomValue(imageStateAtom);
-  const url = useAtomValue(imageUrlAtom);
   const [selectedImage, setSelectedImage] = useAtom(selectedImageAtom);
   const [circleCrop, setCircleCrop] = useAtom(circleCropAtom);
   const cropper = useAtomValue(cropperAtom);
@@ -29,18 +23,6 @@ export const ImageCropper = () => {
   if (!selectedImage) {
     return null;
   }
-
-  const handleRemoveBg = () => {
-    if (url) {
-      setSelectedImage({ state: ImageState.Loading });
-      removeBackground({ url })
-        .then()
-        .catch()
-        .finally(() => {
-          setSelectedImage({ state: ImageState.Normal });
-        });
-    }
-  };
 
   const handleCropDone = () => {
     if (cropper) {
@@ -76,14 +58,9 @@ export const ImageCropper = () => {
   return (
     <Group>
       {imageState === ImageState.Normal && (
-        <>
-          <Button size="xs" variant="outline" onClick={handleRemoveBg}>
-            Remove Background
-          </Button>
-          <Button size="xs" variant="outline" onClick={handleCropImage}>
-            Crop
-          </Button>
-        </>
+        <Button size="md" leftIcon={<Crop />} fullWidth variant="outline" onClick={handleCropImage}>
+          Crop
+        </Button>
       )}
       {imageState === ImageState.Cropping && (
         <>

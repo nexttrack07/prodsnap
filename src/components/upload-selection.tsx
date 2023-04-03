@@ -17,6 +17,7 @@ import domToImage from 'dom-to-image-more';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { storage } from '@/utils/firebase';
 import { RenderCurve } from './canvas/render-curve';
+import { uuid } from '@/utils';
 
 function serialize(obj: any): string {
   return JSON.stringify(obj, (key, value) => {
@@ -25,14 +26,6 @@ function serialize(obj: any): string {
     }
     return value;
   });
-}
-
-function uuid(): string {
-  const timestamp = new Date().getTime();
-  const randomNum = Math.floor(Math.random() * 1000000);
-  const uniqueId = `${timestamp}-${randomNum}`;
-
-  return uniqueId;
 }
 
 const templateAtom = atom((get) => {

@@ -99,3 +99,11 @@ export function calculatePosition(
   
   return position + delta;
 }
+
+export function uuid(): string {
+  const timestamp = new Date().getTime();
+  const randomNum = Math.floor(Math.random() * 1000000);
+  const uniqueId = `${timestamp}-${randomNum}`;
+
+  return uniqueId;
+}

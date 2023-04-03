@@ -10,28 +10,13 @@ import {
 import { addGroupAtom } from '../toolbar';
 import { deserialize } from '@/utils';
 import { Box, Image, LoadingOverlay, SimpleGrid } from '@mantine/core';
+import { useQuery } from '@tanstack/react-query';
 
 export function TemplatesPanel() {
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
   const setElementAtoms = useSetAtom(elementAtomsAtom);
   const setSelectedAtoms = useSetAtom(selectedElementAtomsAtom);
   const addGroup = useSetAtom(addGroupAtom);
-
-  useEffect(() => {
-    async function getTemplateData() {
-      try {
-        setLoading(true);
-        const data = await getTemplates();
-        setData(data);
-      } catch (err) {
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    getTemplateData();
-  }, []);
+  const query = useQuery(['templates'], getTemplates);
 
   const handleAddTemplate = (newEls: CanvasElement[]) => {
     const newElAtoms = newEls.map((el) => createAtom(el));
@@ -44,14 +29,13 @@ export function TemplatesPanel() {
     <SimpleGrid cols={2}>
       <LoadingOverlay
         loaderProps={{ size: 'sm', color: 'pink', variant: 'bars' }}
-        visible={loading}
+        visible={query.isLoading}
       />
-      {data &&
-        data.map((item: any) => (
-          <Box onClick={() => handleAddTemplate(deserialize(item.data.template))} key={item.id}>
-            <Image src={item.data.url} />
-          </Box>
-        ))}
+      {query.data?.map((item: any) => (
+        <Box onClick={() => handleAddTemplate(deserialize(item.data.template))} key={item.id}>
+          <Image src={item.data.url} />
+        </Box>
+      ))}
     </SimpleGrid>
   );
 }
