@@ -8,7 +8,10 @@ import {
   NumberInput,
   SegmentedControl,
   NumberInputHandlers,
-  Box
+  Box,
+  Stack,
+  Text,
+  Slider
 } from '@mantine/core';
 import { activeElementAtom, SVGCurveWithPointAtoms } from '@/components/canvas/store';
 import { Line, LineDashed, LineDotted, VectorBezier } from 'tabler-icons-react';
@@ -67,6 +70,21 @@ export const START_MARKERS: Marker = {
         clipRule="evenodd"
       />
     </>
+  ),
+  'fill-circle': (
+    <>
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M9.75 12a.75.75 0 0 1 .75-.75h10a.75.75 0 0 1 0 1.5h-10a.75.75 0 0 1-.75-.75z"
+        clipRule="evenodd"
+      />
+      <path
+        fill="currentColor"
+        d="M4.5 12a2.5 2.5 0 1 0 5 0 2.5 2.5 0 0 0-5 0zM7 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"
+        clipRule="evenodd"
+      />
+    </>
   )
 };
 
@@ -121,6 +139,21 @@ export const END_MARKERS: Marker = {
         clipRule="evenodd"
       />
     </>
+  ),
+  'fill-circle': (
+    <>
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M2.75 12a.75.75 0 0 1 .75-.75H13a.75.75 0 0 1 0 1.5H3.5a.75.75 0 0 1-.75-.75z"
+        clipRule="evenodd"
+      />
+      <path
+        fill="currentColor"
+        d="M14.5 12a2.5 2.5 0 1 0 5 0 2.5 2.5 0 0 0-5 0zM17 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"
+        clipRule="evenodd"
+      />
+    </>
   )
 };
 
@@ -132,8 +165,12 @@ const elementAtom = atom(
     }
     return null;
   },
-  (get, set, element: SVGCurveWithPointAtoms) => {
-    set(activeElementAtom, element);
+  (get, set, element: Partial<SVGCurveWithPointAtoms>) => {
+    const activeElement = get(activeElementAtom);
+    if (activeElement && activeElement?.type === 'svg-curve') {
+      console.log('set', element);
+      set(activeElementAtom, { ...activeElement, ...element });
+    }
   }
 );
 
@@ -164,7 +201,7 @@ export function SvgCurveToolbar() {
           <ColorPicker
             format="rgba"
             value={element.stroke}
-            onChange={(val) => setElement({ ...element, stroke: val })}
+            onChange={(val) => setElement({ stroke: val })}
             swatches={[
               ...DEFAULT_THEME.colors.red,
               ...DEFAULT_THEME.colors.yellow,
@@ -182,7 +219,7 @@ export function SvgCurveToolbar() {
         <NumberInput
           hideControls
           value={element.strokeWidth}
-          onChange={(val) => setElement({ ...element, strokeWidth: val ?? element.strokeWidth })}
+          onChange={(val) => setElement({ strokeWidth: val ?? element.strokeWidth })}
           handlersRef={handlers}
           max={50}
           min={1}
@@ -198,7 +235,7 @@ export function SvgCurveToolbar() {
       <SegmentedControl
         size="xs"
         value={element.strokeDasharray ?? ''}
-        onChange={(val) => setElement({ ...element, strokeDasharray: val ?? '' })}
+        onChange={(val) => setElement({ strokeDasharray: val ?? '' })}
         data={[
           { label: <Line />, value: '' },
           { label: <LineDashed />, value: '21,7' },
@@ -215,19 +252,30 @@ export function SvgCurveToolbar() {
           </ActionIcon>
         </Popover.Target>
         <Popover.Dropdown>
-          <Group spacing={1}>
-            {Object.entries(START_MARKERS).map(([id, comp]) => (
-              <ActionIcon
-                key={id}
-                onClick={() => setElement({ ...element, startMarker: id as keyof Marker })}
-                size={36}
-              >
-                <svg width={24} height={24}>
-                  {comp}
-                </svg>
-              </ActionIcon>
-            ))}
-          </Group>
+          <Stack>
+            <Group spacing={2}>
+              {Object.entries(START_MARKERS).map(([id, comp]) => (
+                <ActionIcon
+                  key={id}
+                  onClick={() => setElement({ startMarker: id as keyof Marker })}
+                  size={36}
+                  color="dark"
+                  variant={element.startMarker === id ? 'light' : 'default'}
+                >
+                  <svg width={24} height={24}>
+                    {comp}
+                  </svg>
+                </ActionIcon>
+              ))}
+            </Group>
+            <Stack spacing={3}>
+              <Text size="sm">Size</Text>
+              <Slider
+                value={element.markerSize ?? 30}
+                onChange={(val) => setElement({ markerSize: val })}
+              />
+            </Stack>
+          </Stack>
         </Popover.Dropdown>
       </Popover>
 
@@ -240,26 +288,36 @@ export function SvgCurveToolbar() {
           </ActionIcon>
         </Popover.Target>
         <Popover.Dropdown>
-          <Group spacing={1}>
-            {Object.entries(END_MARKERS).map(([id, comp]) => (
-              <ActionIcon
-                key={id}
-                onClick={() => setElement({ ...element, endMarker: id as keyof Marker })}
-                size={36}
-                variant={element.endMarker === id ? 'outline' : 'light'}
-              >
-                <svg width={24} height={24}>
-                  {comp}
-                </svg>
-              </ActionIcon>
-            ))}
-          </Group>
+          <Stack>
+            <Group spacing={2}>
+              {Object.entries(END_MARKERS).map(([id, comp]) => (
+                <ActionIcon
+                  key={id}
+                  color="dark.6"
+                  onClick={() => setElement({ endMarker: id as keyof Marker })}
+                  size={36}
+                  variant={element.endMarker === id ? 'light' : 'default'}
+                >
+                  <svg width={24} height={24}>
+                    {comp}
+                  </svg>
+                </ActionIcon>
+              ))}
+            </Group>
+            <Stack spacing={3}>
+              <Text size="sm">Size</Text>
+              <Slider
+                value={element.markerSize ?? 30}
+                onChange={(val) => setElement({ markerSize: val })}
+              />
+            </Stack>
+          </Stack>
         </Popover.Dropdown>
       </Popover>
       <SegmentedControl
         size="xs"
         value={element.isQuadratic ? 'curved' : 'straight'}
-        onChange={(val) => setElement({ ...element, isQuadratic: val === 'curved' })}
+        onChange={(val) => setElement({ isQuadratic: val === 'curved' })}
         data={[
           { label: <Line />, value: 'straight' },
           { label: <VectorBezier />, value: 'curved' }

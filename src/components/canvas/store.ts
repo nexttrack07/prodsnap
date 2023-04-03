@@ -40,8 +40,9 @@ export type SVGCurveType = {
   points: SVGPointType[];
   isQuadratic?: boolean;
 } & Partial<SVGStrokeProps> & {
-  startMarker: 'none' | 'fill-arrow' | 'outline-arrow' | 'outline-circle';
-  endMarker: 'none' | 'fill-arrow' | 'outline-arrow' | 'outline-circle';
+  startMarker: 'none' | 'fill-arrow' | 'outline-arrow' | 'outline-circle' | 'fill-circle';
+  endMarker: 'none' | 'fill-arrow' | 'outline-arrow' | 'outline-circle' | 'fill-circle';
+  markerSize: number;
 } & MoveableElement;
 
 export type SVGPathType = {

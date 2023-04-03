@@ -8,56 +8,10 @@ import {
   MoveableElement,
   SVGCurveWithPointAtoms,
   SVGPointAtom
-} from './store';
-import { RenderPoint } from './render-point';
-
-const START_MARKERS = {
-  none: null,
-  'outline-arrow': (
-    <path
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M 2.5,-1.5,0.5,0,2.5,1.5 "
-    />
-  ),
-  'fill-arrow': (
-    <path
-      fill="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M 2.5,-1.5,0.5,0,2.5,1.5 Z"
-    />
-  ),
-  'outline-circle': (
-    <circle strokeWidth={1} stroke="currentColor" fill="none" cx={0} cy={0} r="1.2" />
-  )
-} as const;
-
-const END_MARKERS = {
-  none: null,
-  'outline-arrow': (
-    <path
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M -2.5,-1.5,-0.5,0,-2.5,1.5 "
-    />
-  ),
-  'fill-arrow': (
-    <path
-      fill="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M -2.5,-1.5,-0.5,0,-2.5,1.5 Z"
-    />
-  ),
-  'outline-circle': (
-    <circle strokeWidth={1} stroke="currentColor" fill="none" cx={0} cy={0} r="1.2" />
-  )
-} as const;
+} from '../store';
+import { RenderPoint } from '../render-point';
+import { RenderMarker } from './render-start-marker';
+import { uuid } from '@/utils';
 
 type Props = {
   element: SVGCurveWithPointAtoms;
@@ -72,16 +26,6 @@ const getPointsAtom = atomFamily((atoms: SVGPointAtom[]) =>
     return atoms.map((atom) => get(atom));
   })
 );
-
-// const getPathFromPoints = (points: { x: number; y: number }[]) => {
-//   return points.reduce((acc, point) => {
-//     if (acc === '') {
-//       return acc + `M ${point.x} ${point.y}`;
-//     } else {
-//       return acc + `L ${point.x} ${point.y}`;
-//     }
-//   }, '');
-// };
 
 const getPathFromPoints = (points: { x: number; y: number }[], isQuadratic = false) => {
   if (points.length < 2) {
@@ -115,7 +59,6 @@ const getPathFromPoints = (points: { x: number; y: number }[], isQuadratic = fal
 const useStyles = createStyles((theme) => ({
   path: {
     '&:hover + path': {
-      // stroke: theme.colors.blue[6]
       filter: 'drop-shadow(0 0 3px rgba(0, 0, 0, 0.5))'
     }
   }
@@ -132,8 +75,6 @@ export function RenderCurve({
   const { classes } = useStyles();
   const [moving, setMoving] = useState(false);
   const lastPos = useRef({ x: 0, y: 0 });
-  // const updatePoints = useSetAtom(updatePointsAtom(element.points));
-  const { strokeWidth, stroke } = element;
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
@@ -158,7 +99,6 @@ export function RenderCurve({
       if (moving) {
         const deltaX = e.clientX - lastPos.current.x;
         const deltaY = e.clientY - lastPos.current.y;
-        // updatePoints({ x: deltaX, y: deltaY });
         setElement((prev) => {
           return {
             ...prev,
@@ -178,9 +118,7 @@ export function RenderCurve({
       document.removeEventListener('mousemove', handleMouseMove);
     };
   }, [moving]);
-  const markerSize = Math.max(4, strokeWidth ?? 0 * 2);
-  const refX = markerSize * 0.8;
-  const pathD = `M0,0 L${markerSize},${markerSize / 2} L0,${markerSize}`;
+  const markerId = uuid();
   return (
     <>
       <svg
@@ -197,36 +135,20 @@ export function RenderCurve({
         onClick={(e) => e.stopPropagation()}
       >
         <defs>
-          <marker
-            id="arrow"
-            viewBox="0 0 10 10"
-            refX="5"
-            refY="5"
-            markerWidth={element.strokeWidth}
-            markerHeight={element.strokeWidth}
-            orient="auto-start-reverse"
-          >
-            {START_MARKERS[element.startMarker]}
-          </marker>
-          <marker
-            id="circle-marker"
-            viewBox="0 0 10 10"
-            markerWidth="6"
-            markerHeight="6"
-            refX="3"
-            refY="3"
-          >
-            <circle cx="3" cy="3" r="3" fill="currentColor" />
-          </marker>
-          <marker
-            id="outline-arrow-marker"
-            viewBox={`0 0 ${markerSize} ${markerSize}`}
-            refX={refX}
-            refY={markerSize / 2}
-            orient="auto"
-          >
-            <path d={pathD} fill="none" stroke={stroke} />
-          </marker>
+          <RenderMarker
+            orient="start"
+            type={element.startMarker}
+            id={`start-${markerId}`}
+            size={element.markerSize ?? 30}
+            color={element.stroke ?? 'black'}
+          />
+          <RenderMarker
+            orient="end"
+            type={element.endMarker}
+            id={`end-${markerId}`}
+            size={element.markerSize ?? 30}
+            color={element.stroke ?? 'black'}
+          />
         </defs>
         <g>
           <g style={{ userSelect: 'none' }}>
@@ -257,25 +179,10 @@ export function RenderCurve({
               strokeWidth={element.strokeWidth}
               stroke={element.stroke}
               strokeDasharray={element.strokeDasharray}
-              markerEnd="url(#outline-arrow-marker)"
+              markerStart={`url(#start-${markerId})`}
+              markerEnd={`url(#end-${markerId})`}
             />
           </g>
-          {/* <g
-            // style={{ position: 'absolute', left: points.at(0)!.x, top: points.at(-1)!.y }}
-            // transform="translate(0 3.5) scale(7)"
-            color={element.stroke}
-            transform={`translate(${points.at(0)!.x - 7} ${points.at(0)!.y}) scale(5)`}
-          >
-            {START_MARKERS[element.startMarker]}
-          </g>
-          <g
-            // style={{ position: 'absolute', left: points.at(0)!.x, top: points.at(-1)!.y }}
-            // transform="translate(0 3.5) scale(7)"
-            color={element.stroke}
-            transform={`translate(${points.at(-1)!.x + 7} ${points.at(-1)!.y}) scale(5)`}
-          >
-            {END_MARKERS[element.endMarker]}
-          </g> */}
         </g>
       </svg>
       {isSelected &&
