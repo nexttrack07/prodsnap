@@ -13,7 +13,7 @@ import {
   unSelectAllAtom,
   activeElementAtom
 } from './store';
-import { RenderImage } from './render-image';
+import { RenderImage } from './render-image/render-image';
 import { RenderText } from './render-text';
 import { RenderPath } from './render-path';
 import { RenderCurve } from './render-curve';

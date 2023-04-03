@@ -11,12 +11,13 @@ import {
   Draggable,
   canvasAtom,
   circleCropAtom
-} from './store';
-import { calculatePosition, getImageDimensions, SNAP_TOLERANCE } from '../../utils';
+} from '../store';
+import { calculatePosition, getImageDimensions, SNAP_TOLERANCE, uuid } from '../../../utils';
 import { Center, Box, Image, Loader, useMantineTheme } from '@mantine/core';
 import 'react-image-crop/dist/ReactCrop.css';
-import { ResizeHandler } from './resize-handler';
-import { DragHandler } from './drag-handler';
+import { ResizeHandler } from '../resize-handler';
+import { DragHandler } from '../drag-handler';
+import { RenderMask } from './render-mask';
 
 export const cropperAtom = atom<Cropper | null>(null);
 
@@ -86,6 +87,8 @@ export function RenderImage({
   };
 
   const { width, height, x, y } = element;
+  const id = uuid();
+  const s = element.mask.strokeWidth;
 
   return (
     <DragHandler
@@ -97,41 +100,23 @@ export function RenderImage({
       {element.state === ImageState.Loading && <Loader></Loader>}
       {element.state === ImageState.Normal && (
         <>
-          {/* <Image
-            style={{
-              userSelect: 'none',
-              pointerEvents: 'none',
-              border: '4px solid #39f'
-            }}
-            width={width}
-            height={height}
-            src={element.currentUrl ?? element.url}
-          /> */}
           <svg
             x="0"
             y="0"
             xmlSpace="preserve"
             style={{ position: 'absolute' }}
-            enableBackground={`new -6 -6 ${width + 12} ${height + 12}`}
+            enableBackground={`new ${-s} ${-s} ${width + s * 2} ${height + s * 2}`}
           >
             <defs>
-              <clipPath id="001">
-                <circle
-                  fill="none"
-                  stroke="black"
-                  strokeWidth={6}
-                  id="circle"
-                  cx={width / 2}
-                  cy={width / 2}
-                  r={width / 2}
-                />
+              <clipPath id={id}>
+                <RenderMask width={width} height={height} mask={element.mask} uid={id} />
               </clipPath>
             </defs>
           </svg>
-          <svg viewBox={`-6 -6 ${width + 12} ${height + 12}`}>
-            <use href="#circle" />
+          <svg viewBox={`${-s} ${-s} ${width + s * 2} ${height + s * 2}`}>
+            <use href={`#${element.mask.id}-${id}`} />
             <image
-              clipPath="url(#001)"
+              clipPath={id}
               preserveAspectRatio="xMidYMid slice"
               href={element.currentUrl ?? element.url}
               width={width}

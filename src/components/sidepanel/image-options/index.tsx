@@ -32,7 +32,13 @@ export function ImageOptions() {
 
   return (
     <Stack>
-      <Button leftIcon={<WashDrycleanOff />} fullWidth variant="outline" onClick={handleRemoveBg}>
+      <Button
+        size="md"
+        leftIcon={<WashDrycleanOff />}
+        fullWidth
+        variant="outline"
+        onClick={handleRemoveBg}
+      >
         Remove Background
       </Button>
       <ImageCropper />
@@ -42,10 +48,12 @@ export function ImageOptions() {
         {MASKS.map((b) => (
           <ActionIcon
             color="dark"
-            variant={selectedImage.mask === b.id ? 'light' : 'default'}
+            variant={selectedImage.mask.id === b.id ? 'light' : 'default'}
             size={70}
             key={b.id}
-            onClick={() => {}}
+            onClick={() => {
+              setSelectedImage({ mask: { id: b.id, stroke: 'black', strokeWidth: 4 } });
+            }}
           >
             {b.icon}
           </ActionIcon>

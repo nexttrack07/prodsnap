@@ -1,5 +1,5 @@
 import React from 'react';
-import { cropperAtom } from '@/components/canvas/render-image';
+import { cropperAtom } from '@/components/canvas/render-image/render-image';
 import {
   circleCropAtom,
   ImageState,
@@ -58,7 +58,7 @@ export const ImageCropper = () => {
   return (
     <Group>
       {imageState === ImageState.Normal && (
-        <Button leftIcon={<Crop />} fullWidth variant="outline" onClick={handleCropImage}>
+        <Button size="md" leftIcon={<Crop />} fullWidth variant="outline" onClick={handleCropImage}>
           Crop
         </Button>
       )}
