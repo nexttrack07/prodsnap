@@ -72,7 +72,7 @@ export type ImageType = {
   thumbnail?: string;
   currentUrl?: string;
   mask: {
-    id: 'none' | 'circle' | 'pentagon' | 'star' | 'rectangle';
+    id: 'none' | 'circle' | 'rectangle';
     stroke: string;
     strokeWidth: number;
   }

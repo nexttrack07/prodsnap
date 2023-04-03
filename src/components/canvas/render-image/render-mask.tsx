@@ -11,9 +11,9 @@ type Props = {
 const MaskMap: Record<ImageType['mask']['id'], React.FC<any>> = {
   none: () => null,
   circle: RenderCircleMask,
-  rectangle: RenderRectangleMask,
-  pentagon: RenderPentagonMask,
-  star: RenderStarMask
+  rectangle: RenderRectangleMask
+  // pentagon: RenderPentagonMask,
+  // star: RenderStarMask
 };
 
 export const RenderMask = ({ width, height, mask, uid }: Props) => {

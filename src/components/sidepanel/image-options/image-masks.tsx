@@ -11,16 +11,16 @@ export const MASKS: { id: ImageType['mask']['id']; icon: React.ReactNode }[] = [
     id: 'circle',
     icon: <Circle />
   },
-  {
-    id: 'pentagon',
-    icon: <Pentagon />
-  },
+  // {
+  //   id: 'pentagon',
+  //   icon: <Pentagon />
+  // },
   {
     id: 'rectangle',
     icon: <Rectangle />
-  },
-  {
-    id: 'star',
-    icon: <Star />
   }
+  // {
+  //   id: 'star',
+  //   icon: <Star />
+  // }
 ];
