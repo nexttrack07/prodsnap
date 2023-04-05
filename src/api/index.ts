@@ -57,7 +57,8 @@ const PATHS = [
   'M 0 0 L 64 0 L 32 32 L 64 64 L 0 64 L 32 32 L 0 0', // Star-like shape
   'M 32 0 L 64 64 L 32 32 L 0 64 L 32 0', // Abstract shape resembling a bird
   'M 0 0 Q 32 16 64 0 L 64 64 L 0 64 L 0 0', // Wave-like shape
-  'M 0 0 L 64 0 L 64 32 L 48 32 L 48 64 L 16 64 L 16 32 L 0 32 L 0 0' // Sign post with a rectangular base
+  'M 0 0 L 64 0 L 64 32 L 48 32 L 48 64 L 16 64 L 16 32 L 0 32 L 0 0', // Sign post with a rectangular base
+  
 ];
 
 export async function getShapes() {
