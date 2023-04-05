@@ -26,6 +26,7 @@ export type SVGStrokeProps = {
   strokeWidth: number;
   strokeLinecap?: 'inherit' | 'butt' | 'round' | 'square';
   strokeDasharray?: string;
+  strokeLinejoin?: 'inherit' | 'miter' | 'round' | 'bevel';
 };
 
 export type SVGPointAtom = Atom<SVGPointType>;
@@ -47,8 +48,6 @@ export type SVGCurveType = {
 
 export type SVGPathType = {
   type: 'svg-path';
-  getViewBox: (w: number, h: number) => string;
-  getPath: (w: number, h: number) => string;
   props: SVGAttributes<SVGSVGElement>;
   path: SVGAttributes<SVGPathElement>;
   strokeProps: SVGStrokeProps;
