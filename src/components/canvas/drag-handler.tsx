@@ -82,6 +82,7 @@ export function DragHandler({
         height: height,
         width: width,
         userSelect: 'none',
+        outline: 'none',
         cursor: 'move'
       }}
       id="moveable"

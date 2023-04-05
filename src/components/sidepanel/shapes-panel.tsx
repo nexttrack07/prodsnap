@@ -1,9 +1,10 @@
 import React from 'react';
-import { Text, Space, createStyles, SimpleGrid } from '@mantine/core';
+import { Text, Space, createStyles, SimpleGrid, ScrollArea } from '@mantine/core';
 import { useSetAtom } from 'jotai';
 import { useQuery } from '@tanstack/react-query';
 import { getShapes } from '../../api';
 import { addElementAtom, CanvasElementWithPointAtoms } from '../../components/canvas/store';
+import { scalePathData } from '../canvas/render-path';
 
 const useStyles = createStyles(() => ({
   shape: {
@@ -31,22 +32,51 @@ export function ShapesPanel() {
         Shapes
       </Text>
       <Space h="xl" />
-      <SimpleGrid cols={3}>
-        {query.data?.data?.map((item) => (
-          <svg
-            key={item.id}
-            className={classes.shape}
-            width={75}
-            onClick={() => handleAddElement(item.data)}
-            fill={item.data.props?.fill}
-            stroke={item.data.strokeProps.stroke}
-            strokeWidth={item.data.strokeProps.strokeWidth}
-            viewBox={item.data.props?.viewBox}
-          >
-            <path {...item.data.path} />
-          </svg>
-        ))}
-      </SimpleGrid>
+      <ScrollArea style={{ height: 700 }}>
+        <SimpleGrid cols={3}>
+          {query.data?.data?.map((item) => {
+            const element = item.data;
+            const {
+              strokeProps: { strokeWidth },
+              width,
+              height
+            } = element;
+            const pathData = scalePathData(element.path.d!, width, height, strokeWidth);
+            return (
+              <svg
+                key={item.id}
+                onClick={() => handleAddElement(element)}
+                className={classes.shape}
+                opacity={element.opacity}
+                viewBox={`${-strokeWidth} ${-strokeWidth} ${width + strokeWidth}, ${
+                  height + strokeWidth
+                }`}
+              >
+                <clipPath id={element.strokeProps.clipPathId}>
+                  <path
+                    d={pathData}
+                    vectorEffect="non-scaling-stroke"
+                    stroke="transparent"
+                    strokeWidth={element.strokeProps.strokeWidth}
+                  />
+                </clipPath>
+                <path
+                  d={pathData}
+                  stroke={element.strokeProps.stroke}
+                  strokeWidth={element.strokeProps.strokeWidth}
+                  strokeLinecap={element.strokeProps.strokeLinecap}
+                  strokeDasharray={element.strokeProps.strokeDasharray}
+                  // strokeMiterlimit={element.strokeProps.strokeWidth * 2}
+                  clipPath={element.strokeProps.clipPathId}
+                  fill={element.props.fill}
+                  // fill="none"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </svg>
+            );
+          })}
+        </SimpleGrid>
+      </ScrollArea>
     </>
   );
 }
