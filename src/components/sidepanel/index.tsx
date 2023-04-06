@@ -21,6 +21,7 @@ import { PositionPanel } from './position-panel';
 import { TemplatesPanel } from './templates-panel';
 import { NavState, sidepanelAtom } from '../canvas/store';
 import { ImageOptions } from './image-options';
+import { GraphicsPanel } from './graphics-panel';
 
 export const SIDEBAR_SIZE = 60;
 export const SIDEPANEL_SIZE = 350 + SIDEBAR_SIZE;
@@ -42,7 +43,7 @@ const panelMap: Record<NavState, JSX.Element> = {
   text: <TextPanel />,
   curves: <CurvesPanel />,
   shapes: <ShapesPanel />,
-  graphics: <>Graphics</>,
+  graphics: <GraphicsPanel />,
   position: <PositionPanel />,
   'image-editing': <ImageOptions />
 };

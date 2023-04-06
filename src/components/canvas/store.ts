@@ -53,6 +53,14 @@ export type SVGPathType = {
   strokeProps: SVGStrokeProps;
 } & MoveableElement;
 
+export type SVGGraphicType = {
+  name: 'svg' | 'g' | 'path' | 'circle' | 'ellipse' | 'line' | 'polyline' | 'polygon' | 'rect' | 'text' | 'textPath' | 'tspan' | 'use' | 'symbol' | 'defs' | 'linearGradient' | 'radialGradient' | 'stop' | 'clipPath' | 'mask' | 'pattern' | 'marker' | 'foreignObject' | 'image' | 'view' | 'a' | 'switch' | 'style' | 'script' | 'desc' | 'title' | 'metadata' | 'filter' | 'feBlend' | 'feColorMatrix' | 'feComponentTransfer' | 'feComposite' | 'feConvolveMatrix' | 'feDiffuseLighting' | 'feDisplacementMap' | 'feDistantLight' | 'feFlood' | 'feFuncA' | 'feFuncB' | 'feFuncG' | 'feFuncR' | 'feGaussianBlur' | 'feImage' | 'feMerge' | 'feMergeNode' | 'feMorphology' | 'feOffset' | 'fePointLight' | 'feSpecularLighting' | 'feSpotLight' | 'feTile' | 'feTurbulence' | 'feDistantLight' | 'fePointLight' | 'feSpotLight',
+  type: 'element',
+  value: string;
+  attributes: Record<string, string>;
+  children: SVGGraphicType[];
+}
+
 export type TextType = {
   type: 'text';
   content: string;

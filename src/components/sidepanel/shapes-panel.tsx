@@ -33,7 +33,7 @@ export function ShapesPanel() {
       </Text>
       <Space h="xl" />
       <ScrollArea style={{ height: 700 }}>
-        <SimpleGrid cols={3}>
+        <SimpleGrid cols={4}>
           {query.data?.data?.map((item) => {
             const element = item.data;
             const {
