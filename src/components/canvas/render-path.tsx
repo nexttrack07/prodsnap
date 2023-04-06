@@ -12,10 +12,8 @@ import { DragHandler } from './drag-handler';
 import { ResizeHandler } from './resize-handler';
 import { calculatePosition, SNAP_TOLERANCE } from '@/utils';
 
-type SVGCanvasElement = MoveableElement & SVGPathType;
-
 type Props = {
-  element: SVGCanvasElement;
+  element: SVGPathType;
   setElement: (update: SetStateAction<CanvasElement>) => void;
   isSelected: boolean;
   onSelect: (e: React.MouseEvent) => void;
