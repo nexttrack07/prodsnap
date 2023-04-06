@@ -5,6 +5,7 @@ import { DragDropContext, Draggable, OnDragEndResponder } from 'react-beautiful-
 import { StrictModeDroppable } from '@/utils/strict-mode-droppable';
 import { Card, Center, Image, Text, useMantineTheme } from '@mantine/core';
 import { DragDrop } from 'tabler-icons-react';
+import { scalePathData } from '../canvas/render-path';
 
 // a little function to help us with reordering the result
 const reorder = (list: any[], startIndex: number, endIndex: number) => {
@@ -100,10 +101,14 @@ function RenderElement({ elementAtom }: { elementAtom: ElementType }) {
         fill={element.props.fill}
         stroke={element.strokeProps.stroke}
         strokeWidth={element.strokeProps.strokeWidth}
-        transform="scale(0.2)"
-        viewBox={element.getViewBox(width, height)}
+        width={100}
+        height="auto"
+        viewBox={`0 0 ${width} ${height}`}
       >
-        <path {...element.path} d={element.getPath(width, height)} />
+        <path
+          {...element.path}
+          d={scalePathData(element.path.d!, width, height, element.strokeProps.strokeWidth)}
+        />
       </svg>
     );
   } else if (element.type === 'image') {
