@@ -4,7 +4,6 @@ import React, { SetStateAction, SVGAttributes } from 'react';
 export type Action<T> = SetStateAction<T>;
 export type Atom<T> = WritableAtom<T, Action<T>>;
 
-
 export type Draggable = {
   x: number;
   y: number;
@@ -15,10 +14,11 @@ export type Resizable = {
   height: number;
 };
 
-export type MoveableElement = Draggable & Resizable & {
-  group?: string;
-  opacity?: number;
-};
+export type MoveableElement = Draggable &
+  Resizable & {
+    group?: string;
+    opacity?: number;
+  };
 
 export type SVGStrokeProps = {
   clipPathId: string;
@@ -41,10 +41,10 @@ export type SVGCurveType = {
   points: SVGPointType[];
   isQuadratic?: boolean;
 } & Partial<SVGStrokeProps> & {
-  startMarker: 'none' | 'fill-arrow' | 'outline-arrow' | 'outline-circle' | 'fill-circle';
-  endMarker: 'none' | 'fill-arrow' | 'outline-arrow' | 'outline-circle' | 'fill-circle';
-  markerSize: number;
-} & MoveableElement;
+    startMarker: 'none' | 'fill-arrow' | 'outline-arrow' | 'outline-circle' | 'fill-circle';
+    endMarker: 'none' | 'fill-arrow' | 'outline-arrow' | 'outline-circle' | 'fill-circle';
+    markerSize: number;
+  } & MoveableElement;
 
 export type SVGPathType = {
   type: 'svg-path';
@@ -54,12 +54,77 @@ export type SVGPathType = {
 } & MoveableElement;
 
 export type SVGGraphicType = {
-  name: 'svg' | 'g' | 'path' | 'circle' | 'ellipse' | 'line' | 'polyline' | 'polygon' | 'rect' | 'text' | 'textPath' | 'tspan' | 'use' | 'symbol' | 'defs' | 'linearGradient' | 'radialGradient' | 'stop' | 'clipPath' | 'mask' | 'pattern' | 'marker' | 'foreignObject' | 'image' | 'view' | 'a' | 'switch' | 'style' | 'script' | 'desc' | 'title' | 'metadata' | 'filter' | 'feBlend' | 'feColorMatrix' | 'feComponentTransfer' | 'feComposite' | 'feConvolveMatrix' | 'feDiffuseLighting' | 'feDisplacementMap' | 'feDistantLight' | 'feFlood' | 'feFuncA' | 'feFuncB' | 'feFuncG' | 'feFuncR' | 'feGaussianBlur' | 'feImage' | 'feMerge' | 'feMergeNode' | 'feMorphology' | 'feOffset' | 'fePointLight' | 'feSpecularLighting' | 'feSpotLight' | 'feTile' | 'feTurbulence' | 'feDistantLight' | 'fePointLight' | 'feSpotLight',
-  type: 'element',
+  name:
+    | 'svg'
+    | 'g'
+    | 'path'
+    | 'circle'
+    | 'ellipse'
+    | 'line'
+    | 'polyline'
+    | 'polygon'
+    | 'rect'
+    | 'text'
+    | 'textPath'
+    | 'tspan'
+    | 'use'
+    | 'symbol'
+    | 'defs'
+    | 'linearGradient'
+    | 'radialGradient'
+    | 'stop'
+    | 'clipPath'
+    | 'mask'
+    | 'pattern'
+    | 'marker'
+    | 'foreignObject'
+    | 'image'
+    | 'view'
+    | 'a'
+    | 'switch'
+    | 'style'
+    | 'script'
+    | 'desc'
+    | 'title'
+    | 'metadata'
+    | 'filter'
+    | 'feBlend'
+    | 'feColorMatrix'
+    | 'feComponentTransfer'
+    | 'feComposite'
+    | 'feConvolveMatrix'
+    | 'feDiffuseLighting'
+    | 'feDisplacementMap'
+    | 'feDistantLight'
+    | 'feFlood'
+    | 'feFuncA'
+    | 'feFuncB'
+    | 'feFuncG'
+    | 'feFuncR'
+    | 'feGaussianBlur'
+    | 'feImage'
+    | 'feMerge'
+    | 'feMergeNode'
+    | 'feMorphology'
+    | 'feOffset'
+    | 'fePointLight'
+    | 'feSpecularLighting'
+    | 'feSpotLight'
+    | 'feTile'
+    | 'feTurbulence'
+    | 'feDistantLight'
+    | 'fePointLight'
+    | 'feSpotLight';
+  type: 'element';
   value: string;
   attributes: Record<string, string>;
   children: SVGGraphicType[];
-}
+};
+
+export type SVGType = {
+  type: 'svg';
+  graphic: SVGGraphicType;
+} & MoveableElement;
 
 export type TextType = {
   type: 'text';
@@ -70,7 +135,7 @@ export type TextType = {
 export enum ImageState {
   Loading,
   Normal,
-  Cropping,
+  Cropping
 }
 
 export type ImageType = {
@@ -83,11 +148,13 @@ export type ImageType = {
     id: 'none' | 'circle' | 'rectangle';
     stroke: string;
     strokeWidth: number;
-  }
+  };
 } & MoveableElement;
 
-export type CanvasElement = ImageType | TextType | SVGPathType | SVGCurveType;
-export type CanvasElementWithPointAtoms = Exclude<CanvasElement, SVGCurveType> | SVGCurveWithPointAtoms;
+export type CanvasElement = ImageType | TextType | SVGPathType | SVGCurveType | SVGType;
+export type CanvasElementWithPointAtoms =
+  | Exclude<CanvasElement, SVGCurveType>
+  | SVGCurveWithPointAtoms;
 export type ElementType = Atom<CanvasElementWithPointAtoms>;
 export type GroupType = Atom<ElementType[]>;
 
@@ -137,7 +204,6 @@ export const addElementAtom = atom(null, (_, set, newEl: CanvasElementWithPointA
 export const addElementsAtom = atom(null, (_, set, newEls: CanvasElementWithPointAtoms[]) => {
   set(elementAtomsAtom, (elementAtoms) => [...elementAtoms, ...newEls.map((newEl) => atom(newEl))]);
 });
-
 
 export const activeElementAtom = atom(
   (get) => {
@@ -277,7 +343,6 @@ export const unSelectAllAtom = atom(null, (_get, set) => {
   set(activeElementAtomAtom, null);
 });
 
-
 export type NavState =
   | 'templates'
   | 'upload'
@@ -325,7 +390,7 @@ export const selectedImageAtom = atom(
   (get, set, update: Partial<ImageType>) => {
     const activeElementAtom = get(activeElementAtomAtom);
     if (activeElementAtom) {
-      console.log('activeElementAtom', activeElementAtom, update)
+      console.log('activeElementAtom', activeElementAtom, update);
       set(activeElementAtom, (el) =>
         el.type === 'image'
           ? ({
@@ -337,7 +402,6 @@ export const selectedImageAtom = atom(
     }
   }
 );
-
 
 export const imageBorderAtom = atom(
   (get) => {
