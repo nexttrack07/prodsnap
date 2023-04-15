@@ -29,6 +29,7 @@ const data: { id: number; prev: string; data: PointCurveType }[] = [
       strokeWidth: 2,
       stroke: 'black',
       startMarker: 'none',
+      markerSize: 10,
       endMarker: 'none',
       // TODO: DONT USE THIS - create atoms inside the component
       points: [
@@ -62,6 +63,7 @@ const data: { id: number; prev: string; data: PointCurveType }[] = [
       strokeWidth: 2,
       stroke: 'black',
       startMarker: 'none',
+      markerSize: 10,
       endMarker: 'none',
       // TODO: DONT USE THIS - create atoms inside the component
       points: [

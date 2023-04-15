@@ -3,7 +3,6 @@ import { Text, Space, createStyles, SimpleGrid, Image } from '@mantine/core';
 import { useSetAtom } from 'jotai';
 import {
   CanvasElementWithPointAtoms,
-  MoveableElement,
   ImageType,
   ImageState,
   addElementAtom
@@ -23,7 +22,7 @@ const useStyles = createStyles((theme) => ({
   }
 }));
 
-const data: { id: number; data: MoveableElement & ImageType }[] = [
+const data: { id: number; data: ImageType }[] = [
   {
     id: 0,
     data: {
@@ -33,6 +32,7 @@ const data: { id: number; data: MoveableElement & ImageType }[] = [
       y: 200,
       width: 300,
       height: 200,
+      border: { id: 'none', stroke: 'black', strokeWidth: 1 },
       url: 'https://media.kohlsimg.com/is/image/kohls/4637183_Navy_Blue?wid=600&hei=600&op_sharpen=1'
     }
   },
@@ -44,6 +44,7 @@ const data: { id: number; data: MoveableElement & ImageType }[] = [
       x: 200,
       y: 200,
       width: 300,
+      border: { id: 'none', stroke: 'black', strokeWidth: 1 },
       height: 200,
       url: '/winter-hat.png'
     }
