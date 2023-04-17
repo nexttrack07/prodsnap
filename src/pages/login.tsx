@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import { useToggle, upperFirst } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import {
-  TextInput, Center,
+  TextInput,
+  Center,
   PasswordInput,
   Text,
   Paper,
@@ -13,22 +14,31 @@ import {
   Divider,
   Checkbox,
   Anchor,
-  Stack,
+  Stack
 } from '@mantine/core';
 import { BrandGoogle } from 'tabler-icons-react';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
+import { createUserWithEmailAndPassword, UserCredential } from 'firebase/auth';
 import { auth } from '../utils/firebase';
 import { useAtom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from '@/api/user';
 
 export function GoogleButton(props: ButtonProps) {
-  return <Button leftIcon={<BrandGoogle color='red' />} variant="default" color="gray" {...props} />;
+  return (
+    <Button leftIcon={<BrandGoogle color="red" />} variant="default" color="gray" {...props} />
+  );
 }
 
-export const userAtom = atomWithStorage<{ user: null | UserCredential["user"] }>('user', {
-  user: null,
-})
+type USER = {
+  email: string;
+  username?: string;
+  token: string;
+};
+
+export const userAtom = atomWithStorage<{ user: null | UserCredential['user'] | USER }>('user', {
+  user: null
+});
 
 export function Login(props: PaperProps) {
   const [user, setUser] = useAtom(userAtom);
@@ -39,39 +49,44 @@ export function Login(props: PaperProps) {
       email: '',
       name: '',
       password: '',
-      terms: true,
+      terms: true
     },
 
     validate: {
       email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Invalid email'),
-      password: (val) => (val.length <= 6 ? 'Password should include at least 6 characters' : null),
-    },
+      password: (val) => (val.length <= 6 ? 'Password should include at least 6 characters' : null)
+    }
   });
 
   useEffect(() => {
     if (user.user) {
-      navigate('/editor')
+      navigate('/editor');
     }
-  }, [])
+  }, []);
 
   const handleFormSubmit = () => {
     if (type === 'login') {
-      signInWithEmailAndPassword(auth, form.values.email, form.values.password)
-        .then(userCredential => {
-          setUser({ user: userCredential.user })
-          navigate('/editor');
-        })
+      // signInWithEmailAndPassword(auth, form.values.email, form.values.password)
+      //   .then(userCredential => {
+      //     setUser({ user: userCredential.user })
+      //     navigate('/editor');
+      //   })
+      signInWithEmailAndPassword(form.values.email, form.values.password).then((res) => {
+        setUser({ user: { token: res.data.key, email: form.values.email } });
+        navigate('/editor');
+      });
     } else {
-      createUserWithEmailAndPassword(auth, form.values.email, form.values.password)
-        .then(userCredential => {
-          setUser({ user: userCredential.user })
+      createUserWithEmailAndPassword(auth, form.values.email, form.values.password).then(
+        (userCredential) => {
+          setUser({ user: userCredential.user });
           navigate('/editor');
-        })
+        }
+      );
     }
-  }
+  };
 
   return (
-    <Center sx={{ height: "100vh " }}>
+    <Center sx={{ height: '100vh ' }}>
       <Paper radius="md" p="xl" withBorder {...props}>
         <Text size="lg" weight={500}>
           Login
