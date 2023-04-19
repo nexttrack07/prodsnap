@@ -21,6 +21,7 @@ import { RenderGuide } from './render-guides';
 import { useShiftKeyPressed } from '../../utils';
 import { atomFamily } from 'jotai/utils';
 import { MultipleSelect } from './multiple-select';
+import { RenderGraphic } from './render-graphic';
 
 export function Canvas() {
   const elementAtoms = useAtomValue(elementAtomsAtom);
@@ -66,7 +67,8 @@ export const elementCompMap: Record<CanvasElementWithPointAtoms['type'], React.F
   image: RenderImage,
   text: RenderText,
   'svg-path': RenderPath,
-  'svg-curve': RenderCurve
+  'svg-curve': RenderCurve,
+  'svg-graphic': RenderGraphic
 };
 
 const groupFromElementAtom = atomFamily((element: CanvasElementWithPointAtoms) =>
