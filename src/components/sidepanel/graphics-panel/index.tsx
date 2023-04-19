@@ -1,5 +1,5 @@
 import { uuid } from '@/utils';
-import { Image, ScrollArea, SimpleGrid, Text, createStyles } from '@mantine/core';
+import { Image, LoadingOverlay, ScrollArea, SimpleGrid, Text, createStyles } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { getGraphics } from '@/api/template';
@@ -27,9 +27,10 @@ export function GraphicsPanel() {
   };
 
   return (
-    <div>
+    <div style={{ position: 'relative', height: 'calc(100vh - 150px)' }}>
       <Text size="md">Graphics</Text>
       <br />
+      <LoadingOverlay visible={query.isLoading} overlayBlur={2} />
       <ScrollArea.Autosize maxHeight={`calc(100vh - 150px)`}>
         <SimpleGrid cols={5} spacing="md">
           {query.data?.map((graphic) => (
