@@ -1,13 +1,14 @@
 import { SVGGraphicType } from '@/components/canvas/store';
 import { uuid } from '@/utils';
-import { SimpleGrid, Text } from '@mantine/core';
+import { Image, ScrollArea, SimpleGrid, Text } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import DATA from './data.json';
+// import DATA from './data.json';
+import { getGraphics } from '@/api/template';
 
-const getGraphics = (): Promise<SVGGraphicType[]> => {
-  return Promise.resolve(DATA as unknown as SVGGraphicType[]);
-};
+// const getGraphics = (): Promise<SVGGraphicType[]> => {
+//   return Promise.resolve(DATA as unknown as SVGGraphicType[]);
+// };
 
 export function GraphicsPanel() {
   const query = useQuery(['graphics'], getGraphics);
@@ -16,11 +17,13 @@ export function GraphicsPanel() {
     <div>
       <Text size="md">Graphics</Text>
       <br />
-      <SimpleGrid cols={5} spacing="md">
-        {query.data?.map((graphic) => (
-          <RenderGraphic key={uuid()} graphic={graphic} />
-        ))}
-      </SimpleGrid>
+      <ScrollArea.Autosize maxHeight={`calc(100vh - 150px)`}>
+        <SimpleGrid cols={5} spacing="md">
+          {query.data?.map((graphic) => (
+            <Image height={50} src={graphic.url} key={uuid()} alt={graphic.desc} />
+          ))}
+        </SimpleGrid>
+      </ScrollArea.Autosize>
     </div>
   );
 }

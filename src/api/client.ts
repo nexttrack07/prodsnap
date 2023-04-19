@@ -19,21 +19,21 @@ class ApiClient implements IApiClient {
   }
 
   private setupInterceptors() {
-    this.instance.interceptors.request.use((config: AxiosRequestConfig) => {
-      const token = localStorage.getItem('token');
+    this.instance.interceptors.request.use(
+      (config: AxiosRequestConfig) => {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        console.log('interceptor', user.user.token);
+        if (user && user.user.token) {
+          config.headers = {
+            ...config.headers,
+            Authorization: `Token ${user.user.token}`,
+          };
+        }
   
-      if (token) {
-        // Make sure the headers object exists
-        config.headers = config.headers || {};
-  
-        // Add the Authorization header with the token
-        config.headers['Authorization'] = `Token ${token}`;
-      }
-  
-      return config;
-    }, (error) => {
-      return Promise.reject(error);
-    });
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
   }
   
 
