@@ -1,20 +1,16 @@
-import { UserCredential } from "firebase/auth"
-import React from "react";
-import { Navigate } from "react-router-dom";
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import { USER } from './login';
 
 type Props = {
-  user: UserCredential["user"] | null;
+  user: USER | null;
   redirectPath?: string;
   children: JSX.Element;
-}
+};
 
-export function ProtectedRoute({
-  user,
-  redirectPath = '/login',
-  children
-}: Props) {
+export function ProtectedRoute({ user, redirectPath = '/login', children }: Props) {
   if (!user) {
-    return <Navigate to={redirectPath} replace />
+    return <Navigate to={redirectPath} replace />;
   }
 
   return children;

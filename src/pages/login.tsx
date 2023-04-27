@@ -17,8 +17,6 @@ import {
   Stack
 } from '@mantine/core';
 import { BrandGoogle } from 'tabler-icons-react';
-import { createUserWithEmailAndPassword, UserCredential } from 'firebase/auth';
-import { auth } from '../utils/firebase';
 import { useAtom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { useNavigate } from 'react-router-dom';
@@ -30,13 +28,13 @@ export function GoogleButton(props: ButtonProps) {
   );
 }
 
-type USER = {
+export type USER = {
   email: string;
   username?: string;
   token: string;
 };
 
-export const userAtom = atomWithStorage<{ user: null | UserCredential['user'] | USER }>('user', {
+export const userAtom = atomWithStorage<{ user: null | USER }>('user', {
   user: null
 });
 
@@ -66,22 +64,10 @@ export function Login(props: PaperProps) {
 
   const handleFormSubmit = () => {
     if (type === 'login') {
-      // signInWithEmailAndPassword(auth, form.values.email, form.values.password)
-      //   .then(userCredential => {
-      //     setUser({ user: userCredential.user })
-      //     navigate('/editor');
-      //   })
       signInWithEmailAndPassword(form.values.email, form.values.password).then((res) => {
         setUser({ user: { token: res.data.key, email: form.values.email } });
         navigate('/editor');
       });
-    } else {
-      createUserWithEmailAndPassword(auth, form.values.email, form.values.password).then(
-        (userCredential) => {
-          setUser({ user: userCredential.user });
-          navigate('/editor');
-        }
-      );
     }
   };
 
