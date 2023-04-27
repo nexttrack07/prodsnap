@@ -1,6 +1,15 @@
 import { uuid } from '@/utils';
-import { Image, LoadingOverlay, ScrollArea, SimpleGrid, Text, createStyles } from '@mantine/core';
-import { useQuery } from '@tanstack/react-query';
+import {
+  Button,
+  Image,
+  LoadingOverlay,
+  ScrollArea,
+  SimpleGrid,
+  Space,
+  Text,
+  createStyles
+} from '@mantine/core';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { getGraphics } from '@/api/template';
 import { useSetAtom } from 'jotai';
@@ -18,7 +27,15 @@ const useStyles = createStyles(() => ({
 }));
 
 export function GraphicsPanel() {
-  const query = useQuery(['graphics'], getGraphics);
+  // const [page, setPage] = React.useState(1);
+  const { data, error, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } =
+    useInfiniteQuery({
+      queryKey: ['graphics'],
+      queryFn: (page) => getGraphics(page.pageParam || 1),
+      getNextPageParam: (lastPage) =>
+        lastPage.next ? Number(lastPage.next.split('=')[1]) : undefined,
+      keepPreviousData: true
+    });
   const addElement = useSetAtom(addElementAtom);
   const { classes } = useStyles();
 
@@ -30,30 +47,45 @@ export function GraphicsPanel() {
     <div style={{ position: 'relative', height: 'calc(100vh - 150px)' }}>
       <Text size="md">Graphics</Text>
       <br />
-      <LoadingOverlay visible={query.isLoading} overlayBlur={2} />
+      <LoadingOverlay visible={status === 'loading'} overlayBlur={2} />
       <ScrollArea.Autosize maxHeight={`calc(100vh - 150px)`}>
         <SimpleGrid cols={5} spacing="md">
-          {query.data?.map((graphic) => (
-            <Image
-              onClick={() => {
-                handleAddElement({
-                  type: 'svg-graphic',
-                  url: graphic.url,
-                  alt: graphic.desc,
-                  x: 100,
-                  y: 200,
-                  width: 100,
-                  height: 200
-                });
-              }}
-              className={classes.shape}
-              height={50}
-              src={graphic.url}
-              key={uuid()}
-              alt={graphic.desc}
-            />
+          {data?.pages.map((group, i) => (
+            <React.Fragment key={i}>
+              {group.results.map((graphic) => (
+                <Image
+                  onClick={() => {
+                    handleAddElement({
+                      type: 'svg-graphic',
+                      url: graphic.url,
+                      alt: graphic.desc,
+                      x: 100,
+                      y: 200,
+                      width: 100,
+                      height: 200
+                    });
+                  }}
+                  className={classes.shape}
+                  height={50}
+                  src={graphic.url}
+                  key={uuid()}
+                  alt={graphic.desc}
+                />
+              ))}
+            </React.Fragment>
           ))}
         </SimpleGrid>
+        <Space h="xl" />
+        <Button
+          fullWidth
+          loading={isFetchingNextPage}
+          onClick={() => {
+            fetchNextPage();
+          }}
+          disabled={!hasNextPage || isFetchingNextPage}
+        >
+          Load More
+        </Button>
       </ScrollArea.Autosize>
     </div>
   );

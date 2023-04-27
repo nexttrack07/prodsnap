@@ -33,6 +33,13 @@ type GraphicResponse = {
   category_id: number;
 }
 
-export async function getGraphics() {
-  return client.get<GraphicResponse[]>("/graphics/").then(res => res.data);
+type ResWithPagination<T> = {
+  results: T[];
+  count: number;
+  next: string | null;
+  previous: string | null;
+}
+
+export async function getGraphics(page: number = 1) {
+  return client.get<ResWithPagination<GraphicResponse>>("/graphics/?page=" + page).then(res => res.data);
 }
