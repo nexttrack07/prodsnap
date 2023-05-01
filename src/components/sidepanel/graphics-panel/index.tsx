@@ -14,6 +14,8 @@ import React from 'react';
 import { getGraphics } from '@/api/template';
 import { useSetAtom } from 'jotai';
 import { CanvasElementWithPointAtoms, addElementAtom } from '@/components/canvas/store';
+import { SearchInput } from '@/components/search-input';
+import { useInputState } from '@mantine/hooks';
 
 const useStyles = createStyles(() => ({
   shape: {
@@ -27,7 +29,6 @@ const useStyles = createStyles(() => ({
 }));
 
 export function GraphicsPanel() {
-  // const [page, setPage] = React.useState(1);
   const { data, error, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } =
     useInfiniteQuery({
       queryKey: ['graphics'],
@@ -36,6 +37,7 @@ export function GraphicsPanel() {
         lastPage.next ? Number(lastPage.next.split('=')[1]) : undefined,
       keepPreviousData: true
     });
+  const [search, setSearch] = useInputState('');
   const addElement = useSetAtom(addElementAtom);
   const { classes } = useStyles();
 
@@ -43,9 +45,16 @@ export function GraphicsPanel() {
     addElement(newEl);
   };
 
+  const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('searching', e.target.value);
+    setSearch(e.target.value);
+  };
+
   return (
     <div style={{ position: 'relative', height: 'calc(100vh - 150px)' }}>
       <Text size="md">Graphics</Text>
+      <br />
+      <SearchInput value={search} onChange={setSearch} placeholder="Search Graphics" />
       <br />
       <LoadingOverlay visible={status === 'loading'} overlayBlur={2} />
       <ScrollArea.Autosize maxHeight={`calc(100vh - 150px)`}>
