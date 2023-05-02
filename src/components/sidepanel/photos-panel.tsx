@@ -105,11 +105,11 @@ export function PhotosPanel() {
                   width: 300,
                   height: 200,
                   border: { id: 'none', stroke: 'black', strokeWidth: 1 },
-                  url: photo.url,
+                  url: photo.src,
                   alt: photo.alt
                 })
               }
-              src={photo.src}
+              src={photo.thumb}
             />
           ))}
         </SimpleGrid>

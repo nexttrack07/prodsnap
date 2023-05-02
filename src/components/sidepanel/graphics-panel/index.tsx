@@ -16,7 +16,7 @@ import { useSetAtom } from 'jotai';
 import { CanvasElementWithPointAtoms, addElementAtom } from '@/components/canvas/store';
 import { SearchInput } from '@/components/search-input';
 import { useDebouncedValue, useInputState } from '@mantine/hooks';
-import { useStore } from '@/stores';
+// import { useStore } from '@/stores';
 
 const useStyles = createStyles(() => ({
   shape: {
