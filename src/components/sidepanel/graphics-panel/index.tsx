@@ -11,11 +11,12 @@ import {
 } from '@mantine/core';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import React from 'react';
-import { getGraphics } from '@/api/template';
+import { getGraphics, searchGraphics } from '@/api/template';
 import { useSetAtom } from 'jotai';
 import { CanvasElementWithPointAtoms, addElementAtom } from '@/components/canvas/store';
 import { SearchInput } from '@/components/search-input';
-import { useInputState } from '@mantine/hooks';
+import { useDebouncedValue, useInputState } from '@mantine/hooks';
+import { useStore } from '@/stores';
 
 const useStyles = createStyles(() => ({
   shape: {
@@ -37,8 +38,16 @@ export function GraphicsPanel() {
         lastPage.next ? Number(lastPage.next.split('=')[1]) : undefined,
       keepPreviousData: true
     });
-  const [search, setSearch] = useInputState('');
   const addElement = useSetAtom(addElementAtom);
+  // const search = useStore((state) => state.value);
+  // const setSearch = useStore((state) => state.updateValue);
+  const [search, setSearch] = useInputState('');
+  const [debouncedSearch] = useDebouncedValue(search, 500);
+  const searchQuery = useQuery({
+    queryKey: ['graphics/search', debouncedSearch],
+    queryFn: () => searchGraphics(debouncedSearch),
+    enabled: debouncedSearch.length > 0
+  });
   const { classes } = useStyles();
 
   const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
@@ -46,7 +55,7 @@ export function GraphicsPanel() {
   };
 
   const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('searching', e.target.value);
+    e.preventDefault();
     setSearch(e.target.value);
   };
 
@@ -54,14 +63,17 @@ export function GraphicsPanel() {
     <div style={{ position: 'relative', height: 'calc(100vh - 150px)' }}>
       <Text size="md">Graphics</Text>
       <br />
-      <SearchInput value={search} onChange={setSearch} placeholder="Search Graphics" />
+      <SearchInput value={search} onChange={handleSearchInput} placeholder="Search Graphics" />
       <br />
-      <LoadingOverlay visible={status === 'loading'} overlayBlur={2} />
-      <ScrollArea.Autosize maxHeight={`calc(100vh - 150px)`}>
-        <SimpleGrid cols={5} spacing="md">
-          {data?.pages.map((group, i) => (
-            <React.Fragment key={i}>
-              {group.results.map((graphic) => (
+      <LoadingOverlay
+        visible={status === 'loading' || (searchQuery.isFetching && !!search)}
+        overlayBlur={2}
+      />
+      <ScrollArea.Autosize maxHeight={`calc(100vh - 250px)`}>
+        {search.length > 0 ? (
+          <SimpleGrid cols={5} spacing="md">
+            {searchQuery.data?.results.map((graphic, i) => (
+              <React.Fragment key={i}>
                 <Image
                   onClick={() => {
                     handleAddElement({
@@ -80,21 +92,50 @@ export function GraphicsPanel() {
                   key={uuid()}
                   alt={graphic.desc}
                 />
+              </React.Fragment>
+            ))}
+          </SimpleGrid>
+        ) : (
+          <>
+            <SimpleGrid cols={5} spacing="md">
+              {data?.pages.map((group, i) => (
+                <React.Fragment key={i}>
+                  {group.results.map((graphic) => (
+                    <Image
+                      onClick={() => {
+                        handleAddElement({
+                          type: 'svg-graphic',
+                          url: graphic.url,
+                          alt: graphic.desc,
+                          x: 100,
+                          y: 200,
+                          width: 100,
+                          height: 200
+                        });
+                      }}
+                      className={classes.shape}
+                      height={50}
+                      src={graphic.url}
+                      key={uuid()}
+                      alt={graphic.desc}
+                    />
+                  ))}
+                </React.Fragment>
               ))}
-            </React.Fragment>
-          ))}
-        </SimpleGrid>
-        <Space h="xl" />
-        <Button
-          fullWidth
-          loading={isFetchingNextPage}
-          onClick={() => {
-            fetchNextPage();
-          }}
-          disabled={!hasNextPage || isFetchingNextPage}
-        >
-          Load More
-        </Button>
+            </SimpleGrid>
+            <Space h="xl" />
+            <Button
+              fullWidth
+              loading={isFetchingNextPage}
+              onClick={() => {
+                fetchNextPage();
+              }}
+              disabled={!hasNextPage || isFetchingNextPage}
+            >
+              Load More
+            </Button>
+          </>
+        )}
       </ScrollArea.Autosize>
     </div>
   );
