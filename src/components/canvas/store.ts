@@ -77,6 +77,7 @@ export type ImageType = {
   state: ImageState;
   thumbnail?: string;
   currentUrl?: string;
+  alt?: string;
   border: {
     id: 'none' | 'circle' | 'rectangle';
     stroke: string;

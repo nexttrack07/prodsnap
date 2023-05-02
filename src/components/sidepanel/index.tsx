@@ -30,10 +30,10 @@ const navItems: { icon: Icon; label: string; id: NavState }[] = [
   { icon: Template, label: 'Template', id: 'templates' },
   { icon: Camera, label: 'Upload', id: 'upload' },
   { icon: Photo, label: 'Photos', id: 'photos' },
+  { icon: ChartInfographic, label: 'Graphics', id: 'graphics' },
   { icon: TextCaption, label: 'Text', id: 'text' },
   { icon: Line, label: 'Curves', id: 'curves' },
-  { icon: Shape, label: 'Shapes', id: 'shapes' },
-  { icon: ChartInfographic, label: 'Graphics', id: 'graphics' }
+  { icon: Shape, label: 'Shapes', id: 'shapes' }
 ];
 
 const panelMap: Record<NavState, JSX.Element> = {
