@@ -9,7 +9,7 @@ import { client } from './client';
 //   "alt": "Silhouette of Tree Near Body of Water during Golden Hour"
 // },
 
-type PhotoResponse = {
+type Photo = {
   id: number;
   src: string;
   source: string;
@@ -18,6 +18,15 @@ type PhotoResponse = {
   alt: string;
 }
 
-export async function getPopularPhotos() {
-  return client.get<PhotoResponse[]>("/popular-photos").then(res => res.data);
+type PhotoResponse = {
+  page: number;
+  images: Photo[];
+}
+
+export async function getPopularPhotos(page = 1) {
+  return client.get<PhotoResponse>("/popular-photos?page=" + page).then(res => res.data);
+}
+
+export async function searchPhotos(query = 'bag', page = 1) {
+  return client.get<PhotoResponse>("/search-photos?query=" + query + "&page=" + page).then(res => res.data);
 }

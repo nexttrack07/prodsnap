@@ -6,7 +6,8 @@ import {
   SimpleGrid,
   Image,
   LoadingOverlay,
-  ScrollArea
+  ScrollArea,
+  Button
 } from '@mantine/core';
 import { useSetAtom } from 'jotai';
 import {
@@ -15,8 +16,8 @@ import {
   ImageState,
   addElementAtom
 } from '../../components/canvas/store';
-import { useQuery } from '@tanstack/react-query';
-import { getPopularPhotos } from '@/api/photos';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { getPopularPhotos, searchPhotos } from '@/api/photos';
 import { useDebouncedValue, useInputState } from '@mantine/hooks';
 import { SearchInput } from '../search-input';
 
@@ -32,44 +33,24 @@ const useStyles = createStyles((theme) => ({
   }
 }));
 
-const data: { id: number; data: ImageType }[] = [
-  {
-    id: 0,
-    data: {
-      type: 'image',
-      state: ImageState.Normal,
-      x: 200,
-      y: 200,
-      width: 300,
-      height: 200,
-      border: { id: 'none', stroke: 'black', strokeWidth: 1 },
-      url: 'https://media.kohlsimg.com/is/image/kohls/4637183_Navy_Blue?wid=600&hei=600&op_sharpen=1'
-    }
-  },
-  {
-    id: 1,
-    data: {
-      type: 'image',
-      state: ImageState.Normal,
-      x: 200,
-      y: 200,
-      width: 300,
-      border: { id: 'none', stroke: 'black', strokeWidth: 1 },
-      height: 200,
-      url: '/winter-hat.png'
-    }
-  }
-];
-
 export function PhotosPanel() {
   const addElement = useSetAtom(addElementAtom);
   const { classes } = useStyles();
-  const photosQuery = useQuery({
+  const photosQuery = useInfiniteQuery({
     queryKey: ['popular-photos'],
-    queryFn: getPopularPhotos
+    queryFn: (page) => getPopularPhotos(page.pageParam || 1),
+    getNextPageParam: (res) => +res.page + 1,
+    keepPreviousData: true
   });
   const [search, setSearch] = useInputState('');
   const [debouncedSearch] = useDebouncedValue(search, 500);
+  const searchQuery = useInfiniteQuery({
+    queryKey: ['photos/search', debouncedSearch],
+    queryFn: () => searchPhotos(debouncedSearch),
+    enabled: !!debouncedSearch,
+    getNextPageParam: (res) => +res.page + 1,
+    keepPreviousData: true
+  });
 
   const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
     addElement(newEl);
@@ -88,31 +69,90 @@ export function PhotosPanel() {
       <Space h="xl" />
       <SearchInput value={search} onChange={handleSearchInput} placeholder="Search Photos" />
       <Space h="xl" />
-      <LoadingOverlay visible={photosQuery.isFetching && !!search} overlayBlur={2} />
-      <ScrollArea.Autosize maxHeight={`calc(100vh - 250px)`}>
-        <SimpleGrid spacing="xs" cols={2}>
-          {photosQuery.data?.map((photo) => (
-            <Image
-              key={photo.id}
-              radius="xs"
-              className={classes.shape}
-              onClick={() =>
-                handleAddElement({
-                  type: 'image',
-                  state: ImageState.Normal,
-                  x: 200,
-                  y: 200,
-                  width: 300,
-                  height: 200,
-                  border: { id: 'none', stroke: 'black', strokeWidth: 1 },
-                  url: photo.src,
-                  alt: photo.alt
-                })
-              }
-              src={photo.thumb}
-            />
-          ))}
-        </SimpleGrid>
+      <LoadingOverlay
+        visible={(photosQuery.isFetching || searchQuery.isFetching) && !!search}
+        overlayBlur={2}
+      />
+      <ScrollArea.Autosize maxHeight={`calc(100vh - 270px)`}>
+        {search.length > 0 ? (
+          <>
+            <SimpleGrid spacing="xs" cols={2}>
+              {searchQuery.data?.pages.map((group) =>
+                group.images.map((photo) => (
+                  <Image
+                    key={photo.id}
+                    radius="xs"
+                    className={classes.shape}
+                    onClick={() =>
+                      handleAddElement({
+                        type: 'image',
+                        state: ImageState.Normal,
+                        x: 200,
+                        y: 200,
+                        width: 300,
+                        height: 200,
+                        border: { id: 'none', stroke: 'black', strokeWidth: 1 },
+                        url: photo.src,
+                        alt: photo.alt
+                      })
+                    }
+                    src={photo.thumb}
+                  />
+                ))
+              )}
+            </SimpleGrid>
+            <Space h="xl" />
+            <Button
+              fullWidth
+              loading={searchQuery.isFetchingNextPage}
+              onClick={() => {
+                searchQuery.fetchNextPage();
+              }}
+              disabled={!searchQuery.hasNextPage || searchQuery.isFetchingNextPage}
+            >
+              Load More
+            </Button>
+          </>
+        ) : (
+          <>
+            <SimpleGrid spacing="xs" cols={2}>
+              {photosQuery.data?.pages.map((group) =>
+                group.images.map((photo) => (
+                  <Image
+                    key={photo.id}
+                    radius="xs"
+                    className={classes.shape}
+                    onClick={() =>
+                      handleAddElement({
+                        type: 'image',
+                        state: ImageState.Normal,
+                        x: 200,
+                        y: 200,
+                        width: 300,
+                        height: 200,
+                        border: { id: 'none', stroke: 'black', strokeWidth: 1 },
+                        url: photo.src,
+                        alt: photo.alt
+                      })
+                    }
+                    src={photo.thumb}
+                  />
+                ))
+              )}
+            </SimpleGrid>
+            <Space h="xl" />
+            <Button
+              fullWidth
+              loading={photosQuery.isFetchingNextPage}
+              onClick={() => {
+                photosQuery.fetchNextPage();
+              }}
+              disabled={!photosQuery.hasNextPage || photosQuery.isFetchingNextPage}
+            >
+              Load More
+            </Button>
+          </>
+        )}
       </ScrollArea.Autosize>
     </>
   );
