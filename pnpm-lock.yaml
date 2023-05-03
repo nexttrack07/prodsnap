@@ -55,6 +55,7 @@ importers:
       typescript: ^4.6.4
       use-fit-text: ^2.4.0
       vite: ^3.1.0
+      zustand: ^4.3.7
     dependencies:
       '@emotion/react': 11.10.4_w5j4k42lgipnm43s3brx6h3c34
       '@mantine/carousel': 5.3.3_gz7ftvhd6ccq3x24hk3w22v32i
@@ -92,6 +93,7 @@ importers:
       recoil: 0.7.6_biqbaboplfbrettd7655fr4n2y
       tabler-icons-react: 1.56.0_react@18.2.0
       use-fit-text: 2.4.0_react@18.2.0
+      zustand: 4.3.7_react@18.2.0
     devDependencies:
       '@types/file-saver': 2.0.5
       '@types/react': 18.0.20
@@ -4524,3 +4526,19 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  /zustand/4.3.7_react@18.2.0:
+    resolution: {integrity: sha512-dY8ERwB9Nd21ellgkBZFhudER8KVlelZm8388B5nDAXhO/+FZDhYMuRnqDgu5SYyRgz/iaf8RKnbUs/cHfOGlQ==}
+    engines: {node: '>=12.7.0'}
+    peerDependencies:
+      immer: '>=9.0'
+      react: '>=16.8'
+    peerDependenciesMeta:
+      immer:
+        optional: true
+      react:
+        optional: true
+    dependencies:
+      react: 18.2.0
+      use-sync-external-store: 1.2.0_react@18.2.0
+    dev: false

@@ -43,3 +43,7 @@ type ResWithPagination<T> = {
 export async function getGraphics(page: number = 1) {
   return client.get<ResWithPagination<GraphicResponse>>("/graphics/?page=" + page).then(res => res.data);
 }
+
+export async function searchGraphics(query: string = 'nature') {
+  return client.get<ResWithPagination<GraphicResponse>>("/search/graphics/" + query).then(res => res.data);
+}

@@ -13,7 +13,7 @@ import {
   circleCropAtom
 } from '../store';
 import { calculatePosition, getImageDimensions, SNAP_TOLERANCE, uuid } from '../../../utils';
-import { Center, Box, Image, Loader, useMantineTheme } from '@mantine/core';
+import { Center, Box, Image, Loader, useMantineTheme, LoadingOverlay } from '@mantine/core';
 import 'react-image-crop/dist/ReactCrop.css';
 import { ResizeHandler } from '../resize-handler';
 import { DragHandler } from '../drag-handler';
@@ -36,17 +36,39 @@ export function RenderImage({
 }) {
   const canvasProps = useAtomValue(canvasAtom);
 
+  // useEffect(() => {
+  //   async function setImageDimensions(src: string) {
+  //     setElement((el) => ({ ...el, state: ImageState.Loading }));
+  //     const { width, height } = await getImageDimensions(src);
+  //     setElement((el) => ({
+  //       ...el,
+  //       width,
+  //       height
+  //     }));
+  //     setElement((el) => ({ ...el, state: ImageState.Normal }));
+  //   }
+  //   if (element.type === 'image') {
+  //     setImageDimensions(element.url);
+  //   }
+  // }, [element.type]);
+
   useEffect(() => {
     async function setImageDimensions(src: string) {
       setElement((el) => ({ ...el, state: ImageState.Loading }));
-      const { width, height } = await getImageDimensions(src);
-      setElement((el) => ({
-        ...el,
-        width,
-        height
-      }));
-      setElement((el) => ({ ...el, state: ImageState.Normal }));
+
+      try {
+        const { width, height } = await getImageDimensions(src);
+        setElement((el) => ({
+          ...el,
+          width,
+          height
+        }));
+        setElement((el) => ({ ...el, state: ImageState.Normal }));
+      } catch (error) {
+        console.error('Failed to set image dimensions:', error);
+      }
     }
+
     if (element.type === 'image') {
       setImageDimensions(element.url);
     }
@@ -97,7 +119,11 @@ export function RenderImage({
       onMove={handleMouseMove}
       onClick={handleClick}
     >
-      {element.state === ImageState.Loading && <Loader></Loader>}
+      {element.state === ImageState.Loading && (
+        <div style={{ width, height, border: '1px solid rgba(0,0,0,.2)', borderRadius: 5 }}>
+          <LoadingOverlay visible overlayOpacity={0.1} overlayColor="black" />
+        </div>
+      )}
       {element.state === ImageState.Normal && (
         <>
           <svg
