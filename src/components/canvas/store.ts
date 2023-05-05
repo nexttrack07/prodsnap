@@ -16,6 +16,7 @@ export type Resizable = {
 };
 
 export type MoveableElement = Draggable & Resizable & {
+  rotation?: number;
   group?: string;
   opacity?: number;
 };

@@ -143,11 +143,13 @@ export function ResizeHandler({
         const delta = e.movementX;
         onResize({ x: delta, y: delta, width: -delta, height: -delta });
       } else if (status === 'resizing-bl') {
-        const delta = e.movementX;
-        onResize({ x: 0, y: 0, width: -delta, height: delta });
+        const deltaX = e.movementX;
+        const deltaY = e.movementY;
+        onResize({ x: deltaX, y: 0, width: -deltaX, height: deltaY });
       } else if (status === 'resizing-tr') {
-        const delta = e.movementX;
-        onResize({ x: 0, y: 0, width: delta, height: -delta });
+        const deltaX = e.movementX;
+        const deltaY = e.movementY;
+        onResize({ x: 0, y: deltaY, width: deltaX, height: -deltaY });
       } else if (status === 'resizing-tm') {
         const delta = e.movementY;
         onResize({ x: 0, y: delta, width: 0, height: -delta });

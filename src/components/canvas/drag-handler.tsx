@@ -8,6 +8,7 @@ import { ArrowsMove } from 'tabler-icons-react';
 type Props = {
   dimension: Resizable;
   position: Draggable;
+  rotation?: number;
   onMove: (p: Draggable) => void;
   onClick?: (e: React.MouseEvent) => void;
   children?: React.ReactNode;
@@ -18,6 +19,7 @@ type Props = {
 
 export function DragHandler({
   dimension,
+  rotation = 0,
   position,
   onMove,
   onClick,
@@ -82,6 +84,8 @@ export function DragHandler({
         height: height,
         width: width,
         userSelect: 'none',
+        transform: `rotate(${rotation}deg)`,
+        transformOrigin: 'center center',
         outline: 'none',
         cursor: 'move'
       }}
