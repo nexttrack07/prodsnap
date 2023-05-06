@@ -86,6 +86,7 @@ export function RotateHandler({ dimension, position, onRotate, show = true }: Pr
 
     const handleMouseUp = (e: MouseEvent) => {
       e.preventDefault();
+      e.stopPropagation();
       setIsActive(false);
     };
 
@@ -100,5 +101,13 @@ export function RotateHandler({ dimension, position, onRotate, show = true }: Pr
 
   if (!show) return null;
 
-  return <div onMouseDown={handleRotateMouseDown} className={classes.rotateHandler} />;
+  return (
+    <div
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+      onMouseDown={handleRotateMouseDown}
+      className={classes.rotateHandler}
+    />
+  );
 }

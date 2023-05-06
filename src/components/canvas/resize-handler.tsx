@@ -178,6 +178,10 @@ export function ResizeHandler({
     };
   }, [status]);
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   if (!show) return null;
 
   return (
@@ -195,6 +199,7 @@ export function ResizeHandler({
     >
       {withNEResize && (
         <span
+          onClick={handleClick}
           onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-tl')}
           className={clsx(classes.resize, classes.resize_tl)}
         />
@@ -202,6 +207,7 @@ export function ResizeHandler({
       {withNWResize && (
         <span
           onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-tr')}
+          onClick={handleClick}
           className={clsx(classes.resize, classes.resize_tr)}
         />
       )}
@@ -209,23 +215,27 @@ export function ResizeHandler({
         <span
           onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-bl')}
           className={clsx(classes.resize, classes.resize_bl)}
+          onClick={handleClick}
         />
       )}
       {withSEResize && (
         <span
           onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-br')}
           className={clsx(classes.resize, classes.resize_br)}
+          onClick={handleClick}
         />
       )}
       {withTMResize && (
         <span
           onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-tm')}
           className={clsx(classes.resize, classes.resize_tm)}
+          onClick={handleClick}
         />
       )}
       {withBMResize && (
         <span
           onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-bm')}
+          onClick={handleClick}
           className={clsx(classes.resize, classes.resize_bm)}
         />
       )}
@@ -233,12 +243,14 @@ export function ResizeHandler({
         <span
           onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-lm')}
           className={clsx(classes.resize, classes.resize_lm)}
+          onClick={handleClick}
         />
       )}
       {withRMResize && (
         <span
           onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-rm')}
           className={clsx(classes.resize, classes.resize_rm)}
+          onClick={handleClick}
         />
       )}
     </div>

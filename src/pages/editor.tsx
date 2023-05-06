@@ -48,7 +48,7 @@ export function Editor() {
           <Toolbar />
         </div>
         <Center
-          onClick={handleEditorClick}
+          onMouseDown={handleEditorClick}
           sx={(theme) => ({ flex: 1, backgroundColor: theme.colors.gray[1] })}
         >
           <Canvas />
