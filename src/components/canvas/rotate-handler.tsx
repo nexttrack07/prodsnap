@@ -30,9 +30,18 @@ const useStyles = createStyles((theme) => ({
 export function RotateHandler({ dimension, position, onRotate, show = true }: Props) {
   const [isActive, setIsActive] = useState(false);
   const [startAngle, setStartAngle] = useState(0);
+  const [canvasPosition, setCanvasPosition] = useState({ x: 0, y: 0 });
   const { classes } = useStyles();
   const center = useRef({ x: 0, y: 0 });
   const R2D = 180 / Math.PI;
+
+  useEffect(() => {
+    const canvas = document.getElementById('canvas');
+    if (canvas) {
+      const { x, y } = canvas.getBoundingClientRect();
+      setCanvasPosition({ x, y });
+    }
+  }, []);
 
   const handleRotateMouseDown = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     e.stopPropagation();
@@ -43,21 +52,34 @@ export function RotateHandler({ dimension, position, onRotate, show = true }: Pr
       y: position.y + dimension.height / 2
     };
 
-    const x = clientX - center.current.x;
-    const y = clientY - center.current.y;
+    const posX = clientX - canvasPosition.x;
+    const posY = clientY - canvasPosition.y;
+    const x = posX - center.current.x;
+    const y = posY - center.current.y;
 
     setStartAngle(R2D * Math.atan2(y, x));
     setIsActive(true);
+
+    // middle of the element
+    const middle = {
+      x: position.x + dimension.width / 2,
+      y: position.y - 40
+    };
+    console.log('expected position: ', middle);
+    console.log('actual position: ', { x: posX, y: posY });
+    console.log('actual position: ', { x: clientX, y: clientY });
   };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isActive) {
         e.preventDefault();
-        const x = e.clientX - center.current.x;
-        const y = e.clientY - center.current.y;
+        const posX = e.clientX - canvasPosition.x;
+        const posY = e.clientY - canvasPosition.y;
+        const x = posX - center.current.x;
+        const y = posY - center.current.y;
         const d = R2D * Math.atan2(y, x);
-        const currentRotation = d - startAngle;
+        const currentRotation = d; // - startAngle;
         onRotate(currentRotation);
       }
     };

@@ -96,7 +96,7 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
     setElement((prev) => {
       return {
         ...prev,
-        rotation: angle + (prev.rotation ?? 0)
+        rotation: angle // + (prev.rotation ?? 0)
       };
     });
   };

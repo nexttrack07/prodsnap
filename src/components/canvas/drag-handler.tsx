@@ -84,7 +84,7 @@ export function DragHandler({
         height: height,
         width: width,
         userSelect: 'none',
-        transform: `rotate(${rotation}deg)`,
+        transform: `rotate(${rotation + 90}deg)`,
         transformOrigin: 'center center',
         outline: 'none',
         cursor: 'move'

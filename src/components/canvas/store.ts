@@ -131,6 +131,7 @@ export const selectedItemsAtom = atom((get) => {
 });
 
 export const addElementAtom = atom(null, (_, set, newEl: CanvasElementWithPointAtoms) => {
+  newEl = { ...newEl, rotation: -90 }
   set(elementAtomsAtom, (elementAtoms) => [...elementAtoms, atom(newEl)]);
 });
 
