@@ -13,6 +13,7 @@ import { calculatePosition, SNAP_TOLERANCE, getImageDimensions, uuid } from '../
 import 'react-image-crop/dist/ReactCrop.css';
 import { ResizeHandler } from './resize-handler';
 import { DragHandler } from './drag-handler';
+import { RotateHandler } from './rotate-handler';
 
 export function RenderGraphic({
   element,
@@ -77,13 +78,14 @@ export function RenderGraphic({
     onSelect(e);
   };
 
-  const { width, height, x, y } = element;
+  const { rotation, width, height, x, y } = element;
   const id = uuid();
 
   return (
     <DragHandler
       position={{ x, y }}
       dimension={{ width, height }}
+      rotation={rotation}
       onMove={handleMouseMove}
       onClick={handleClick}
     >
@@ -104,6 +106,12 @@ export function RenderGraphic({
         show={isSelected}
         dimension={{ width, height }}
         onResize={handleResize}
+      />
+      <RotateHandler
+        show={isSelected}
+        dimension={{ width, height }}
+        onRotate={(rotation) => setElement((el) => ({ ...el, rotation }))}
+        position={{ x, y }}
       />
     </DragHandler>
   );
