@@ -13,11 +13,12 @@ import {
   circleCropAtom
 } from '../store';
 import { calculatePosition, getImageDimensions, SNAP_TOLERANCE, uuid } from '../../../utils';
-import { Center, Box, Image, Loader, useMantineTheme, LoadingOverlay } from '@mantine/core';
+import { Box, LoadingOverlay } from '@mantine/core';
 import 'react-image-crop/dist/ReactCrop.css';
 import { ResizeHandler } from '../resize-handler';
 import { DragHandler } from '../drag-handler';
 import { RenderBorder } from './render-border';
+import { RotateHandler } from '../rotate-handler';
 
 export const cropperAtom = atom<Cropper | null>(null);
 
@@ -35,22 +36,6 @@ export function RenderImage({
   onSelect: (e: React.MouseEvent) => void;
 }) {
   const canvasProps = useAtomValue(canvasAtom);
-
-  // useEffect(() => {
-  //   async function setImageDimensions(src: string) {
-  //     setElement((el) => ({ ...el, state: ImageState.Loading }));
-  //     const { width, height } = await getImageDimensions(src);
-  //     setElement((el) => ({
-  //       ...el,
-  //       width,
-  //       height
-  //     }));
-  //     setElement((el) => ({ ...el, state: ImageState.Normal }));
-  //   }
-  //   if (element.type === 'image') {
-  //     setImageDimensions(element.url);
-  //   }
-  // }, [element.type]);
 
   useEffect(() => {
     async function setImageDimensions(src: string) {
@@ -108,7 +93,11 @@ export function RenderImage({
     onSelect(e);
   };
 
-  const { width, height, x, y } = element;
+  const handleRotate = (rotation: number) => {
+    setElement((el) => ({ ...el, rotation }));
+  };
+
+  const { width, height, rotation, x, y } = element;
   const id = uuid();
   const s = element.border.strokeWidth;
 
@@ -116,6 +105,7 @@ export function RenderImage({
     <DragHandler
       position={{ x, y }}
       dimension={{ width, height }}
+      rotation={rotation}
       onMove={handleMouseMove}
       onClick={handleClick}
     >
@@ -157,6 +147,12 @@ export function RenderImage({
             show={isSelected}
             dimension={{ width, height }}
             onResize={handleResize}
+          />
+          <RotateHandler
+            show={isSelected}
+            dimension={{ width, height }}
+            onRotate={handleRotate}
+            position={{ x, y }}
           />
         </>
       )}
