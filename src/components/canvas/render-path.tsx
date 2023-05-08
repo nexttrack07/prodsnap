@@ -11,6 +11,7 @@ import {
 import { DragHandler } from './drag-handler';
 import { ResizeHandler } from './resize-handler';
 import { calculatePosition, SNAP_TOLERANCE } from '@/utils';
+import { RotateHandler } from './rotate-handler';
 
 type SVGCanvasElement = MoveableElement & SVGPathType;
 
@@ -27,7 +28,8 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
     y,
     width,
     height,
-    strokeProps: { strokeWidth }
+    strokeProps: { strokeWidth },
+    rotation = 0
   } = element;
   const canvasProps = useAtomValue(canvasAtom);
 
@@ -90,10 +92,20 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
 
   const pathData = scalePathData(element.path.d!, width, height, strokeWidth);
 
+  const handleRotate = (angle: number) => {
+    setElement((prev) => {
+      return {
+        ...prev,
+        rotation: angle // + (prev.rotation ?? 0)
+      };
+    });
+  };
+
   return (
     <DragHandler
       onClick={handleClick}
       position={{ x, y }}
+      rotation={rotation}
       dimension={{ width, height }}
       onMove={handleMouseMove}
       hide={!isSelected}
@@ -116,14 +128,19 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
           strokeWidth={element.strokeProps.strokeWidth}
           strokeLinecap={element.strokeProps.strokeLinecap}
           strokeDasharray={element.strokeProps.strokeDasharray}
-          // strokeMiterlimit={element.strokeProps.strokeWidth * 2}
+          strokeMiterlimit={element.strokeProps.strokeWidth * 2}
           clipPath={element.strokeProps.clipPathId}
           fill={element.props.fill}
-          // fill="none"
           vectorEffect="non-scaling-stroke"
         />
       </svg>
       <ResizeHandler show={isSelected} dimension={{ width, height }} onResize={handleResize} />
+      <RotateHandler
+        show={isSelected}
+        dimension={{ width, height }}
+        position={{ x, y }}
+        onRotate={handleRotate}
+      />
     </DragHandler>
   );
 }
@@ -200,7 +217,6 @@ export function scalePathData(
       return command + scaledValues;
     }
   );
-  console.log('d: ', newPathData);
 
   return newPathData;
 }
