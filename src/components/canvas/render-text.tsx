@@ -3,7 +3,8 @@ import { MoveableElement, TextType } from './store';
 import { Box, Center, useMantineTheme } from '@mantine/core';
 import { useWindowEvent } from '@mantine/hooks';
 import clsx from 'clsx';
-import { useResizeStyles } from './resize-handler';
+import { ResizeHandler, useResizeStyles } from './resize-handler';
+import { RotateHandler } from './rotate-handler';
 
 type Status =
   | 'none'
@@ -127,6 +128,15 @@ export function RenderText({
     setEditable(false);
   };
 
+  const handleRotate = (angle: number) => {
+    setElement((prev) => {
+      return {
+        ...prev,
+        rotation: angle
+      };
+    });
+  };
+
   const cursor =
     isSelected && status === 'move'
       ? 'move'
@@ -145,8 +155,9 @@ export function RenderText({
         userSelect: 'none',
         position: 'absolute',
         whiteSpace: 'pre-wrap',
-        // width: element.width,
-        // height: element.height,
+        transform: `rotate(${(element.rotation ?? 0) + 90}deg)`,
+        transformOrigin: 'center center',
+        outline: 'none',
         cursor,
         ...element.props
       }}
@@ -183,10 +194,12 @@ export function RenderText({
           />
         </>
       )}
+      <RotateHandler
+        show={isSelected}
+        dimension={{ width: element.width, height: element.height }}
+        position={{ x: element.x, y: element.y }}
+        onRotate={handleRotate}
+      />
     </Center>
   );
-}
-
-function reverseString(str: string): string {
-  return str.split('').reverse().join('');
 }
