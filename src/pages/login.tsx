@@ -17,10 +17,10 @@ import {
   Stack
 } from '@mantine/core';
 import { BrandGoogle } from 'tabler-icons-react';
-import { useAtom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from '@/api/user';
+import { useLoginStore } from '@/stores';
 
 export function GoogleButton(props: ButtonProps) {
   return (
@@ -39,7 +39,7 @@ export const userAtom = atomWithStorage<{ user: null | USER }>('user', {
 });
 
 export function Login(props: PaperProps) {
-  const [user, setUser] = useAtom(userAtom);
+  const [user, setUser] = useLoginStore((state) => [state.user, state.setUser]);
   const navigate = useNavigate();
   const [type, toggle] = useToggle(['login', 'register']);
   const form = useForm({
@@ -57,7 +57,8 @@ export function Login(props: PaperProps) {
   });
 
   useEffect(() => {
-    if (user.user) {
+    if (user?.email && user?.token) {
+      console.log('user.email && token');
       navigate('/editor');
     }
   }, []);
@@ -65,7 +66,7 @@ export function Login(props: PaperProps) {
   const handleFormSubmit = () => {
     if (type === 'login') {
       signInWithEmailAndPassword(form.values.email, form.values.password).then((res) => {
-        setUser({ user: { token: res.data.key, email: form.values.email } });
+        setUser({ email: form.values.email, token: res.data.key });
         navigate('/editor');
       });
     }

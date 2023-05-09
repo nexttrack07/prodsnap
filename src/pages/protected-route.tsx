@@ -1,4 +1,3 @@
-import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { USER } from './login';
 
@@ -9,7 +8,7 @@ type Props = {
 };
 
 export function ProtectedRoute({ user, redirectPath = '/login', children }: Props) {
-  if (!user) {
+  if (!user?.token) {
     return <Navigate to={redirectPath} replace />;
   }
 
