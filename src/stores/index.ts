@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import { SidepanelSearchState, createSidepanelSearchSlice } from './sidepanel-search.slice';
+import { LoginState, loginSlice } from './login.slice';
 
-type BoundStore = SidepanelSearchState;
+type BoundStore = LoginState;
 
 export const useStore = create<BoundStore>((...a) => ({
-  ...createSidepanelSearchSlice(...a),
+  ...loginSlice(...a),
 }))
