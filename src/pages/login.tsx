@@ -20,7 +20,7 @@ import { BrandGoogle } from 'tabler-icons-react';
 import { atomWithStorage } from 'jotai/utils';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from '@/api/user';
-import { useStore } from '@/stores';
+import { useLoginStore } from '@/stores';
 
 export function GoogleButton(props: ButtonProps) {
   return (
@@ -39,7 +39,7 @@ export const userAtom = atomWithStorage<{ user: null | USER }>('user', {
 });
 
 export function Login(props: PaperProps) {
-  const [user, setUser] = useStore((state) => [state.user, state.setUser]);
+  const [user, setUser] = useLoginStore((state) => [state.user, state.setUser]);
   const navigate = useNavigate();
   const [type, toggle] = useToggle(['login', 'register']);
   const form = useForm({

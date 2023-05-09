@@ -7,13 +7,13 @@ import ReactDOM from 'react-dom/client';
 import { Route, Routes, BrowserRouter as Router } from 'react-router-dom';
 import { Editor, Login, ProtectedRoute, userAtom } from './pages';
 import './index.css';
-import { useStore } from './stores';
+import { useLoginStore } from './stores';
 
 const queryClient = new QueryClient();
 
 function App() {
   // const { user } = useAtomValue(userAtom);
-  const user = useStore((state) => state.user);
+  const user = useLoginStore((state) => state.user);
 
   return (
     <Routes>
