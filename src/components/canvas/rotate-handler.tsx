@@ -65,9 +65,6 @@ export function RotateHandler({ dimension, position, onRotate, show = true }: Pr
       x: position.x + dimension.width / 2,
       y: position.y - 40
     };
-    console.log('expected position: ', middle);
-    console.log('actual position: ', { x: posX, y: posY });
-    console.log('actual position: ', { x: clientX, y: clientY });
   };
 
   useEffect(() => {

@@ -27,10 +27,9 @@ export function ImageOptions() {
       try {
         setSelectedImage({ state: ImageState.Loading });
         const res = await removeBackground(url);
-        console.log('response: ', res);
         setPrediction(res);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
   };

@@ -58,7 +58,6 @@ export function Login(props: PaperProps) {
 
   useEffect(() => {
     if (user?.email && user?.token) {
-      console.log('user.email && token');
       navigate('/editor');
     }
   }, []);

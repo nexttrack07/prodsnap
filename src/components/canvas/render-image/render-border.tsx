@@ -56,7 +56,6 @@ function RenderRectangleBorder({
   border: ImageType['border'];
   uid: string;
 }) {
-  console.log('helo', border);
   return (
     <rect
       width={width}
@@ -80,8 +79,6 @@ function RenderPentagonBorder({
   border: ImageType['border'];
   uid: string;
 }) {
-  console.log('hello', border);
-
   const radius = Math.min(width, height) / 2;
   const centerX = width / 2;
   const centerY = height / 2;
@@ -121,8 +118,6 @@ function RenderStarBorder({
   border: ImageType['border'];
   uid: string;
 }) {
-  console.log('hello', border);
-
   const outerRadius = Math.min(width, height) / 2;
   const innerRadius = outerRadius * 0.381966; // Golden ratio approximation
   const centerX = width / 2;

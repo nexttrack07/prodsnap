@@ -168,7 +168,6 @@ const elementAtom = atom(
   (get, set, element: Partial<SVGCurveWithPointAtoms>) => {
     const activeElement = get(activeElementAtom);
     if (activeElement && activeElement?.type === 'svg-curve') {
-      console.log('set', element);
       set(activeElementAtom, { ...activeElement, ...element });
     }
   }
