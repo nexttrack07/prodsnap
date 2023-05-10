@@ -130,7 +130,6 @@ export function RenderImage({
             </defs>
           </svg>
           <svg viewBox={`${-s} ${-s} ${width + s * 2} ${height + s * 2}`}>
-            <use href={`#${element.border.id}-${id}`} />
             <image
               clipPath={id}
               preserveAspectRatio="xMidYMid slice"
@@ -138,6 +137,7 @@ export function RenderImage({
               width={width}
               height={height}
             />
+            <use href={`#${element.border.id}-${id}`} />
           </svg>
           <ResizeHandler
             withBMResize={false}

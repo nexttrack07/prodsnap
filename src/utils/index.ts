@@ -107,3 +107,19 @@ export function uuid(): string {
 
   return uniqueId;
 }
+
+export function getFileNameFromUrl(url: string): string {
+  // Create a new URL object
+  let urlObj = new URL(url);
+
+  // Get the pathname, split it by '/' to get the parts
+  let pathParts = urlObj.pathname.split('/');
+
+  // Get the last part, which should be the file name with extension
+  let fileNameWithExt = pathParts[pathParts.length - 1];
+
+  // Split by '.' to separate the name and extension, and get the first part
+  let fileName = fileNameWithExt.split('.')[0];
+
+  return fileName;
+}

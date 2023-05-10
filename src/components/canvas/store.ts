@@ -75,6 +75,7 @@ export enum ImageState {
 export type ImageType = {
   type: 'image';
   url: string;
+  public_id?: string;
   state: ImageState;
   thumbnail?: string;
   currentUrl?: string;
