@@ -29,8 +29,6 @@ export function Canvas() {
   const [{ width, height, backgroundColor }, setCanvas] = useAtom(canvasAtom);
   const selected = useAtomValue(selectedElementAtomsAtom);
 
-  console.log('Elements: ', elementAtoms);
-
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
     unSelectAllElements();
