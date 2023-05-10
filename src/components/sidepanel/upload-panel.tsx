@@ -114,11 +114,12 @@ export function UploadPanel() {
           <Image
             key={image.image}
             className={classes.shape}
-            src={image.image}
+            src={import.meta.env.VITE_CLOUDINARY_IMAGE_URL + image.image}
             onClick={() => {
               const el: CanvasElementWithPointAtoms = {
                 ...defaultImage,
-                url: image.image
+                url: import.meta.env.VITE_CLOUDINARY_IMAGE_URL + image.image,
+                public_id: image.public_id
               };
 
               handleAddElement(el);

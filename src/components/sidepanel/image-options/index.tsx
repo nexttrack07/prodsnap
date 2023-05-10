@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActionIcon, Button, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { WashDrycleanOff } from 'tabler-icons-react';
 import { httpsCallable } from 'firebase/functions';
@@ -12,29 +12,48 @@ import {
 import { useAtom, useAtomValue } from 'jotai';
 import { ImageCropper } from './crop-image';
 import { BORDERS } from './image-borders';
+import { getBackgroundRemovalStatus, removeBackground } from '@/api/photos';
 
-const removeBackground = httpsCallable(functions, 'removeBackground');
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export function ImageOptions() {
   const [selectedImage, setSelectedImage] = useAtom(selectedImageAtom);
   const [border, setBorder] = useAtom(imageBorderAtom);
+  const [prediction, setPrediction] = useState<any | null>(null);
   const url = useAtomValue(imageUrlAtom);
+
+  const handleRemoveBg = async () => {
+    if (url) {
+      try {
+        setSelectedImage({ state: ImageState.Loading });
+        const res = await removeBackground(url);
+        console.log('response: ', res);
+        setPrediction(res);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const checkStatus = async () => {
+      if (!prediction) return;
+      if (prediction?.status === 'succeeded') {
+        setSelectedImage({ state: ImageState.Normal, url: prediction.output });
+      } else if (prediction?.status === 'failed') {
+        setSelectedImage({ state: ImageState.Normal });
+      } else {
+        await sleep(1000);
+        const response = await getBackgroundRemovalStatus(prediction?.id);
+        setPrediction(response);
+      }
+    };
+    checkStatus();
+  }, [prediction]);
 
   if (!selectedImage) {
     return null;
   }
-
-  const handleRemoveBg = () => {
-    if (url) {
-      setSelectedImage({ state: ImageState.Loading });
-      removeBackground({ url })
-        .then()
-        .catch()
-        .finally(() => {
-          setSelectedImage({ state: ImageState.Normal });
-        });
-    }
-  };
 
   return (
     <Stack>

@@ -4,6 +4,7 @@ importers:
 
   .:
     specifiers:
+      '@cloudinary/url-gen': ^1.10.0
       '@emotion/react': ^11.10.4
       '@mantine/carousel': ^5.3.3
       '@mantine/core': ^5.3.3
@@ -57,6 +58,7 @@ importers:
       vite: ^3.1.0
       zustand: ^4.3.7
     dependencies:
+      '@cloudinary/url-gen': 1.10.0
       '@emotion/react': 11.10.4_w5j4k42lgipnm43s3brx6h3c34
       '@mantine/carousel': 5.3.3_gz7ftvhd6ccq3x24hk3w22v32i
       '@mantine/core': 5.3.3_i2yg2ezuwprqywup3vllzgovyu
@@ -395,6 +397,18 @@ packages:
       '@babel/helper-string-parser': 7.18.10
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
+
+  /@cloudinary/transformation-builder-sdk/1.2.8:
+    resolution: {integrity: sha512-Rxvt/tjzTNzHDvH2l5ZLky/ahp60pHf51uLfzkFA/Mrh6Uj8aMHne0TRbYvpaH4t8l9wLGcdK6SbBqKVzlN16A==}
+    dependencies:
+      '@cloudinary/url-gen': 1.10.0
+    dev: false
+
+  /@cloudinary/url-gen/1.10.0:
+    resolution: {integrity: sha512-J3V+gzT6Tepw9bMrR3prWVbW22cIFJtPS8Wkt1WFSZVHWpZx8/vv9ACHaxUmRqaSkjhX8ErsuzDY5YxdWnaCbw==}
+    dependencies:
+      '@cloudinary/transformation-builder-sdk': 1.2.8
+    dev: false
 
   /@emotion/babel-plugin/11.10.2:
     resolution: {integrity: sha512-xNQ57njWTFVfPAc3cjfuaPdsgLp5QOSuRsj9MA6ndEhH/AzuZM86qIQzt6rq+aGBwj3n5/TkLmU5lhAfdRmogA==}
