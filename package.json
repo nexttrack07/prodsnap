@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@cloudinary/url-gen": "^1.10.0",
     "@emotion/react": "^11.10.4",
     "@mantine/carousel": "^5.3.3",
     "@mantine/core": "^5.3.3",
