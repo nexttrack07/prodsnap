@@ -1,10 +1,11 @@
 import React from 'react';
 import { Text, Space, createStyles, SimpleGrid, ScrollArea } from '@mantine/core';
-import { useSetAtom } from 'jotai';
+import { atom, useAtom, useSetAtom } from 'jotai';
 import { useQuery } from '@tanstack/react-query';
 import { getShapes } from '../../api';
 import { addElementAtom, CanvasElementWithPointAtoms } from '../../components/canvas/store';
 import { scalePathData } from '../canvas/render-path';
+import { Element, ElementGroup, elementGroupAtomsAtom } from '@/stores/elements';
 
 const useStyles = createStyles(() => ({
   shape: {
@@ -19,11 +20,22 @@ const useStyles = createStyles(() => ({
 
 export function ShapesPanel() {
   const query = useQuery(['shapes'], getShapes);
-  const addElement = useSetAtom(addElementAtom);
+  // const addElement = useSetAtom(addElementAtom);
+  const [elementGroupAtoms, setElementGroupAtoms] = useAtom(elementGroupAtomsAtom);
   const { classes } = useStyles();
 
-  const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
-    addElement(newEl);
+  const handleAddElement = (newEl: Element) => {
+    // addElement(newEl);
+    const newElementGroup: ElementGroup = {
+      type: 'group',
+      x: 100,
+      y: 100,
+      width: 100,
+      height: 100,
+      angle: 0,
+      elements: [atom(newEl)]
+    };
+    setElementGroupAtoms((prev) => [...prev, atom(newElementGroup)]);
   };
 
   return (
@@ -37,38 +49,44 @@ export function ShapesPanel() {
           {query.data?.data?.map((item) => {
             const element = item.data;
             const {
-              strokeProps: { strokeWidth },
+              pathProps: { strokeWidth = 1 },
               width,
               height
             } = element;
-            const pathData = scalePathData(element.path.d!, width, height, strokeWidth);
+            const pathData = scalePathData(
+              element.pathProps.d!,
+              width,
+              height,
+              Number(strokeWidth) ?? 1
+            );
             return (
               <svg
                 key={item.id}
                 onClick={() => handleAddElement(element)}
                 className={classes.shape}
-                opacity={element.opacity}
-                viewBox={`${-strokeWidth} ${-strokeWidth} ${width + strokeWidth}, ${
-                  height + strokeWidth
+                fill={element.svgProps.fill}
+                stroke={element.svgProps.stroke}
+                viewBox={`${-strokeWidth} ${-strokeWidth} ${width + +strokeWidth}, ${
+                  height + +strokeWidth
                 }`}
               >
-                <clipPath id={element.strokeProps.clipPathId}>
+                <clipPath id={element.clipPathId}>
                   <path
                     d={pathData}
                     vectorEffect="non-scaling-stroke"
                     stroke="transparent"
-                    strokeWidth={element.strokeProps.strokeWidth}
+                    strokeWidth={element.pathProps.strokeWidth}
                   />
                 </clipPath>
                 <path
                   d={pathData}
-                  stroke={element.strokeProps.stroke}
-                  strokeWidth={element.strokeProps.strokeWidth}
-                  strokeLinecap={element.strokeProps.strokeLinecap}
-                  strokeDasharray={element.strokeProps.strokeDasharray}
-                  // strokeMiterlimit={element.strokeProps.strokeWidth * 2}
-                  clipPath={element.strokeProps.clipPathId}
-                  fill={element.props.fill}
+                  stroke={element.pathProps.stroke}
+                  strokeWidth={element.pathProps.strokeWidth}
+                  strokeLinecap={element.pathProps.strokeLinecap}
+                  strokeDasharray={element.pathProps.strokeDasharray}
+                  // strokeMiterlimit={element.pathProps.strokeWidth * 2}
+                  clipPath={element.clipPathId}
+                  fill={element.pathProps.fill}
                   // fill="none"
                   vectorEffect="non-scaling-stroke"
                 />

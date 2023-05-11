@@ -9,7 +9,8 @@ import {
   Menu,
   Portal,
   Text,
-  Divider
+  Divider,
+  ActionIcon
 } from '@mantine/core';
 import { Logo } from './logo';
 import { HEADER_SIZE } from '../pages';
@@ -137,9 +138,9 @@ export function HeaderComponent() {
         <Avatar color="cyan" radius="xl">
           FH
         </Avatar>
-        <Button onClick={handleDownloadClick} variant="outline" leftIcon={<Download />}>
-          Download
-        </Button>
+        <ActionIcon size={36} variant="outline" color="dark" onClick={handleDownloadClick}>
+          <Download />
+        </ActionIcon>
       </Group>
     </Header>
   );

@@ -2,7 +2,8 @@ import { canvasAtom, unSelectAllAtom } from '@/components/canvas/store';
 import { Center, AppShell, Footer, Text, Navbar } from '@mantine/core';
 import { useSetAtom } from 'jotai';
 import React from 'react';
-import { Canvas, Toolbar, Sidepanel, SIDEPANEL_SIZE, HeaderComponent } from '../components';
+import { Toolbar, Sidepanel, SIDEPANEL_SIZE, HeaderComponent } from '../components';
+import { Canvas } from '@/components/element-canvas';
 
 export const HEADER_SIZE = 60;
 export const FOOTER_SIZE = 60;

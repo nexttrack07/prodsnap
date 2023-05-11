@@ -1,30 +1,30 @@
+import { Dimension, Path, Position, Rotation } from '@/stores/elements';
 import { uuid } from '@/utils';
 import { DEFAULT_THEME } from '@mantine/core';
-import { MoveableElement, SVGPathType } from 'components/canvas/store';
 
-function createShapeObjects(
-  paths: string[]
-): { id: string; data: MoveableElement & SVGPathType }[] {
+function createShapeObjects(paths: string[]): { id: string; data: Path & Position & Dimension & Rotation }[] {
   const shapes = paths.map((path) => {
     return {
       id: uuid(),
       data: {
-        type: 'svg-path' as const,
+        type: 'path' as const,
         width: 64,
         height: 64,
         x: 100,
         y: 10,
-        props: {
+        angle: -90,
+        clipPathId: uuid(),
+        svgProps: {
           fill: DEFAULT_THEME.colors.gray[3]
         },
-        path: { d: path },
-        strokeProps: {
-          clipPathId: uuid(),
+        pathProps: {
+          d: path,
           stroke: DEFAULT_THEME.colors.gray[8],
           strokeWidth: 3,
           strokeDasharray: 'none',
           strokeLinecap: 'round' as const
-        }
+        },
+        strokeProps: {}
       }
     };
   });
@@ -57,8 +57,7 @@ const PATHS = [
   'M 0 0 L 64 0 L 32 32 L 64 64 L 0 64 L 32 32 L 0 0', // Star-like shape
   'M 32 0 L 64 64 L 32 32 L 0 64 L 32 0', // Abstract shape resembling a bird
   'M 0 0 Q 32 16 64 0 L 64 64 L 0 64 L 0 0', // Wave-like shape
-  'M 0 0 L 64 0 L 64 32 L 48 32 L 48 64 L 16 64 L 16 32 L 0 32 L 0 0', // Sign post with a rectangular base
-  
+  'M 0 0 L 64 0 L 64 32 L 48 32 L 48 64 L 16 64 L 16 32 L 0 32 L 0 0' // Sign post with a rectangular base
 ];
 
 export async function getShapes() {
