@@ -22,9 +22,11 @@ import {
   LayoutAlignRight,
   LayoutAlignTop,
   LayoutDashboard,
+  LayoutGrid,
   Trash
 } from 'tabler-icons-react';
 import { SvgCurveToolbar } from './svg-curve-toolbar';
+import { combineElementGroupsAtom, selectedElementGroupAtomsAtom } from '@/stores/elements';
 
 const deleteSelectedAtom = atom(null, (get, set) => {
   const selectedElementAtoms = get(selectedElementAtomsAtom);
@@ -157,6 +159,8 @@ const alignElementsAtom = atom(
 export function Toolbar() {
   const deletedSelectedElements = useSetAtom(deleteSelectedAtom);
   const selectedElements = useAtomValue(selectedElementAtomsAtom);
+  const selectedGroupAtoms = useAtomValue(selectedElementGroupAtomsAtom);
+  const combineGroups = useSetAtom(combineElementGroupsAtom);
   const allElements = useAtomValue(elementAtomsAtom);
   const addGroup = useSetAtom(addGroupAtom);
   const removeGroup = useSetAtom(removeGroupAtom);
@@ -276,6 +280,16 @@ export function Toolbar() {
             variant="default"
           >
             Copy
+          </Button>
+        )}
+        {selectedGroupAtoms.length > 1 && (
+          <Button
+            leftIcon={<LayoutGrid size={18} />}
+            onClick={() => combineGroups()}
+            size="xs"
+            variant="default"
+          >
+            Combine
           </Button>
         )}
         <Button

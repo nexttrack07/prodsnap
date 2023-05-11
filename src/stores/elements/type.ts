@@ -34,5 +34,5 @@ export type ElementAtom = WritableAtom<Element, SetStateAction<Element>>;
 export type ElementGroup = {
   type: 'group';
   elements: ElementAtom[];
-} & Position & Dimension & Rotation;
+} & Rotation;
 export type ElementGroupAtom = WritableAtom<ElementGroup, SetStateAction<ElementGroup>>;

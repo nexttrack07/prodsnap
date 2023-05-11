@@ -123,3 +123,17 @@ export function getFileNameFromUrl(url: string): string {
 
   return fileName;
 }
+
+export function sortArrayBasedOnFirst<T>(firstArray: T[], secondArray: T[]): T[] {
+  const order = new Map<T, number>();
+  firstArray.forEach((val, index) => {
+    order.set(val, index);
+  });
+
+  const secondArrayCopy = secondArray.slice();
+  secondArrayCopy.sort((a, b) => {
+    return order.get(a)! - order.get(b)!;
+  });
+
+  return secondArrayCopy;
+}

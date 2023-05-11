@@ -28,10 +28,6 @@ export function ShapesPanel() {
     // addElement(newEl);
     const newElementGroup: ElementGroup = {
       type: 'group',
-      x: 100,
-      y: 100,
-      width: 100,
-      height: 100,
       angle: 0,
       elements: [atom(newEl)]
     };
