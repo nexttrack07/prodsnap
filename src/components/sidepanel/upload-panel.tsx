@@ -11,9 +11,6 @@ import {
 } from '@mantine/core';
 import { useSetAtom } from 'jotai';
 import { addElementAtom, CanvasElementWithPointAtoms, defaultImage } from '../canvas/store';
-import { firestore, storage } from '../../utils/firebase';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { addDoc, collection, getDocs } from 'firebase/firestore';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import { Check, CloudUpload, X } from 'tabler-icons-react';
 import { useQuery } from '@tanstack/react-query';

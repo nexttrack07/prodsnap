@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ActionIcon, Button, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { WashDrycleanOff } from 'tabler-icons-react';
-import { httpsCallable } from 'firebase/functions';
-import { functions } from '@/utils/firebase';
 import {
   imageBorderAtom,
   ImageState,
