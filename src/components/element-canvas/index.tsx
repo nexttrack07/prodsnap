@@ -10,8 +10,8 @@ export function Canvas() {
     <Box
       id="canvas"
       sx={(theme) => ({
-        width: 1000,
-        height: 800,
+        width: 900,
+        height: 700,
         border: `1px solid ${theme.colors.gray[4]}`,
         boxShadow: '0px 0px 0.8px rgba(0,0,0,0.3)',
         position: 'relative',

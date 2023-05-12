@@ -3,6 +3,7 @@ import {
   ElementAtom,
   ElementGroupAtom,
   Position,
+  activeElementAtomAtom,
   dimensionAtom,
   positionAtom,
   selectedElementGroupAtomsAtom
@@ -12,6 +13,7 @@ import { TextRenderer } from './text-renderer';
 import { PathRenderer } from './path-renderer';
 import { DragHandler } from './drag-handler';
 import { useShiftKeyPressed } from '@/utils';
+import { useMantineTheme } from '@mantine/core';
 
 type ElementGroupProps = {
   group: ElementGroupAtom;
@@ -25,6 +27,11 @@ export function ElementGroup({ group }: ElementGroupProps) {
   const isShiftPressed = useShiftKeyPressed();
 
   const handleClick = () => {
+    // if the group is already selected, do nothing
+    if (selectedGroupAtoms.includes(group)) {
+      return;
+    }
+
     // if shift key is pressed, concat the group to the selected groups
     // else set the selected groups to the group
     if (isShiftPressed) {
@@ -41,6 +48,7 @@ export function ElementGroup({ group }: ElementGroupProps) {
   return (
     <div onClick={handleClick}>
       <DragHandler
+        show={selectedGroupAtoms.includes(group)}
         onPositionChange={handlePositionChange}
         attrs={{
           x,
@@ -50,9 +58,11 @@ export function ElementGroup({ group }: ElementGroupProps) {
           angle: elementGroup.angle
         }}
       >
-        {elementGroup.elements.map((element) => (
-          <ElementComponent position={{ x, y }} key={element.toString()} elementAtom={element} />
-        ))}
+        <div>
+          {elementGroup.elements.map((element) => (
+            <ElementComponent position={{ x, y }} key={element.toString()} elementAtom={element} />
+          ))}
+        </div>
       </DragHandler>
     </div>
   );
@@ -69,16 +79,25 @@ type ElementComponentProps = {
 };
 
 function ElementComponent({ elementAtom, position }: ElementComponentProps) {
-  const [element, setElement] = useAtom(elementAtom);
+  const element = useAtomValue(elementAtom);
+  const [activeElement, setActiveElement] = useAtom(activeElementAtomAtom);
   const ElementComp = elementCompMap[element.type];
+  const theme = useMantineTheme();
+
+  const handleClick = () => {
+    setActiveElement(elementAtom);
+  };
+
   return (
     <div
+      onClick={handleClick}
       style={{
         position: 'absolute',
         top: element.y - position.y,
         left: element.x - position.x,
         width: element.width,
-        height: element.height
+        height: element.height,
+        border: activeElement === elementAtom ? `2px solid ${theme.colors.blue[5]}` : 'none'
       }}
     >
       <ElementComp element={element} />

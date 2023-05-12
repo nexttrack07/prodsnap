@@ -5,7 +5,7 @@ import { sortArrayBasedOnFirst } from "@/utils";
 
 export * from './type';
 export const elementGroupAtomsAtom = atom<ElementGroupAtom[]>([]);
-export const activeElementGroupAtom = atom<ElementGroupAtom | null>(null);
+export const activeElementAtomAtom = atom<ElementAtom | null>(null);
 export const selectedElementGroupAtomsAtom = atom<ElementGroupAtom[]>([]);
 
 export const positionAtom = atomFamily((elementAtoms: ElementAtom[]) => atom(
@@ -38,7 +38,7 @@ export const dimensionAtom = atomFamily((elementAtoms: ElementAtom[]) => atom(
 
     return { width, height };
   },
-  (get, set, update: { width: number; height: number }) => {
+  (_, set, update: { width: number; height: number }) => {
     elementAtoms.forEach((elementAtom) => {
       set(elementAtom, (el) => ({
         ...el,
@@ -62,6 +62,9 @@ export const combineElementGroupsAtom = atom(
       elements: elementAtoms,
       angle: 0,
     }
+    // remove all the selected element groups
+    set(elementGroupAtomsAtom, (prev) => prev.filter(x => !selectedElementGroupAtoms.includes(x)));
+    // add the new group
     set(elementGroupAtomsAtom, (prev) => [...prev, atom(newGroup)]);
   }
 )

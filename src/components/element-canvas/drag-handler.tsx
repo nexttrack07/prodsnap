@@ -1,16 +1,19 @@
 import { Dimension, Position, Rotation } from '@/stores/elements';
+import { useMantineTheme } from '@mantine/core';
 import { useEffect, useState } from 'react';
 
 type Props = {
   attrs: Dimension & Position & Rotation;
   onPositionChange: (position: Position) => void;
   children: React.ReactNode;
+  show: boolean;
 };
 
 type DragStatus = 'idle' | 'move' | 'resize' | 'rotate';
 
-export function DragHandler({ attrs, children, onPositionChange }: Props) {
+export function DragHandler({ attrs, children, show, onPositionChange }: Props) {
   const [dragStatus, setDragStatus] = useState<DragStatus>('idle');
+  const theme = useMantineTheme();
 
   const handleMoveMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.stopPropagation();
@@ -58,7 +61,7 @@ export function DragHandler({ attrs, children, onPositionChange }: Props) {
         transformOrigin: 'center center',
         outline: 'none',
         cursor: 'move',
-        border: '1px solid black'
+        border: show ? `1px dashed ${theme.colors.gray[5]}` : 'none'
       }}
       id="drag-handler"
     >
