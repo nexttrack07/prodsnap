@@ -1,24 +1,55 @@
 import { Dimension, Position, Rotation } from '@/stores/elements';
 import { useMantineTheme } from '@mantine/core';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type Props = {
   attrs: Dimension & Position & Rotation;
   onPositionChange: (position: Position) => void;
+  onRotate: (rotation: number) => void;
   children: React.ReactNode;
   show: boolean;
 };
 
 type DragStatus = 'idle' | 'move' | 'resize' | 'rotate';
 
-export function DragHandler({ attrs, children, show, onPositionChange }: Props) {
+export function DragHandler({ attrs, children, show, onPositionChange, onRotate }: Props) {
   const [dragStatus, setDragStatus] = useState<DragStatus>('idle');
+  const [startAngle, setStartAngle] = useState(0);
+  const [canvasPosition, setCanvasPosition] = useState({ x: 0, y: 0 });
+  const center = useRef({ x: 0, y: 0 });
   const theme = useMantineTheme();
+  const R2D = 180 / Math.PI;
 
   const handleMoveMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.stopPropagation();
     e.preventDefault();
     setDragStatus('move');
+  };
+
+  useEffect(() => {
+    const canvas = document.getElementById('canvas');
+    if (canvas) {
+      const { x, y } = canvas.getBoundingClientRect();
+      setCanvasPosition({ x, y });
+    }
+  }, []);
+
+  const handleRotateMouseDown = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+    e.stopPropagation();
+    const { clientX, clientY } = e;
+
+    center.current = {
+      x: attrs.x + attrs.width / 2,
+      y: attrs.y + attrs.height / 2
+    };
+
+    const posX = clientX - canvasPosition.x;
+    const posY = clientY - canvasPosition.y;
+    const x = posX - center.current.x;
+    const y = posY - center.current.y;
+
+    setStartAngle(R2D * Math.atan2(y, x));
+    setDragStatus('rotate');
   };
 
   useEffect(() => {
@@ -29,11 +60,20 @@ export function DragHandler({ attrs, children, show, onPositionChange }: Props) 
 
     // handleMouseMove handler updates the position of the element if the dragStatus is 'move'
     const handleMouseMove = (e: MouseEvent) => {
+      e.preventDefault();
       if (dragStatus === 'move') {
         onPositionChange({
           x: e.movementX,
           y: e.movementY
         });
+      } else if (dragStatus === 'rotate') {
+        const posX = e.clientX - canvasPosition.x;
+        const posY = e.clientY - canvasPosition.y;
+        const x = posX - center.current.x;
+        const y = posY - center.current.y;
+        const d = R2D * Math.atan2(y, x);
+        const currentRotation = d;
+        onRotate(currentRotation + 90);
       }
     };
 
@@ -66,6 +106,74 @@ export function DragHandler({ attrs, children, show, onPositionChange }: Props) 
       id="drag-handler"
     >
       {children}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: 15,
+          height: 15,
+          borderRadius: '100%',
+          transform: 'translate(-50%, -50%)',
+          backgroundColor: theme.colors.gray[0],
+          border: `1px solid ${theme.colors.gray[5]}`
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: 15,
+          height: 15,
+          borderRadius: '100%',
+          transform: 'translate(50%, -50%)',
+          backgroundColor: theme.colors.gray[0],
+          border: `1px solid ${theme.colors.gray[5]}`
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+          width: 15,
+          height: 15,
+          borderRadius: '100%',
+          transform: 'translate(50%, 50%)',
+          backgroundColor: theme.colors.gray[0],
+          border: `1px solid ${theme.colors.gray[5]}`
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          width: 15,
+          height: 15,
+          borderRadius: '100%',
+          transform: 'translate(-50%, 50%)',
+          backgroundColor: theme.colors.gray[0],
+          border: `1px solid ${theme.colors.gray[5]}`,
+          cursor: 'grab'
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: -attrs.width * 0.4,
+          width: 15,
+          height: 15,
+          borderRadius: '100%',
+          transform: 'translateX(-50%)',
+          backgroundColor: theme.colors.gray[0],
+          border: `1px solid ${theme.colors.gray[5]}`,
+          cursor: 'crosshair'
+        }}
+        onMouseDown={handleRotateMouseDown}
+      />
     </div>
   );
 }

@@ -20,7 +20,7 @@ type ElementGroupProps = {
 };
 
 export function ElementGroup({ group }: ElementGroupProps) {
-  const elementGroup = useAtomValue(group);
+  const [elementGroup, setElementGroup] = useAtom(group);
   const [{ x, y }, setPosition] = useAtom(positionAtom(elementGroup.elements));
   const [{ width, height }] = useAtom(dimensionAtom(elementGroup.elements));
   const [selectedGroupAtoms, setSelectedGroupAtoms] = useAtom(selectedElementGroupAtomsAtom);
@@ -45,9 +45,17 @@ export function ElementGroup({ group }: ElementGroupProps) {
     setPosition(position);
   };
 
+  const handleRotate = (angle: number) => {
+    setElementGroup((prev) => ({
+      ...prev,
+      angle
+    }));
+  };
+
   return (
     <div onClick={handleClick}>
       <DragHandler
+        onRotate={handleRotate}
         show={selectedGroupAtoms.includes(group)}
         onPositionChange={handlePositionChange}
         attrs={{
@@ -58,11 +66,9 @@ export function ElementGroup({ group }: ElementGroupProps) {
           angle: elementGroup.angle
         }}
       >
-        <div>
-          {elementGroup.elements.map((element) => (
-            <ElementComponent position={{ x, y }} key={element.toString()} elementAtom={element} />
-          ))}
-        </div>
+        {elementGroup.elements.map((element) => (
+          <ElementComponent position={{ x, y }} key={element.toString()} elementAtom={element} />
+        ))}
       </DragHandler>
     </div>
   );

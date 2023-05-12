@@ -9,7 +9,7 @@ import {
   Image
 } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import { useSetAtom } from 'jotai';
+import { atom, useSetAtom } from 'jotai';
 import React from 'react';
 import {
   addElementAtom,
@@ -21,10 +21,11 @@ import {
 } from '../../components/canvas/store';
 import { addGroupAtom } from '../toolbar';
 import { deserialize } from '@/utils';
+import { Element, ElementGroup, elementGroupAtomsAtom } from '@/stores/elements';
 
 const elementData: {
   id: number;
-  data: CanvasElement;
+  data: Element;
 }[] = [
   {
     id: 0,
@@ -33,9 +34,10 @@ const elementData: {
       y: 100,
       type: 'text' as const,
       width: 300,
+      angle: 0,
       height: 50,
       content: 'Heading',
-      props: {
+      textProps: {
         fontSize: 50,
         color: '#000'
       }
@@ -46,11 +48,12 @@ const elementData: {
     data: {
       x: 200,
       y: 100,
+      angle: 0,
       type: 'text' as const,
       width: 300,
       height: 50,
       content: 'Subheading',
-      props: {
+      textProps: {
         fontSize: 30,
         color: '#000'
       }
@@ -65,7 +68,8 @@ const elementData: {
       width: 300,
       height: 50,
       content: 'A little bit of text',
-      props: {
+      angle: 0,
+      textProps: {
         fontSize: 20,
         color: '#000'
       }
@@ -77,11 +81,17 @@ export function TextPanel() {
   const addElement = useSetAtom(addElementAtom);
   const theme = useMantineTheme();
   const setElementAtoms = useSetAtom(elementAtomsAtom);
+  const setElementGroupAtoms = useSetAtom(elementGroupAtomsAtom);
   const setSelectedAtoms = useSetAtom(selectedElementAtomsAtom);
   const addGroup = useSetAtom(addGroupAtom);
 
-  const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
-    addElement(newEl);
+  const handleAddElement = (newEl: Element) => {
+    const newElementGroup: ElementGroup = {
+      type: 'group',
+      angle: 0,
+      elements: [atom(newEl)]
+    };
+    setElementGroupAtoms((prev) => [...prev, atom(newElementGroup)]);
   };
 
   const handleAddTemplate = (newEls: CanvasElement[]) => {

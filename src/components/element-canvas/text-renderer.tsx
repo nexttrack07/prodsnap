@@ -10,12 +10,9 @@ export function TextRenderer({ element }: Props) {
     <Center
       // ref={ref}
       style={{
-        left: element.x,
-        top: element.y,
         userSelect: 'none',
-        position: 'absolute',
         whiteSpace: 'pre-wrap',
-        transform: `rotate(${(element.angle ?? 0) + 90}deg)`,
+        // transform: `rotate(${(element.angle ?? 0) + 90}deg)`,
         transformOrigin: 'center center',
         outline: 'none',
         cursor: 'text',
