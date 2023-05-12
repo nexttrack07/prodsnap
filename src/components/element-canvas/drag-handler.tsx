@@ -88,6 +88,26 @@ export function DragHandler({ attrs, children, show, onPositionChange, onRotate 
     };
   }, [dragStatus]);
 
+  if (!show) {
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          top: attrs.y,
+          left: attrs.x,
+          width: attrs.width,
+          height: attrs.height,
+          transform: `rotate(${attrs.angle ?? 0}deg)`,
+          transformOrigin: 'center center',
+          outline: 'none',
+          cursor: 'pointer'
+        }}
+      >
+        {children}
+      </div>
+    );
+  }
+
   return (
     <div
       onMouseDown={handleMoveMouseDown}
@@ -101,7 +121,7 @@ export function DragHandler({ attrs, children, show, onPositionChange, onRotate 
         transformOrigin: 'center center',
         outline: 'none',
         cursor: 'move',
-        border: show ? `1px dashed ${theme.colors.gray[5]}` : 'none'
+        border: `1px dashed ${theme.colors.gray[5]}`
       }}
       id="drag-handler"
     >
