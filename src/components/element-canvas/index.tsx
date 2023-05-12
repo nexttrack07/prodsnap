@@ -1,4 +1,8 @@
-import { elementGroupAtomsAtom, selectedElementGroupAtomsAtom } from '@/stores/elements';
+import {
+  activeElementAtomAtom,
+  elementGroupAtomsAtom,
+  selectedElementGroupAtomsAtom
+} from '@/stores/elements';
 import { Box } from '@mantine/core';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { ElementGroup } from './element';
@@ -6,9 +10,11 @@ import { ElementGroup } from './element';
 export function Canvas() {
   const elementGroupAtoms = useAtomValue(elementGroupAtomsAtom);
   const setSelectedElementGroupAtoms = useSetAtom(selectedElementGroupAtomsAtom);
+  const setActiveElementAtom = useSetAtom(activeElementAtomAtom);
 
   const handleCanvasClick = () => {
     setSelectedElementGroupAtoms([]);
+    setActiveElementAtom(null);
   };
 
   return (

@@ -14,6 +14,7 @@ import { PathRenderer } from './path-renderer';
 import { DragHandler } from './drag-handler';
 import { useShiftKeyPressed } from '@/utils';
 import { useMantineTheme } from '@mantine/core';
+import { MouseEvent } from 'react';
 
 type ElementGroupProps = {
   group: ElementGroupAtom;
@@ -26,7 +27,8 @@ export function ElementGroup({ group }: ElementGroupProps) {
   const [selectedGroupAtoms, setSelectedGroupAtoms] = useAtom(selectedElementGroupAtomsAtom);
   const isShiftPressed = useShiftKeyPressed();
 
-  const handleClick = () => {
+  const handleClick = (e: MouseEvent) => {
+    e.stopPropagation();
     // if the group is already selected, do nothing
     if (selectedGroupAtoms.includes(group)) {
       return;
@@ -53,7 +55,7 @@ export function ElementGroup({ group }: ElementGroupProps) {
   };
 
   return (
-    <div onClick={handleClick}>
+    <div onMouseDown={handleClick}>
       <DragHandler
         onRotate={handleRotate}
         show={selectedGroupAtoms.includes(group)}
