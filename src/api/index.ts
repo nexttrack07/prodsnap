@@ -12,7 +12,7 @@ function createShapeObjects(paths: string[]): { id: string; data: Path & Positio
         height: 64,
         x: 100,
         y: 10,
-        angle: -90,
+        angle: 0,
         clipPathId: uuid(),
         svgProps: {
           fill: DEFAULT_THEME.colors.gray[3]

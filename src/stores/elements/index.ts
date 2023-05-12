@@ -56,7 +56,16 @@ export const combineElementGroupsAtom = atom(
     const elementGroupAtoms = get(elementGroupAtomsAtom);
     const sortedSelectedElementGroupAtoms = sortArrayBasedOnFirst(elementGroupAtoms, selectedElementGroupAtoms);
     const elementGroups = sortedSelectedElementGroupAtoms.map(el => get(el));
-    const elementAtoms = elementGroups.reduce((prev, { elements }) => [...prev, ...elements], [] as ElementAtom[]);
+    // const elementAtoms = elementGroups.reduce((prev, { elements }) => [...prev, ...elements], [] as ElementAtom[]);
+    // extract the element atoms from the groups into an arrow
+    // however the elements within a group should inherit the group's angle
+    const elementAtoms = elementGroups.reduce((prev, { elements, angle }) => {
+      // get the element values from the atoms
+      const elementValues = elements.map(el => get(el));
+      // add the angle to the elements and create new atoms
+      const elementAtoms = elementValues.map(el => atom({ ...el, angle: el.angle + angle }));
+      return [...prev, ...elementAtoms];
+    }, [] as ElementAtom[]);
     const newGroup = {
       type: 'group' as const,
       elements: elementAtoms,

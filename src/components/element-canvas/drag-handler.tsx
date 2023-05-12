@@ -163,7 +163,7 @@ export function DragHandler({ attrs, children, show, onPositionChange, onRotate 
         style={{
           position: 'absolute',
           left: '50%',
-          top: -attrs.width * 0.4,
+          top: -Math.min(40, Math.max(attrs.width * 0.4, 70)),
           width: 15,
           height: 15,
           borderRadius: '100%',
