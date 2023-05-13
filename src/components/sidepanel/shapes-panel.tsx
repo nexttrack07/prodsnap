@@ -25,7 +25,6 @@ export function ShapesPanel() {
   const { classes } = useStyles();
 
   const handleAddElement = (newEl: Element) => {
-    // addElement(newEl);
     const newElementGroup: ElementGroup = {
       type: 'group',
       angle: 0,

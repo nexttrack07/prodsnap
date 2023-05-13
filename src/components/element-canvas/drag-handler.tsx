@@ -4,17 +4,34 @@ import { useEffect, useRef, useState } from 'react';
 
 type Props = {
   attrs: Dimension & Position & Rotation;
-  onPositionChange: (position: Position) => void;
-  onRotate: (rotation: number) => void;
-  children: React.ReactNode;
   show: boolean;
+  children: React.ReactNode;
+  onResize: (attrs: Dimension & Position) => void;
+  onRotate: (rotation: number) => void;
+  onPositionChange: (position: Position) => void;
 };
 
-type DragStatus = 'idle' | 'move' | 'resize' | 'rotate';
-
-export function DragHandler({ attrs, children, show, onPositionChange, onRotate }: Props) {
+type DragStatus =
+  | 'idle'
+  | 'move'
+  | 'rotate'
+  | 'resizing-br'
+  | 'resizing-tl'
+  | 'resizing-bl'
+  | 'resizing-tr'
+  | 'resizing-tm'
+  | 'resizing-bm'
+  | 'resizing-lm'
+  | 'resizing-rm';
+export function DragHandler({
+  attrs,
+  children,
+  show,
+  onResize,
+  onRotate,
+  onPositionChange
+}: Props) {
   const [dragStatus, setDragStatus] = useState<DragStatus>('idle');
-  const [startAngle, setStartAngle] = useState(0);
   const [canvasPosition, setCanvasPosition] = useState({ x: 0, y: 0 });
   const center = useRef({ x: 0, y: 0 });
   const theme = useMantineTheme();
@@ -48,8 +65,16 @@ export function DragHandler({ attrs, children, show, onPositionChange, onRotate 
     const x = posX - center.current.x;
     const y = posY - center.current.y;
 
-    setStartAngle(R2D * Math.atan2(y, x));
     setDragStatus('rotate');
+  };
+
+  const handleResizeMouseDown = (
+    e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
+    type: DragStatus
+  ) => {
+    e.stopPropagation();
+    setDragStatus(type);
+    // lastPosition.current = { x: e.clientX, y: e.clientY };
   };
 
   useEffect(() => {
@@ -74,6 +99,32 @@ export function DragHandler({ attrs, children, show, onPositionChange, onRotate 
         const d = R2D * Math.atan2(y, x);
         const currentRotation = d;
         onRotate(currentRotation + 90);
+      } else if (dragStatus === 'resizing-br') {
+        const delta = e.movementX;
+        onResize({ x: 0, y: 0, width: delta, height: delta });
+      } else if (dragStatus === 'resizing-tl') {
+        const delta = e.movementX;
+        onResize({ x: delta, y: delta, width: -delta, height: -delta });
+      } else if (dragStatus === 'resizing-bl') {
+        const deltaX = e.movementX;
+        const deltaY = e.movementY;
+        onResize({ x: deltaX, y: 0, width: -deltaX, height: deltaY });
+      } else if (dragStatus === 'resizing-tr') {
+        const deltaX = e.movementX;
+        const deltaY = e.movementY;
+        onResize({ x: 0, y: deltaY, width: deltaX, height: -deltaY });
+      } else if (dragStatus === 'resizing-tm') {
+        const delta = e.movementY;
+        onResize({ x: 0, y: delta, width: 0, height: -delta });
+      } else if (dragStatus === 'resizing-bm') {
+        const delta = e.movementY;
+        onResize({ x: 0, y: 0, width: 0, height: delta });
+      } else if (dragStatus === 'resizing-lm') {
+        const delta = e.movementX;
+        onResize({ x: delta, y: 0, width: -delta, height: 0 });
+      } else if (dragStatus === 'resizing-rm') {
+        const delta = e.movementX;
+        onResize({ x: 0, y: 0, width: delta, height: 0 });
       }
     };
 
@@ -108,6 +159,8 @@ export function DragHandler({ attrs, children, show, onPositionChange, onRotate 
     );
   }
 
+  console.log('dragStatus', dragStatus);
+
   return (
     <div
       onMouseDown={handleMoveMouseDown}
@@ -121,7 +174,7 @@ export function DragHandler({ attrs, children, show, onPositionChange, onRotate 
         transformOrigin: 'center center',
         outline: 'none',
         cursor: 'move',
-        border: `1px dashed ${theme.colors.gray[5]}`
+        border: `1px dashed ${theme.colors.gray[4]}`
       }}
       id="drag-handler"
     >
@@ -136,8 +189,10 @@ export function DragHandler({ attrs, children, show, onPositionChange, onRotate 
           borderRadius: '100%',
           transform: 'translate(-50%, -50%)',
           backgroundColor: theme.colors.gray[0],
-          border: `1px solid ${theme.colors.gray[5]}`
+          border: `1px solid ${theme.colors.gray[5]}`,
+          cursor: 'grab'
         }}
+        onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-tl')}
       />
       <div
         style={{
@@ -149,8 +204,10 @@ export function DragHandler({ attrs, children, show, onPositionChange, onRotate 
           borderRadius: '100%',
           transform: 'translate(50%, -50%)',
           backgroundColor: theme.colors.gray[0],
-          border: `1px solid ${theme.colors.gray[5]}`
+          border: `1px solid ${theme.colors.gray[5]}`,
+          cursor: 'grab'
         }}
+        onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-tr')}
       />
       <div
         style={{
@@ -162,8 +219,10 @@ export function DragHandler({ attrs, children, show, onPositionChange, onRotate 
           borderRadius: '100%',
           transform: 'translate(50%, 50%)',
           backgroundColor: theme.colors.gray[0],
-          border: `1px solid ${theme.colors.gray[5]}`
+          border: `1px solid ${theme.colors.gray[5]}`,
+          cursor: 'grab'
         }}
+        onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-br')}
       />
       <div
         style={{
@@ -178,6 +237,7 @@ export function DragHandler({ attrs, children, show, onPositionChange, onRotate 
           border: `1px solid ${theme.colors.gray[5]}`,
           cursor: 'grab'
         }}
+        onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-bl')}
       />
       <div
         style={{

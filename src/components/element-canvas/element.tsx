@@ -1,10 +1,13 @@
 import {
+  Dimension,
   Element,
   ElementAtom,
   ElementGroupAtom,
   Position,
   activeElementAtomAtom,
+  attrsAtom,
   dimensionAtom,
+  positionAndDimensionAtom,
   positionAtom,
   selectedElementGroupAtomsAtom
 } from '@/stores/elements';
@@ -22,8 +25,9 @@ type ElementGroupProps = {
 
 export function ElementGroup({ group }: ElementGroupProps) {
   const [elementGroup, setElementGroup] = useAtom(group);
-  const [{ x, y }, setPosition] = useAtom(positionAtom(elementGroup.elements));
-  const [{ width, height }] = useAtom(dimensionAtom(elementGroup.elements));
+  // const [{ x, y }, setPosition] = useAtom(positionAtom(elementGroup.elements));
+  // const [{ width, height }, setDimension] = useAtom(dimensionAtom(elementGroup.elements));
+  const [{ x, y, width, height }, setAttrs] = useAtom(attrsAtom(elementGroup.elements));
   const [selectedGroupAtoms, setSelectedGroupAtoms] = useAtom(selectedElementGroupAtomsAtom);
   const isShiftPressed = useShiftKeyPressed();
 
@@ -44,7 +48,7 @@ export function ElementGroup({ group }: ElementGroupProps) {
   };
 
   const handlePositionChange = (position: Position) => {
-    setPosition(position);
+    setAttrs({ x: position.x, y: position.y, width: 0, height: 0 });
   };
 
   const handleRotate = (angle: number) => {
@@ -54,11 +58,16 @@ export function ElementGroup({ group }: ElementGroupProps) {
     }));
   };
 
+  const handleResize = (attrs: Position & Dimension) => {
+    setAttrs(attrs);
+  };
+
   return (
-    <div onMouseDown={handleClick}>
+    <div id="element-group" onMouseDown={handleClick}>
       <DragHandler
-        onRotate={handleRotate}
         show={selectedGroupAtoms.includes(group)}
+        onResize={handleResize}
+        onRotate={handleRotate}
         onPositionChange={handlePositionChange}
         attrs={{
           x,
@@ -98,6 +107,7 @@ function ElementComponent({ elementAtom, position }: ElementComponentProps) {
 
   return (
     <div
+      id={elementAtom.toString()}
       onClick={handleClick}
       style={{
         position: 'absolute',

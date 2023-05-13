@@ -1,3 +1,5 @@
+import { Dimension, Position, Rotation } from '@/stores/elements';
+
 export * from './use-shiftkey';
 export { default as useEventListener } from './use-event';
 export * from './use-click-outside';
@@ -136,4 +138,51 @@ export function sortArrayBasedOnFirst<T>(firstArray: T[], secondArray: T[]): T[]
   });
 
   return secondArrayCopy;
+}
+
+export function getElementBoundingBox(element: Position & Dimension & Rotation) {
+  const { x, y, width, height, angle } = element;
+
+  if (angle === 0) {
+      return { x, y, width, height };
+  } else {
+      // Convert angle to radians
+      const angleRad = angle * (Math.PI / 180);
+
+      // Calculate the half dimensions
+      const halfWidth = width / 2;
+      const halfHeight = height / 2;
+
+      // Calculate the coordinates of the corners of the original (unrotated) rectangle
+      const corners = [
+          { x: x - halfWidth, y: y - halfHeight },
+          { x: x + halfWidth, y: y - halfHeight },
+          { x: x - halfWidth, y: y + halfHeight },
+          { x: x + halfWidth, y: y + halfHeight }
+      ];
+
+      // Rotate each corner point and calculate the bounding box of the rotated rectangle
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      for (const corner of corners) {
+          const dx = corner.x - x;
+          const dy = corner.y - y;
+          const rotatedX = x + dx * Math.cos(angleRad) - dy * Math.sin(angleRad);
+          const rotatedY = y + dx * Math.sin(angleRad) + dy * Math.cos(angleRad);
+          
+          minX = Math.min(minX, rotatedX);
+          maxX = Math.max(maxX, rotatedX);
+          minY = Math.min(minY, rotatedY);
+          maxY = Math.max(maxY, rotatedY);
+      }
+
+      // The width and height of the bounding box are calculated as the difference between the maximum and minimum x and y values
+      const boundingBox = {
+          x: minX,
+          y: minY,
+          width: maxX - minX,
+          height: maxY - minY
+      };
+
+      return boundingBox;
+  }
 }
