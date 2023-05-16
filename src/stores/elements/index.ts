@@ -214,8 +214,6 @@ export const attrsAtom = atomFamily((elementAtoms: ElementAtom[]) => atom(
     const width = attrs.reduce((prev, { x: elX, width }) => Math.max(prev, elX + width - x), 0);
     const height = attrs.reduce((prev, { y: elY, height }) => Math.max(prev, elY + height - y), 0);
 
-    console.log('attrs', attrs)
-
     return { x, y, width, height };
   },
   (_, set, update: { x: number; y: number; width: number; height: number }) => {
