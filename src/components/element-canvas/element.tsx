@@ -17,7 +17,7 @@ import { PathRenderer } from './path-renderer';
 import { DragHandler } from './drag-handler';
 import { useShiftKeyPressed } from '@/utils';
 import { useMantineTheme } from '@mantine/core';
-import { MouseEvent } from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 
 type ElementGroupProps = {
   group: ElementGroupAtom;
@@ -115,6 +115,8 @@ function ElementComponent({ elementAtom, position }: ElementComponentProps) {
         left: element.x - position.x,
         width: element.width,
         height: element.height,
+        transform: `rotate(${element.angle ?? 0}deg)`,
+        transformOrigin: 'center center',
         border: activeElement === elementAtom ? `2px solid ${theme.colors.blue[5]}` : 'none'
       }}
     >

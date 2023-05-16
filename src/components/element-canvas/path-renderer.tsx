@@ -15,9 +15,6 @@ export function PathRenderer({ element }: Props) {
   const pathData = scalePathData(element.pathProps.d!, width, height, strokeWidth);
   return (
     <svg
-      style={{
-        transform: `rotate(${element.angle ?? 0}deg)`
-      }}
       viewBox={`${-strokeWidth} ${-strokeWidth} ${width + strokeWidth}, ${height + strokeWidth}`}
     >
       <clipPath id={element.clipPathId}>

@@ -12,8 +12,6 @@ export function TextRenderer({ element }: Props) {
       style={{
         userSelect: 'none',
         whiteSpace: 'pre-wrap',
-        transform: `rotate(${element.angle ?? 0}deg)`,
-        transformOrigin: 'center center',
         outline: 'none',
         cursor: 'text',
         ...element.textProps
