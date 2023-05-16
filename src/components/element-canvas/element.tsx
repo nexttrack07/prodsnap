@@ -63,25 +63,24 @@ export function ElementGroup({ group }: ElementGroupProps) {
   };
 
   return (
-    <div id="element-group" onMouseDown={handleClick}>
-      <DragHandler
-        show={selectedGroupAtoms.includes(group)}
-        onResize={handleResize}
-        onRotate={handleRotate}
-        onPositionChange={handlePositionChange}
-        attrs={{
-          x,
-          y,
-          width,
-          height,
-          angle: elementGroup.angle
-        }}
-      >
-        {elementGroup.elements.map((element) => (
-          <ElementComponent position={{ x, y }} key={element.toString()} elementAtom={element} />
-        ))}
-      </DragHandler>
-    </div>
+    <DragHandler
+      show={selectedGroupAtoms.includes(group)}
+      onClick={handleClick}
+      onResize={handleResize}
+      onRotate={handleRotate}
+      onPositionChange={handlePositionChange}
+      attrs={{
+        x,
+        y,
+        width,
+        height,
+        angle: elementGroup.angle
+      }}
+    >
+      {elementGroup.elements.map((element) => (
+        <ElementComponent position={{ x, y }} key={element.toString()} elementAtom={element} />
+      ))}
+    </DragHandler>
   );
 }
 

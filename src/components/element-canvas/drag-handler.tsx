@@ -27,6 +27,7 @@ type Props = {
   attrs: Dimension & Position & Rotation;
   show: boolean;
   children: React.ReactNode;
+  onClick: React.MouseEventHandler<HTMLDivElement>;
   onResize: (attrs: Dimension & Position) => void;
   onRotate: (rotation: number) => void;
   onPositionChange: (position: Position) => void;
@@ -48,6 +49,7 @@ export function DragHandler({
   attrs,
   children,
   show,
+  onClick,
   onResize,
   onRotate,
   onPositionChange
@@ -158,6 +160,7 @@ export function DragHandler({
   if (!show) {
     return (
       <div
+        onClick={onClick}
         style={{
           position: 'absolute',
           top: attrs.y,
@@ -178,6 +181,7 @@ export function DragHandler({
   return (
     <Box
       onMouseDown={handleMoveMouseDown}
+      onClick={onClick}
       style={{
         position: 'absolute',
         top: attrs.y,
