@@ -53,17 +53,11 @@ export function DragHandler({
 
   const handleRotateMouseDown = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     e.stopPropagation();
-    const { clientX, clientY } = e;
 
     center.current = {
       x: attrs.x + attrs.width / 2,
       y: attrs.y + attrs.height / 2
     };
-
-    const posX = clientX - canvasPosition.x;
-    const posY = clientY - canvasPosition.y;
-    const x = posX - center.current.x;
-    const y = posY - center.current.y;
 
     setDragStatus('rotate');
   };
