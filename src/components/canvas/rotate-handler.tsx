@@ -80,7 +80,7 @@ export function RotateHandler({ dimension, position, onRotate, show = true }: Pr
         const y = posY - center.current.y;
         const d = R2D * Math.atan2(y, x);
         const currentRotation = d; // - startAngle;
-        onRotate(currentRotation);
+        onRotate(currentRotation + 90);
       }
     };
 
