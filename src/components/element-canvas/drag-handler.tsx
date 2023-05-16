@@ -1,6 +1,27 @@
 import { Dimension, Position, Rotation } from '@/stores/elements';
-import { useMantineTheme } from '@mantine/core';
+import { Box, createStyles, useMantineTheme } from '@mantine/core';
 import { useEffect, useRef, useState } from 'react';
+import { RotateDot } from 'tabler-icons-react';
+
+const useStyles = createStyles((theme) => ({
+  handler: {
+    position: 'absolute',
+    border: `1px solid ${theme.colors.gray[5]}`,
+    borderRadius: '50%',
+    backgroundColor: theme.colors.gray[0],
+    cursor: 'grab',
+    zIndex: 1,
+    width: 15,
+    height: 15,
+    '&:hover': {
+      backgroundColor: theme.colors.gray[9],
+      borderColor: theme.colors.gray[0],
+      zIndex: 2,
+      cursor: 'grabbing',
+      color: theme.colors.gray[0]
+    }
+  }
+}));
 
 type Props = {
   attrs: Dimension & Position & Rotation;
@@ -33,6 +54,7 @@ export function DragHandler({
 }: Props) {
   const [dragStatus, setDragStatus] = useState<DragStatus>('idle');
   const [canvasPosition, setCanvasPosition] = useState({ x: 0, y: 0 });
+  const { classes } = useStyles();
   const center = useRef({ x: 0, y: 0 });
   const theme = useMantineTheme();
   const R2D = 180 / Math.PI;
@@ -153,10 +175,8 @@ export function DragHandler({
     );
   }
 
-  console.log('dragStatus', dragStatus);
-
   return (
-    <div
+    <Box
       onMouseDown={handleMoveMouseDown}
       style={{
         position: 'absolute',
@@ -173,81 +193,55 @@ export function DragHandler({
       id="drag-handler"
     >
       {children}
-      <div
+      <Box
         style={{
-          position: 'absolute',
           top: 0,
           left: 0,
-          width: 15,
-          height: 15,
-          borderRadius: '100%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: theme.colors.gray[0],
-          border: `1px solid ${theme.colors.gray[5]}`,
-          cursor: 'grab'
+          transform: 'translate(-50%, -50%)'
         }}
+        className={classes.handler}
         onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-tl')}
       />
-      <div
+      <Box
         style={{
-          position: 'absolute',
           top: 0,
           right: 0,
-          width: 15,
-          height: 15,
-          borderRadius: '100%',
-          transform: 'translate(50%, -50%)',
-          backgroundColor: theme.colors.gray[0],
-          border: `1px solid ${theme.colors.gray[5]}`,
-          cursor: 'grab'
+          transform: 'translate(50%, -50%)'
         }}
+        className={classes.handler}
         onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-tr')}
       />
-      <div
+      <Box
         style={{
-          position: 'absolute',
           bottom: 0,
           right: 0,
-          width: 15,
-          height: 15,
-          borderRadius: '100%',
-          transform: 'translate(50%, 50%)',
-          backgroundColor: theme.colors.gray[0],
-          border: `1px solid ${theme.colors.gray[5]}`,
-          cursor: 'grab'
+          transform: 'translate(50%, 50%)'
         }}
+        className={classes.handler}
         onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-br')}
       />
-      <div
+      <Box
         style={{
-          position: 'absolute',
           bottom: 0,
           left: 0,
-          width: 15,
-          height: 15,
-          borderRadius: '100%',
-          transform: 'translate(-50%, 50%)',
-          backgroundColor: theme.colors.gray[0],
-          border: `1px solid ${theme.colors.gray[5]}`,
-          cursor: 'grab'
+          transform: 'translate(-50%, 50%)'
         }}
+        className={classes.handler}
         onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-bl')}
       />
-      <div
-        style={{
-          position: 'absolute',
+      <Box
+        sx={{
           left: '50%',
           top: -Math.min(40, Math.max(attrs.width * 0.4, 70)),
-          width: 15,
-          height: 15,
-          borderRadius: '100%',
-          transform: 'translateX(-50%)',
-          backgroundColor: theme.colors.gray[0],
-          border: `1px solid ${theme.colors.gray[5]}`,
-          cursor: 'crosshair'
+          width: 18,
+          height: 18,
+          transform: 'translateX(-50%)'
         }}
+        className={classes.handler}
         onMouseDown={handleRotateMouseDown}
-      />
-    </div>
+      >
+        <RotateDot color="currentColor" size={15} />
+      </Box>
+    </Box>
   );
 }

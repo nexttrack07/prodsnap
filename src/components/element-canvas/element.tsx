@@ -117,7 +117,7 @@ function ElementComponent({ elementAtom, position }: ElementComponentProps) {
         height: element.height,
         transform: `rotate(${element.angle ?? 0}deg)`,
         transformOrigin: 'center center',
-        border: activeElement === elementAtom ? `2px solid ${theme.colors.blue[5]}` : 'none'
+        border: activeElement === elementAtom ? `2px solid ${theme.colors.gray[7]}` : 'none'
       }}
     >
       <ElementComp element={element} />
