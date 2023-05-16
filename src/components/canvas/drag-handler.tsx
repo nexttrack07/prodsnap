@@ -99,7 +99,8 @@ export function DragHandler({
           onMouseDown={handleMouseDown}
           style={{
             position: 'absolute',
-            top: -30,
+            // if y is less than 30, move the handle to the bottom
+            top: y < 30 ? height + 10 : -30,
             left: '50%',
             transform: 'translateX(-50%)',
             boxShadow: theme.shadows.md,
