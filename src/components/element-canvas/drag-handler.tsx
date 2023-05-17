@@ -65,6 +65,7 @@ export function DragHandler({
     e.stopPropagation();
     e.preventDefault();
     setDragStatus('move');
+    onClick(e);
   };
 
   useEffect(() => {
@@ -160,7 +161,7 @@ export function DragHandler({
   if (!show) {
     return (
       <div
-        onClick={onClick}
+        onMouseDown={onClick}
         style={{
           position: 'absolute',
           top: attrs.y,
@@ -181,7 +182,6 @@ export function DragHandler({
   return (
     <Box
       onMouseDown={handleMoveMouseDown}
-      onClick={onClick}
       style={{
         position: 'absolute',
         top: attrs.y,

@@ -32,15 +32,18 @@ export function ElementGroup({ group }: ElementGroupProps) {
   const isShiftPressed = useShiftKeyPressed();
 
   const handleClick = (e: MouseEvent) => {
+    console.log('click');
     e.stopPropagation();
     // if the group is already selected, do nothing
     if (selectedGroupAtoms.includes(group)) {
+      console.log('already selected');
       return;
     }
 
     // if shift key is pressed, concat the group to the selected groups
     // else set the selected groups to the group
     if (isShiftPressed) {
+      console.log('shift pressed');
       setSelectedGroupAtoms((prev) => [...prev, group]);
     } else {
       setSelectedGroupAtoms([group]);
@@ -61,6 +64,8 @@ export function ElementGroup({ group }: ElementGroupProps) {
   const handleResize = (attrs: Position & Dimension) => {
     setAttrs(attrs);
   };
+
+  console.log('selectedGroupAtoms', selectedGroupAtoms);
 
   return (
     <DragHandler

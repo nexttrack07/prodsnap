@@ -28,28 +28,6 @@ export const positionAtom = atomFamily((elementAtoms: ElementAtom[]) => atom(
   }
 ));
 
-// export const dimensionAtom1 = atomFamily((elementAtoms: ElementAtom[]) => atom(
-//   (get) => {
-//     const elements = elementAtoms.map(el => get(el));
-//     const { x, y } = get(positionAtom(elementAtoms));
-
-//     const width = elements.reduce((prev, { x: elX, width }) => Math.max(prev, elX + width - x), 0);
-//     const height = elements.reduce((prev, { y: elY, height }) => Math.max(prev, elY + height - y), 0);
-
-//     return { width, height };
-//   },
-//   (_, set, update: { width: number; height: number }) => {
-//     elementAtoms.forEach((elementAtom) => {
-//       set(elementAtom, (el) => ({
-//         ...el,
-//         height: el.height + update.height,
-//         width: el.width + update.width,
-//       }));
-//     });
-//   }
-// ));
-
-
 export const dimensionAtom = atomFamily((elementAtoms: ElementAtom[]) => atom(
   (get) => {
     const elements = elementAtoms.map(el => get(el));
