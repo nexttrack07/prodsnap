@@ -252,6 +252,23 @@ export const dimensionAtom = atom(
   }
 );
 
+// rotate atom that rotates the selected elements
+export const rotateAtom = atom(null, 
+  (get, set, angle: number) => {
+    // get the selected elements
+    const selected = get(selectedItemsAtom);
+    // apply the rotation to each element
+    selected.atoms.forEach((elementAtom) => {
+      set(elementAtom, (el) => {
+        return {
+          ...el,
+          rotation: angle
+        }
+      });
+    });
+  }
+  )
+
 export const createAtom = (element: CanvasElement): ElementType => {
   if (element.type === 'svg-curve') {
     return atom({
