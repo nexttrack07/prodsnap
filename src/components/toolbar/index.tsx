@@ -26,20 +26,25 @@ import {
   Trash
 } from 'tabler-icons-react';
 import { SvgCurveToolbar } from './svg-curve-toolbar';
-import { combineElementGroupsAtom, selectedElementGroupAtomsAtom } from '@/stores/elements';
+import {
+  combineElementGroupsAtom,
+  activeElementAtomAtom as activeElementAtom2,
+  elementGroupAtomsAtom,
+  selectedElementGroupAtomsAtom
+} from '@/stores/elements';
 
 const deleteSelectedAtom = atom(null, (get, set) => {
-  const selectedElementAtoms = get(selectedElementAtomsAtom);
+  const selectedElementAtoms = get(selectedElementGroupAtomsAtom);
 
   if (selectedElementAtoms.length === 0) {
-    set(elementAtomsAtom, []);
+    set(elementGroupAtomsAtom, []);
   } else {
-    set(elementAtomsAtom, (elementAtoms) =>
+    set(elementGroupAtomsAtom, (elementAtoms) =>
       elementAtoms.filter((elementAtom) => !selectedElementAtoms.includes(elementAtom))
     );
-    set(selectedElementAtomsAtom, []);
+    set(selectedElementGroupAtomsAtom, []);
   }
-  set(activeElementAtomAtom, null);
+  set(activeElementAtom2, null);
 });
 
 const isGroupedAtom = atom((get) => {
@@ -161,6 +166,7 @@ export function Toolbar() {
   const selectedElements = useAtomValue(selectedElementAtomsAtom);
   const selectedGroupAtoms = useAtomValue(selectedElementGroupAtomsAtom);
   const combineGroups = useSetAtom(combineElementGroupsAtom);
+  const allElementGroupAtoms = useAtomValue(elementGroupAtomsAtom);
   const allElements = useAtomValue(elementAtomsAtom);
   const addGroup = useSetAtom(addGroupAtom);
   const removeGroup = useSetAtom(removeGroupAtom);
@@ -301,7 +307,7 @@ export function Toolbar() {
           Position
         </Button>
         <ActionIcon
-          disabled={allElements.length === 0}
+          disabled={allElementGroupAtoms.length === 0}
           size={36}
           variant="outline"
           onClick={handleDeleteClick}
