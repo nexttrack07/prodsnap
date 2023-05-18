@@ -15,6 +15,7 @@ import { DragHandler } from './drag-handler';
 import { useShiftKeyPressed } from '@/utils';
 import { useMantineTheme } from '@mantine/core';
 import { MouseEvent, useEffect, useState } from 'react';
+import { CurveRenderer } from './curve-renderer';
 
 type ElementGroupProps = {
   group: ElementGroupAtom;
@@ -27,7 +28,6 @@ export function ElementGroup({ group }: ElementGroupProps) {
   const isShiftPressed = useShiftKeyPressed();
 
   const handleClick = (e: MouseEvent) => {
-    console.log('click in element group');
     e.stopPropagation();
     // if the group is already selected, do nothing
     if (selectedGroupAtoms.includes(group)) {
@@ -37,11 +37,8 @@ export function ElementGroup({ group }: ElementGroupProps) {
     // if shift key is pressed, concat the group to the selected groups
     // else set the selected groups to the group
     if (isShiftPressed) {
-      console.log('shift pressed');
-      console.log('selectedGroupAtoms', selectedGroupAtoms);
       setSelectedGroupAtoms((prev) => [...prev, group]);
     } else {
-      console.log('shift not pressed');
       setSelectedGroupAtoms([group]);
     }
   };
@@ -89,7 +86,8 @@ export function ElementGroup({ group }: ElementGroupProps) {
 
 export const elementCompMap: Record<Element['type'], React.FC<any>> = {
   text: TextRenderer,
-  path: PathRenderer
+  path: PathRenderer,
+  curve: CurveRenderer
 };
 
 type ElementComponentProps = {
@@ -106,20 +104,13 @@ function ElementComponent({ elementAtom, position, onClick }: ElementComponentPr
   const theme = useMantineTheme();
 
   const handleClick = (e: React.MouseEvent) => {
-    console.log('click in element component');
     setActiveElementAtom(elementAtom);
     onClick(e);
-  };
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    console.log('mouse down in element component');
   };
 
   return (
     <div
       id={elementAtom.toString()}
-      // onClick={handleClick}
-      onMouseDown={handleMouseDown}
       style={{
         position: 'absolute',
         top: element.y - position.y,

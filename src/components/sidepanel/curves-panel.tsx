@@ -2,6 +2,18 @@ import { Text, Space, createStyles, SimpleGrid } from '@mantine/core';
 import React from 'react';
 import { atom, useSetAtom } from 'jotai';
 import { addElementAtom, MoveableElement, SVGCurveType } from '../../components/canvas/store';
+import {
+  Curve,
+  DefaultCurve,
+  Dimension,
+  Element,
+  ElementAtom,
+  ElementGroup,
+  PointAtom,
+  Position,
+  Rotation,
+  elementGroupAtomsAtom
+} from '@/stores/elements';
 
 const useStyles = createStyles(() => ({
   shape: {
@@ -14,97 +26,67 @@ const useStyles = createStyles(() => ({
   }
 }));
 
-type PointCurveType = MoveableElement & SVGCurveType;
+type PointCurveType = Position & Rotation & Dimension & DefaultCurve;
 
 const data: { id: number; prev: string; data: PointCurveType }[] = [
   {
     id: 0,
     prev: 'M 0 0 L 50 0',
     data: {
-      type: 'svg-curve',
+      type: 'curve',
       x: 200,
       y: 200,
       width: 100,
       height: 3,
-      strokeWidth: 2,
-      stroke: 'black',
-      startMarker: 'none',
-      markerSize: 10,
-      endMarker: 'none',
-      // TODO: DONT USE THIS - create atoms inside the component
+      angle: 0,
+      pathProps: {
+        strokeWidth: 2,
+        stroke: 'black'
+      },
+      markerProps: {
+        startMarker: 'none',
+        markerSize: 10,
+        endMarker: 'none'
+      },
       points: [
         {
-          type: 'svg-point',
+          type: 'point',
           x: 100,
           y: 100
         },
         {
-          type: 'svg-point',
+          type: 'point',
           x: 200,
           y: 200
         },
         {
-          type: 'svg-point',
+          type: 'point',
           x: 500,
           y: 100
         }
       ]
     }
-  },
-  {
-    id: 1,
-    prev: 'M 0 0 L 50 0',
-    data: {
-      type: 'svg-curve',
-      x: 200,
-      y: 200,
-      width: 100,
-      height: 3,
-      strokeWidth: 2,
-      stroke: 'black',
-      startMarker: 'none',
-      markerSize: 10,
-      endMarker: 'none',
-      // TODO: DONT USE THIS - create atoms inside the component
-      points: [
-        {
-          type: 'svg-point',
-          x: 100,
-          y: 100
-        },
-        {
-          type: 'svg-point',
-          x: 400,
-          y: 400
-        },
-        {
-          type: 'svg-point',
-          x: 200,
-          y: 200
-        },
-        {
-          type: 'svg-point',
-          x: 500,
-          y: 100
-        }
-      ]
-    }
-  }
-];
-
-const templateData = [
-  {
-    id: 0,
-    data: [{}]
   }
 ];
 
 export function CurvesPanel() {
   const addElement = useSetAtom(addElementAtom);
+  const setElementGroupAtoms = useSetAtom(elementGroupAtomsAtom);
   const { classes } = useStyles();
 
   const handleAddElement = (newEl: PointCurveType) => {
-    addElement({ ...newEl, points: newEl.points.map((p) => atom(p)) });
+    const newElement: Element = {
+      ...newEl,
+      points: newEl.points.map((p) => atom(p))
+    };
+    // const newElement: Element = newEl.points.map((p) => atom(p));
+    const newElementGroup: ElementGroup = {
+      type: 'group',
+      angle: 0,
+      elements: [atom(newElement)] as ElementAtom[]
+    };
+
+    setElementGroupAtoms((prev) => [...prev, atom(newElementGroup)]);
   };
 
   return (

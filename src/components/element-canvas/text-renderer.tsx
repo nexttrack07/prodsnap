@@ -116,10 +116,6 @@ export function TextRenderer({ element, setElement, isSelected, onSelect }: Prop
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
           onClick={handleClick}
-          // onBlur={handleBlur}
-          // contentEditable={editable}
-          // suppressContentEditableWarning={true}
-          // ref={textRef}
           style={{
             cursor: 'grab',
             whiteSpace: 'pre'
