@@ -13,8 +13,7 @@ type Props = {
 export function TextRenderer({ element, setElement, isSelected, onSelect }: Props) {
   const [editable, setEditable] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  // const textRef = useRef<HTMLDivElement>(null);
-  const textRef2 = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
   const positionRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -24,13 +23,13 @@ export function TextRenderer({ element, setElement, isSelected, onSelect }: Prop
   }, [isSelected]);
 
   useEffect(() => {
-    if (textRef2.current) {
+    if (textRef.current) {
       setElement((el) => ({
         ...el,
         // set the width to the width of the text + 10px padding but minimum 20px
-        width: Math.max(textRef2.current!.offsetWidth + 5, 20),
+        width: Math.max(textRef.current!.offsetWidth + 5, 20),
         // set the height to the height of the textpx padding but minimum 20px
-        height: Math.max(textRef2.current!.offsetHeight + 5, 40)
+        height: Math.max(textRef.current!.offsetHeight + 5, 40)
       }));
     }
   }, [element.content]);
@@ -130,7 +129,7 @@ export function TextRenderer({ element, setElement, isSelected, onSelect }: Prop
         </div>
       )}
       <div
-        ref={textRef2}
+        ref={textRef}
         style={{
           position: 'absolute',
           visibility: 'hidden',
