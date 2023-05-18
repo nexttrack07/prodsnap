@@ -3,9 +3,10 @@ import { scalePathData } from '../canvas/render-path';
 
 type Props = {
   element: Element & Path;
+  onSelect: (e: React.MouseEvent) => void;
 };
 
-export function PathRenderer({ element }: Props) {
+export function PathRenderer({ element, onSelect }: Props) {
   let {
     pathProps: { strokeWidth = 1 },
     width,
@@ -15,6 +16,7 @@ export function PathRenderer({ element }: Props) {
   const pathData = scalePathData(element.pathProps.d!, width, height, strokeWidth);
   return (
     <svg
+      onClick={onSelect}
       viewBox={`${-strokeWidth} ${-strokeWidth} ${width + strokeWidth}, ${height + strokeWidth}`}
     >
       <clipPath id={element.clipPathId}>

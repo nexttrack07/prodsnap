@@ -37,8 +37,11 @@ export function ElementGroup({ group }: ElementGroupProps) {
     // if shift key is pressed, concat the group to the selected groups
     // else set the selected groups to the group
     if (isShiftPressed) {
+      console.log('shift pressed');
+      console.log('selectedGroupAtoms', selectedGroupAtoms);
       setSelectedGroupAtoms((prev) => [...prev, group]);
     } else {
+      console.log('shift not pressed');
       setSelectedGroupAtoms([group]);
     }
   };

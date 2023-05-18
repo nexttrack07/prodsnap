@@ -17,17 +17,6 @@ export function TextRenderer({ element, setElement, isSelected, onSelect }: Prop
   const textRef2 = useRef<HTMLDivElement>(null);
   const positionRef = useRef({ x: 0, y: 0 });
 
-  // useEffect(() => {
-  //   if (textRef.current) {
-  //     console.log('textRef.current', textRef.current);
-  //     setElement((el) => ({
-  //       ...el,
-  //       width: textRef.current!.offsetWidth,
-  //       height: textRef.current!.offsetHeight
-  //     }));
-  //   }
-  // }, [textRef.current]);
-
   useEffect(() => {
     // Reset editable state when isSelected changes.
     // Prevents an item staying editable when another is selected.
@@ -38,8 +27,6 @@ export function TextRenderer({ element, setElement, isSelected, onSelect }: Prop
     if (textRef2.current) {
       setElement((el) => ({
         ...el,
-        // width: textRef2.current!.offsetWidth + 10,
-        // height: textRef2.current!.offsetHeight
         // set the width to the width of the text + 10px padding but minimum 20px
         width: Math.max(textRef2.current!.offsetWidth + 5, 20),
         // set the height to the height of the textpx padding but minimum 20px

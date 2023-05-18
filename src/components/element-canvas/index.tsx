@@ -20,7 +20,7 @@ export function Canvas() {
   return (
     <Box
       id="canvas"
-      onMouseDown={handleCanvasClick}
+      onClick={handleCanvasClick}
       sx={(theme) => ({
         width: 900,
         height: 700,
