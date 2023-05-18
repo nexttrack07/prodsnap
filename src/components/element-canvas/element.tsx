@@ -6,9 +6,6 @@ import {
   Position,
   activeElementAtomAtom,
   attrsAtom,
-  dimensionAtom,
-  positionAndDimensionAtom,
-  positionAtom,
   selectedElementGroupAtomsAtom
 } from '@/stores/elements';
 import { useAtom, useAtomValue } from 'jotai';
@@ -25,25 +22,21 @@ type ElementGroupProps = {
 
 export function ElementGroup({ group }: ElementGroupProps) {
   const [elementGroup, setElementGroup] = useAtom(group);
-  // const [{ x, y }, setPosition] = useAtom(positionAtom(elementGroup.elements));
-  // const [{ width, height }, setDimension] = useAtom(dimensionAtom(elementGroup.elements));
   const [{ x, y, width, height }, setAttrs] = useAtom(attrsAtom(elementGroup.elements));
   const [selectedGroupAtoms, setSelectedGroupAtoms] = useAtom(selectedElementGroupAtomsAtom);
   const isShiftPressed = useShiftKeyPressed();
 
   const handleClick = (e: MouseEvent) => {
-    console.log('click');
+    console.log('click in element group');
     e.stopPropagation();
     // if the group is already selected, do nothing
     if (selectedGroupAtoms.includes(group)) {
-      console.log('already selected');
       return;
     }
 
     // if shift key is pressed, concat the group to the selected groups
     // else set the selected groups to the group
     if (isShiftPressed) {
-      console.log('shift pressed');
       setSelectedGroupAtoms((prev) => [...prev, group]);
     } else {
       setSelectedGroupAtoms([group]);
@@ -65,12 +58,9 @@ export function ElementGroup({ group }: ElementGroupProps) {
     setAttrs(attrs);
   };
 
-  console.log('selectedGroupAtoms', selectedGroupAtoms);
-
   return (
     <DragHandler
       show={selectedGroupAtoms.includes(group)}
-      onClick={handleClick}
       onResize={handleResize}
       onRotate={handleRotate}
       onPositionChange={handlePositionChange}
@@ -83,7 +73,12 @@ export function ElementGroup({ group }: ElementGroupProps) {
       }}
     >
       {elementGroup.elements.map((element) => (
-        <ElementComponent position={{ x, y }} key={element.toString()} elementAtom={element} />
+        <ElementComponent
+          onClick={handleClick}
+          position={{ x, y }}
+          key={element.toString()}
+          elementAtom={element}
+        />
       ))}
     </DragHandler>
   );
@@ -97,22 +92,31 @@ export const elementCompMap: Record<Element['type'], React.FC<any>> = {
 type ElementComponentProps = {
   elementAtom: ElementAtom;
   position: Position;
+  onClick: (e: React.MouseEvent) => void;
 };
 
-function ElementComponent({ elementAtom, position }: ElementComponentProps) {
-  const element = useAtomValue(elementAtom);
-  const [activeElement, setActiveElement] = useAtom(activeElementAtomAtom);
+function ElementComponent({ elementAtom, position, onClick }: ElementComponentProps) {
+  // const element = useAtomValue(elementAtom);
+  const [element, setElement] = useAtom(elementAtom);
+  const [activeElementAtom, setActiveElementAtom] = useAtom(activeElementAtomAtom);
   const ElementComp = elementCompMap[element.type];
   const theme = useMantineTheme();
 
-  const handleClick = () => {
-    setActiveElement(elementAtom);
+  const handleClick = (e: React.MouseEvent) => {
+    console.log('click in element component');
+    setActiveElementAtom(elementAtom);
+    onClick(e);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    console.log('mouse down in element component');
   };
 
   return (
     <div
       id={elementAtom.toString()}
-      onClick={handleClick}
+      // onClick={handleClick}
+      onMouseDown={handleMouseDown}
       style={{
         position: 'absolute',
         top: element.y - position.y,
@@ -121,10 +125,15 @@ function ElementComponent({ elementAtom, position }: ElementComponentProps) {
         height: element.height,
         transform: `rotate(${element.angle ?? 0}deg)`,
         transformOrigin: 'center center',
-        border: activeElement === elementAtom ? `2px solid ${theme.colors.gray[7]}` : 'none'
+        border: activeElementAtom === elementAtom ? `2px solid ${theme.colors.gray[7]}` : 'none'
       }}
     >
-      <ElementComp element={element} />
+      <ElementComp
+        element={element}
+        setElement={setElement}
+        isSelected={activeElementAtom === elementAtom}
+        onSelect={handleClick}
+      />
     </div>
   );
 }

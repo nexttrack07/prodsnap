@@ -27,7 +27,6 @@ type Props = {
   attrs: Dimension & Position & Rotation;
   show: boolean;
   children: React.ReactNode;
-  onClick: React.MouseEventHandler<HTMLDivElement>;
   onResize: (attrs: Dimension & Position) => void;
   onRotate: (rotation: number) => void;
   onPositionChange: (position: Position) => void;
@@ -49,7 +48,6 @@ export function DragHandler({
   attrs,
   children,
   show,
-  onClick,
   onResize,
   onRotate,
   onPositionChange
@@ -61,11 +59,12 @@ export function DragHandler({
   const theme = useMantineTheme();
   const R2D = 180 / Math.PI;
 
-  const handleMoveMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleMoveMouseDown = (e: React.MouseEvent) => {
+    console.log('mouse down in drag-handler');
     e.stopPropagation();
-    e.preventDefault();
+    // e.preventDefault();
     setDragStatus('move');
-    onClick(e);
+    // onClick(e);
   };
 
   useEffect(() => {
@@ -104,7 +103,7 @@ export function DragHandler({
 
     // handleMouseMove handler updates the position of the element if the dragStatus is 'move'
     const handleMouseMove = (e: MouseEvent) => {
-      e.preventDefault();
+      // e.preventDefault();
       if (dragStatus === 'move') {
         onPositionChange({
           x: e.movementX,
@@ -161,7 +160,6 @@ export function DragHandler({
   if (!show) {
     return (
       <div
-        onMouseDown={onClick}
         style={{
           position: 'absolute',
           top: attrs.y,
