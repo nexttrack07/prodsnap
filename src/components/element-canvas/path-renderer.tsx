@@ -35,7 +35,7 @@ export function PathRenderer({ element, onSelect }: Props) {
         strokeDasharray={element.pathProps.strokeDasharray}
         strokeMiterlimit={strokeWidth * 2}
         clipPath={element.clipPathId}
-        fill={element.svgProps.fill}
+        fill={element.pathProps.fill}
         vectorEffect="non-scaling-stroke"
       />
     </svg>

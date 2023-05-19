@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   ActionIcon,
   ColorPicker,
@@ -10,53 +9,78 @@ import {
   SegmentedControl,
   Box
 } from '@mantine/core';
-import {
-  activeElementAtom,
-  activeElementAtomAtom,
-  CanvasElementWithPointAtoms,
-  MoveableElement,
-  SVGPathType
-} from '@/components/canvas/store';
 import { BorderAll, BorderNone, BorderRadius, BorderStyle2 } from 'tabler-icons-react';
-import { atom, useAtom } from 'jotai';
+import { SetStateAction, atom, useAtom } from 'jotai';
+import { activeElementAtomAtom, Element, Path } from '@/stores/elements';
 
-const propsAtom = atom(
+const activeElementAtom = atom(
   (get) => {
-    const element = get(activeElementAtom);
-    if (element && element.type === 'svg-path') {
-      return element.props;
+    const elementAtom = get(activeElementAtomAtom);
+    if (elementAtom) {
+      return get(elementAtom);
     }
     return null;
   },
-  (get, set, props: SVGPathType['props']) => {
-    const element = get(activeElementAtom);
-    if (element && element.type === 'svg-path') {
-      set(activeElementAtom, { ...element, props });
+  (get, set, element: Element | SetStateAction<Element>) => {
+    const elementAtom = get(activeElementAtomAtom);
+    if (elementAtom) {
+      set(elementAtom, element);
     }
   }
 );
 
-const strokePropsAtom = atom(
+const pathPropsAtom = atom(
   (get) => {
     const element = get(activeElementAtom);
-    if (element && element.type === 'svg-path') {
-      return element.strokeProps;
+    if (element && element.type === 'path') {
+      return element.pathProps;
     }
     return null;
   },
-  (get, set, strokeProps: SVGPathType['strokeProps']) => {
+  (get, set, pathProps: Path['pathProps']) => {
     const element = get(activeElementAtom);
-    if (element && element.type === 'svg-path') {
-      set(activeElementAtom, { ...element, strokeProps });
+    if (element && element.type === 'path') {
+      set(activeElementAtom, { ...element, pathProps });
     }
   }
 );
+
+// const propsAtom = atom(
+//   (get) => {
+//     const element = get(activeElementAtom);
+//     if (element && element.type === 'path') {
+//       return element.pathProps;
+//     }
+//     return null;
+//   },
+//   (get, set, props: SVGPathType['props']) => {
+//     const element = get(activeElementAtom);
+//     if (element && element.type === 'svg-path') {
+//       set(activeElementAtom, { ...element, props });
+//     }
+//   }
+// );
+
+// const strokePropsAtom = atom(
+//   (get) => {
+//     const element = get(activeElementAtom);
+//     if (element && element.type === 'svg-path') {
+//       return element.pathProps;
+//     }
+//     return null;
+//   },
+//   (get, set, pathProps: SVGPathType['pathProps']) => {
+//     const element = get(activeElementAtom);
+//     if (element && element.type === 'svg-path') {
+//       set(activeElementAtom, { ...element, pathProps });
+//     }
+//   }
+// );
 
 export function SvgPathToolbar() {
-  const [svgProps, setProps] = useAtom(propsAtom);
-  const [strokeProps, setStrokeProps] = useAtom(strokePropsAtom);
+  const [pathProps, setPathProps] = useAtom(pathPropsAtom);
 
-  if (!svgProps || !strokeProps) {
+  if (!pathProps) {
     return null;
   }
 
@@ -69,7 +93,7 @@ export function SvgPathToolbar() {
               sx={{
                 width: '100%',
                 height: '100%',
-                borderColor: strokeProps.stroke,
+                borderColor: pathProps.stroke,
                 borderWidth: 8,
                 borderStyle: 'solid'
               }}
@@ -79,12 +103,12 @@ export function SvgPathToolbar() {
         <Popover.Dropdown>
           <ColorPicker
             format="rgba"
-            value={strokeProps.stroke}
+            value={pathProps.stroke}
             onChange={(val) =>
-              setStrokeProps({
-                ...strokeProps,
+              setPathProps({
+                ...pathProps,
                 stroke: val,
-                strokeWidth: strokeProps.strokeWidth ?? 10
+                strokeWidth: pathProps.strokeWidth ?? 10
               })
             }
             swatches={[
@@ -103,7 +127,7 @@ export function SvgPathToolbar() {
               sx={{
                 width: '100%',
                 height: '100%',
-                backgroundColor: svgProps.fill
+                backgroundColor: pathProps.fill
               }}
             />
           </ActionIcon>
@@ -111,8 +135,8 @@ export function SvgPathToolbar() {
         <Popover.Dropdown>
           <ColorPicker
             format="rgba"
-            value={svgProps.fill}
-            onChange={(val) => setProps({ ...svgProps, fill: val })}
+            value={pathProps.fill}
+            onChange={(val) => setPathProps({ ...pathProps, fill: val })}
             swatches={[
               ...DEFAULT_THEME.colors.red,
               ...DEFAULT_THEME.colors.yellow,
@@ -140,13 +164,13 @@ export function SvgPathToolbar() {
                     strokeWidth = 0;
                   case 'dashed':
                     strokeDasharray = '5,10';
-                    strokeWidth = strokeProps.strokeWidth === 0 ? 10 : strokeProps.strokeWidth;
+                    strokeWidth = pathProps.strokeWidth === 0 ? 10 : Number(pathProps.strokeWidth);
                   case 'all':
                     strokeDasharray = '0';
-                    strokeWidth = strokeProps.strokeWidth === 0 ? 10 : strokeProps.strokeWidth;
+                    strokeWidth = pathProps.strokeWidth === 0 ? 10 : Number(pathProps.strokeWidth);
                 }
-                setStrokeProps({
-                  ...strokeProps,
+                setPathProps({
+                  ...pathProps,
                   strokeWidth,
                   strokeDasharray
                 });
@@ -161,8 +185,8 @@ export function SvgPathToolbar() {
           <Menu.Label>Border Width</Menu.Label>
           <Menu.Item>
             <Slider
-              value={strokeProps.strokeWidth}
-              onChange={(strokeWidth) => setStrokeProps({ ...strokeProps, strokeWidth })}
+              value={Number(pathProps.strokeWidth)}
+              onChange={(strokeWidth) => setPathProps({ ...pathProps, strokeWidth })}
             />
           </Menu.Item>
           <Menu.Label>Rounded Corner</Menu.Label>

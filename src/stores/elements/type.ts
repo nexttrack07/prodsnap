@@ -18,7 +18,6 @@ export type Rotation = {
 export type Path = {
   type: 'path';
   clipPathId: string;
-  svgProps: SVGAttributes<SVGSVGElement>;
   pathProps: SVGAttributes<SVGPathElement>;
 }
 
