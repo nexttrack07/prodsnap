@@ -18,6 +18,7 @@ import { MouseEvent } from 'react';
 import { CurveRenderer } from './curve-renderer';
 import { atomFamily } from 'jotai/utils';
 import { ImageRenderer } from './image-renderer';
+import { GraphicRenderer } from './graphic-renderer';
 
 type ElementGroupProps = {
   group: ElementGroupAtom;
@@ -90,7 +91,8 @@ export const elementCompMap: Record<Element['type'], React.FC<any>> = {
   text: TextRenderer,
   path: PathRenderer,
   curve: CurveRenderer,
-  image: ImageRenderer
+  image: ImageRenderer,
+  graphic: GraphicRenderer
 };
 
 type ElementComponentProps = {

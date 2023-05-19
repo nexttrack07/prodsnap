@@ -1,4 +1,4 @@
-import { uuid } from '@/utils';
+import { getImageDimensions, uuid } from '@/utils';
 import {
   Button,
   Image,
@@ -12,10 +12,11 @@ import {
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { getGraphics, searchGraphics } from '@/api/template';
-import { useSetAtom } from 'jotai';
+import { atom, useAtom, useSetAtom } from 'jotai';
 import { CanvasElementWithPointAtoms, addElementAtom } from '@/components/canvas/store';
 import { SearchInput } from '@/components/search-input';
 import { useDebouncedValue, useInputState } from '@mantine/hooks';
+import { Element, ElementGroup, elementGroupAtomsAtom } from '@/stores/elements';
 // import { useStore } from '@/stores';
 
 const useStyles = createStyles(() => ({
@@ -38,7 +39,8 @@ export function GraphicsPanel() {
         lastPage.next ? Number(lastPage.next.split('=')[1]) : undefined,
       keepPreviousData: true
     });
-  const addElement = useSetAtom(addElementAtom);
+  // const addElement = useSetAtom(addElementAtom);
+  const [elementGroupAtoms, setElementGroupAtoms] = useAtom(elementGroupAtomsAtom);
   // const search = useStore((state) => state.value);
   // const setSearch = useStore((state) => state.updateValue);
   const [search, setSearch] = useInputState('');
@@ -50,8 +52,23 @@ export function GraphicsPanel() {
   });
   const { classes } = useStyles();
 
-  const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
-    addElement(newEl);
+  const handleAddElement = (newEl: Element) => {
+    const graphicAtom = atom(newEl);
+    graphicAtom.onMount = (setAtom) => {
+      if (newEl.type === 'graphic') {
+        getImageDimensions(newEl.url).then(({ width, height }) => {
+          setAtom((prev) => ({ ...prev, width, height }));
+        });
+      }
+    };
+    setElementGroupAtoms((prev) => {
+      const newGroup: ElementGroup = {
+        angle: 0,
+        type: 'group',
+        elements: [graphicAtom]
+      };
+      return [...prev, atom(newGroup)];
+    });
   };
 
   const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +94,8 @@ export function GraphicsPanel() {
                 <Image
                   onClick={() => {
                     handleAddElement({
-                      type: 'svg-graphic',
+                      type: 'graphic',
+                      angle: 0,
                       url: graphic.url,
                       alt: graphic.desc,
                       x: 100,
@@ -104,7 +122,8 @@ export function GraphicsPanel() {
                     <Image
                       onClick={() => {
                         handleAddElement({
-                          type: 'svg-graphic',
+                          type: 'graphic',
+                          angle: 0,
                           url: graphic.url,
                           alt: graphic.desc,
                           x: 100,

@@ -49,6 +49,12 @@ export type Image = {
   }
 }
 
+export type Graphic = {
+  type: 'graphic';
+  url: string;
+  alt?: string;
+}
+
 export type Point = {
   type: 'point';
 } & Position;
@@ -79,7 +85,7 @@ export type DefaultCurve = {
   };
 }
 
-export type Element = (Path | Text | Curve | Image) & Position & Dimension & Rotation;
+export type Element = (Path | Text | Curve | Image | Graphic) & Position & Dimension & Rotation;
 export type ElementAtom = WritableAtom<Element, SetStateAction<Element>>;
 
 export type ElementGroup = {
