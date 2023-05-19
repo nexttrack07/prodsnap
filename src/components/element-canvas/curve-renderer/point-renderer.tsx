@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { createStyles } from '@mantine/core';
 import { useAtom } from 'jotai';
-import useEventListener from '../../utils/use-event';
+import useEventListener from '../../../utils/use-event';
 import { PointAtom } from '@/stores/elements';
 
 const useStyles = createStyles((theme) => ({

@@ -28,6 +28,27 @@ export type Text = {
   textProps: CSSProperties;
 }
 
+export enum ImageState {
+  Loading,
+  Normal,
+  Cropping,
+}
+
+export type Image = {
+  type: 'image';
+  url: string;
+  public_id?: string;
+  state: ImageState;
+  thumbnail?: string;
+  currentUrl?: string;
+  alt?: string;
+  border: {
+    id: 'none' | 'circle' | 'rectangle';
+    stroke: string;
+    strokeWidth: number;
+  }
+}
+
 export type Point = {
   type: 'point';
 } & Position;
@@ -58,7 +79,7 @@ export type DefaultCurve = {
   };
 }
 
-export type Element = (Path | Text | Curve) & Position & Dimension & Rotation;
+export type Element = (Path | Text | Curve | Image) & Position & Dimension & Rotation;
 export type ElementAtom = WritableAtom<Element, SetStateAction<Element>>;
 
 export type ElementGroup = {

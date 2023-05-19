@@ -4,7 +4,7 @@ import { createStyles } from '@mantine/core';
 import { atom, useAtomValue } from 'jotai';
 import { atomFamily } from 'jotai/utils';
 import { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
-import { RenderMarker } from '../canvas/render-curve/render-start-marker';
+import { RenderMarker } from '../../canvas/render-curve/render-start-marker';
 import { PointRenderer } from './point-renderer';
 
 type Props = {

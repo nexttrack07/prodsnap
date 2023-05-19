@@ -17,6 +17,7 @@ import { useMantineTheme } from '@mantine/core';
 import { MouseEvent } from 'react';
 import { CurveRenderer } from './curve-renderer';
 import { atomFamily } from 'jotai/utils';
+import { ImageRenderer } from './image-renderer';
 
 type ElementGroupProps = {
   group: ElementGroupAtom;
@@ -88,7 +89,8 @@ export function ElementGroup({ group }: ElementGroupProps) {
 export const elementCompMap: Record<Element['type'], React.FC<any>> = {
   text: TextRenderer,
   path: PathRenderer,
-  curve: CurveRenderer
+  curve: CurveRenderer,
+  image: ImageRenderer
 };
 
 type ElementComponentProps = {

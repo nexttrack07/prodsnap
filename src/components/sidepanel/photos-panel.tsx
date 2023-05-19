@@ -9,17 +9,14 @@ import {
   ScrollArea,
   Button
 } from '@mantine/core';
-import { useSetAtom } from 'jotai';
-import {
-  CanvasElementWithPointAtoms,
-  ImageType,
-  ImageState,
-  addElementAtom
-} from '../../components/canvas/store';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { atom, useSetAtom } from 'jotai';
+import { ImageState } from '../../components/canvas/store';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { getPopularPhotos, searchPhotos } from '@/api/photos';
 import { useDebouncedValue, useInputState } from '@mantine/hooks';
 import { SearchInput } from '../search-input';
+import { ElementGroup, elementGroupAtomsAtom, Element } from '@/stores/elements';
+import { getImageDimensions } from '@/utils';
 
 const useStyles = createStyles((theme) => ({
   shape: {
@@ -34,7 +31,8 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export function PhotosPanel() {
-  const addElement = useSetAtom(addElementAtom);
+  // const addElement = useSetAtom(addElementAtom);
+  const setElementGroupAtoms = useSetAtom(elementGroupAtomsAtom);
   const { classes } = useStyles();
   const photosQuery = useInfiniteQuery({
     queryKey: ['popular-photos'],
@@ -52,8 +50,21 @@ export function PhotosPanel() {
     keepPreviousData: true
   });
 
-  const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
-    addElement(newEl);
+  const handleAddElement = (newEl: Element) => {
+    const imageAtom = atom(newEl);
+    imageAtom.onMount = (setAtom) => {
+      if (newEl.type === 'image') {
+        getImageDimensions(newEl.url).then(({ width, height }) => {
+          setAtom((prev) => ({ ...prev, width, height }));
+        });
+      }
+    };
+    const newElementGroup: ElementGroup = {
+      type: 'group',
+      angle: 0,
+      elements: [imageAtom]
+    };
+    setElementGroupAtoms((prev) => [...prev, atom(newElementGroup)]);
   };
 
   const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,6 +98,7 @@ export function PhotosPanel() {
                       handleAddElement({
                         type: 'image',
                         state: ImageState.Normal,
+                        angle: 0,
                         x: 200,
                         y: 200,
                         width: 300,
@@ -125,6 +137,7 @@ export function PhotosPanel() {
                     onClick={() =>
                       handleAddElement({
                         type: 'image',
+                        angle: 0,
                         state: ImageState.Normal,
                         x: 200,
                         y: 200,
