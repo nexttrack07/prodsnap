@@ -181,6 +181,22 @@ export const attrsAtom = atomFamily((elementAtoms: ElementAtom[]) => atom(
   (get) => {
     const attrs = elementAtoms.map(elAtom => {
       const el = get(elAtom);
+
+      if (el.type === 'curve') {
+        const points = el.points.map(pointAtom => get(pointAtom));
+        // a curve has points which have x and y
+        // we need to find minX, maxX, minY, maxY
+
+        const { minX, maxX, minY, maxY } = points.reduce(({ minX, maxX, minY, maxY }, { x, y }) => ({
+          minX: Math.min(minX, x),
+          maxX: Math.max(maxX, x),
+          minY: Math.min(minY, y),
+          maxY: Math.max(maxY, y),
+        }), { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity });
+
+        // return the x, y, width, height
+        return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+      }
       
       const { x, y, width, height } = getElementBoundingBox(el);
 
@@ -196,13 +212,24 @@ export const attrsAtom = atomFamily((elementAtoms: ElementAtom[]) => atom(
   },
   (_, set, update: { x: number; y: number; width: number; height: number }) => {
     elementAtoms.forEach((elementAtom) => {
-      set(elementAtom, (el) => ({
+      set(elementAtom, (el) => {
+        // if the element is curve, we need to update the points
+        if (el.type === 'curve') {
+          el.points.forEach(pointAtom => {
+            set(pointAtom, (point) => ({
+              ...point,
+              x: update.x + point.x,
+              y: update.y + point.y,
+            }))
+          })
+        }
+        return {
         ...el,
         x: update.x + el.x,
         y: update.y + el.y,
         width: el.width + update.width,
         height: el.height + update.height,
-      }));
+      }});
     });
   }
 ));

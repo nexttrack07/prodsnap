@@ -8,14 +8,15 @@ import {
   attrsAtom,
   selectedElementGroupAtomsAtom
 } from '@/stores/elements';
-import { useAtom, useAtomValue } from 'jotai';
+import { atom, useAtom, useAtomValue } from 'jotai';
 import { TextRenderer } from './text-renderer';
 import { PathRenderer } from './path-renderer';
 import { DragHandler } from './drag-handler';
 import { useShiftKeyPressed } from '@/utils';
 import { useMantineTheme } from '@mantine/core';
-import { MouseEvent, useEffect, useState } from 'react';
+import { MouseEvent } from 'react';
 import { CurveRenderer } from './curve-renderer';
+import { atomFamily } from 'jotai/utils';
 
 type ElementGroupProps = {
   group: ElementGroupAtom;
@@ -96,9 +97,37 @@ type ElementComponentProps = {
   onClick: (e: React.MouseEvent) => void;
 };
 
+const elementAttrsAtom = atomFamily((elementAtom: ElementAtom) =>
+  atom((get) => {
+    const element = get(elementAtom);
+
+    // if element is a curve, get minx, miny, maxx, maxy and return x, y, width, height
+    if (element.type === 'curve') {
+      // get points from curve
+      const points = element.points.map((pointAtom) => get(pointAtom));
+      // get minx, miny, maxx, maxy
+      const minX = Math.min(...points.map((point) => point.x));
+      const minY = Math.min(...points.map((point) => point.y));
+      const maxX = Math.max(...points.map((point) => point.x));
+      const maxY = Math.max(...points.map((point) => point.y));
+
+      return {
+        x: minX,
+        y: minY,
+        width: maxX - minX,
+        height: maxY - minY,
+        angle: element.angle
+      };
+    }
+
+    return element;
+  })
+);
+
 function ElementComponent({ elementAtom, position, onClick }: ElementComponentProps) {
   // const element = useAtomValue(elementAtom);
   const [element, setElement] = useAtom(elementAtom);
+  const attrs = useAtomValue(elementAttrsAtom(elementAtom));
   const [activeElementAtom, setActiveElementAtom] = useAtom(activeElementAtomAtom);
   const ElementComp = elementCompMap[element.type];
   const theme = useMantineTheme();
@@ -113,13 +142,13 @@ function ElementComponent({ elementAtom, position, onClick }: ElementComponentPr
       id={elementAtom.toString()}
       style={{
         position: 'absolute',
-        top: element.y - position.y,
-        left: element.x - position.x,
-        width: element.width,
-        height: element.height,
-        transform: `rotate(${element.angle ?? 0}deg)`,
+        top: attrs.y - position.y,
+        left: attrs.x - position.x,
+        width: attrs.width,
+        height: attrs.height,
+        transform: `rotate(${attrs.angle ?? 0}deg)`,
         transformOrigin: 'center center',
-        border: activeElementAtom === elementAtom ? `2px solid ${theme.colors.gray[7]}` : 'none'
+        border: activeElementAtom === elementAtom ? `1px solid ${theme.colors.gray[7]}` : 'none'
       }}
     >
       <ElementComp
@@ -127,6 +156,7 @@ function ElementComponent({ elementAtom, position, onClick }: ElementComponentPr
         setElement={setElement}
         isSelected={activeElementAtom === elementAtom}
         onSelect={handleClick}
+        position={position}
       />
     </div>
   );
