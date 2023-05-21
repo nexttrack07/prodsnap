@@ -13,6 +13,7 @@ export function Canvas() {
   const setActiveElementAtom = useSetAtom(activeElementAtomAtom);
 
   const handleCanvasClick = () => {
+    console.log('handleCanvasClick');
     setSelectedElementGroupAtoms([]);
     setActiveElementAtom(null);
   };

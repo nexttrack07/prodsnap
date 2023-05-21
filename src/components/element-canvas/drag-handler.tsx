@@ -60,7 +60,6 @@ export function DragHandler({
   const R2D = 180 / Math.PI;
 
   const handleMoveMouseDown = (e: React.MouseEvent) => {
-    console.log('mouse down in drag-handler');
     e.stopPropagation();
     // e.preventDefault();
     setDragStatus('move');
@@ -97,7 +96,8 @@ export function DragHandler({
 
   useEffect(() => {
     // handleMouseUp handler resets the dragStatus to idle
-    const handleMouseUp = () => {
+    const handleMouseUp = (e: MouseEvent) => {
+      e.stopPropagation();
       setDragStatus('idle');
     };
 
@@ -203,6 +203,7 @@ export function DragHandler({
         }}
         className={classes.handler}
         onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-tl')}
+        onClick={(e) => e.stopPropagation()}
       />
       <Box
         style={{
@@ -212,6 +213,7 @@ export function DragHandler({
         }}
         className={classes.handler}
         onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-tr')}
+        onClick={(e) => e.stopPropagation()}
       />
       <Box
         style={{
@@ -221,6 +223,7 @@ export function DragHandler({
         }}
         className={classes.handler}
         onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-br')}
+        onClick={(e) => e.stopPropagation()}
       />
       <Box
         style={{
@@ -230,6 +233,7 @@ export function DragHandler({
         }}
         className={classes.handler}
         onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-bl')}
+        onClick={(e) => e.stopPropagation()}
       />
       <Box
         sx={{
@@ -241,6 +245,7 @@ export function DragHandler({
         }}
         className={classes.handler}
         onMouseDown={handleRotateMouseDown}
+        onClick={(e) => e.stopPropagation()}
       >
         <RotateDot color="currentColor" size={15} />
       </Box>

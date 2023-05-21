@@ -59,8 +59,8 @@ export function ShapesPanel() {
                 key={item.id}
                 onClick={() => handleAddElement(element)}
                 className={classes.shape}
-                fill={element.svgProps.fill}
-                stroke={element.svgProps.stroke}
+                fill={element.pathProps.fill}
+                stroke={element.pathProps.stroke}
                 viewBox={`${-strokeWidth} ${-strokeWidth} ${width + +strokeWidth}, ${
                   height + +strokeWidth
                 }`}

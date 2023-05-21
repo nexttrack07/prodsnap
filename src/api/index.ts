@@ -14,11 +14,9 @@ function createShapeObjects(paths: string[]): { id: string; data: Path & Positio
         y: 10,
         angle: 0,
         clipPathId: uuid(),
-        svgProps: {
-          fill: DEFAULT_THEME.colors.gray[3]
-        },
         pathProps: {
           d: path,
+          fill: DEFAULT_THEME.colors.gray[3],
           stroke: DEFAULT_THEME.colors.gray[8],
           strokeWidth: 3,
           strokeDasharray: 'none',

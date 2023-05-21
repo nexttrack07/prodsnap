@@ -13,6 +13,7 @@ export function Editor() {
   const setCanvas = useSetAtom(canvasAtom);
 
   const handleEditorClick = () => {
+    console.log('handleEditorClick');
     unSelectAllElements();
     setCanvas((c) => ({ ...c, isSelected: false }));
   };
@@ -49,7 +50,7 @@ export function Editor() {
           <Toolbar />
         </div>
         <Center
-          onMouseDown={handleEditorClick}
+          onClick={handleEditorClick}
           sx={(theme) => ({ flex: 1, backgroundColor: theme.colors.gray[1] })}
         >
           <Canvas />
