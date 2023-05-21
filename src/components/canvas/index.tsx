@@ -117,6 +117,7 @@ export function Element({ elementAtom }: { elementAtom: ElementType }) {
     <Comp
       onSelect={handleSelectElement}
       element={element}
+      isGrouped={isGrouped}
       setElement={handleSetElement}
       isSelected={selectedElementAtoms.includes(elementAtom) && !isGrouped}
     />

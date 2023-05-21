@@ -17,12 +17,13 @@ type SVGCanvasElement = MoveableElement & SVGPathType;
 
 type Props = {
   element: SVGCanvasElement;
-  setElement: (update: SetStateAction<CanvasElement>) => void;
   isSelected: boolean;
+  isGrouped: boolean;
   onSelect: (e: React.MouseEvent) => void;
+  setElement: (update: SetStateAction<CanvasElement>) => void;
 };
 
-export function RenderPath({ element, onSelect, setElement, isSelected }: Props) {
+export function RenderPath({ element, isGrouped, onSelect, setElement, isSelected }: Props) {
   const {
     x,
     y,
@@ -101,6 +102,8 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
     });
   };
 
+  const show = isSelected && !isGrouped;
+
   return (
     <DragHandler
       onClick={handleClick}
@@ -108,7 +111,7 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
       rotation={rotation}
       dimension={{ width, height }}
       onMove={handleMouseMove}
-      hide={!isSelected}
+      hide={!show}
     >
       <svg
         opacity={element.opacity}
@@ -134,9 +137,9 @@ export function RenderPath({ element, onSelect, setElement, isSelected }: Props)
           vectorEffect="non-scaling-stroke"
         />
       </svg>
-      <ResizeHandler show={isSelected} dimension={{ width, height }} onResize={handleResize} />
+      <ResizeHandler show={show} dimension={{ width, height }} onResize={handleResize} />
       <RotateHandler
-        show={isSelected}
+        show={show}
         dimension={{ width, height }}
         position={{ x, y }}
         onRotate={handleRotate}
