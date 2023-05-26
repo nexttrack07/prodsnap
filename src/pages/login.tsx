@@ -17,10 +17,10 @@ import {
   Stack
 } from '@mantine/core';
 import { BrandGoogle } from 'tabler-icons-react';
-import { atomWithStorage } from 'jotai/utils';
 import { useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword } from '@/api/user';
 import { useLoginStore } from '@/stores';
+import { UserCredential, signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/utils/firebase';
 
 export function GoogleButton(props: ButtonProps) {
   return (
@@ -28,15 +28,7 @@ export function GoogleButton(props: ButtonProps) {
   );
 }
 
-export type USER = {
-  email: string;
-  username?: string;
-  token: string;
-};
-
-export const userAtom = atomWithStorage<{ user: null | USER }>('user', {
-  user: null
-});
+export type User = UserCredential | null;
 
 export function Login(props: PaperProps) {
   const [user, setUser] = useLoginStore((state) => [state.user, state.setUser]);
@@ -57,18 +49,19 @@ export function Login(props: PaperProps) {
   });
 
   useEffect(() => {
-    if (user?.email && user?.token) {
-      console.log('user.email && token');
+    if (user) {
       navigate('/editor');
     }
   }, []);
 
   const handleFormSubmit = () => {
     if (type === 'login') {
-      signInWithEmailAndPassword(form.values.email, form.values.password).then((res) => {
-        setUser({ email: form.values.email, token: res.data.key });
-        navigate('/editor');
-      });
+      signInWithEmailAndPassword(auth, form.values.email, form.values.password).then(
+        (userCredential) => {
+          setUser(userCredential);
+          navigate('/editor');
+        }
+      );
     }
   };
 

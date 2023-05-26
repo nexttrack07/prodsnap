@@ -5,14 +5,13 @@ import { useAtomValue } from 'jotai';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Route, Routes, BrowserRouter as Router } from 'react-router-dom';
-import { Editor, Login, ProtectedRoute, userAtom } from './pages';
+import { Editor, Login, ProtectedRoute } from './pages';
 import './index.css';
 import { useLoginStore } from './stores';
 
 const queryClient = new QueryClient();
 
 function App() {
-  // const { user } = useAtomValue(userAtom);
   const user = useLoginStore((state) => state.user);
 
   return (
