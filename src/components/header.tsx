@@ -137,7 +137,7 @@ export function HeaderComponent() {
         {isSelected ? <UploadSelection /> : <UploadTemplate />}
         <Menu>
           <Menu.Target>
-            <Avatar color="cyan" radius="xl">
+            <Avatar sx={{ cursor: 'pointer' }} color="cyan" radius="xl">
               FH
             </Avatar>
           </Menu.Target>

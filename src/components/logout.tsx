@@ -1,6 +1,6 @@
 import { useLoginStore } from '@/stores';
 import { auth } from '@/utils/firebase';
-import { ActionIcon, Flex } from '@mantine/core';
+import { Flex } from '@mantine/core';
 import { signOut } from 'firebase/auth';
 import { Logout } from 'tabler-icons-react';
 
