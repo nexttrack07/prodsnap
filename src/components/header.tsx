@@ -31,6 +31,7 @@ import { UploadTemplate } from './upload-template';
 import { UploadSelection } from './upload-selection';
 import { useAtomValue } from 'jotai';
 import { selectedElementAtomsAtom } from './canvas/store';
+import { LogoutComponent } from './logout';
 
 export function HeaderComponent() {
   const isSelected = useAtomValue(selectedElementAtomsAtom).length > 0;
@@ -134,9 +135,20 @@ export function HeaderComponent() {
       <div style={{ flex: 1 }} />
       <Group>
         {isSelected ? <UploadSelection /> : <UploadTemplate />}
-        <Avatar color="cyan" radius="xl">
-          FH
-        </Avatar>
+        <Menu>
+          <Menu.Target>
+            <Avatar sx={{ cursor: 'pointer' }} color="cyan" radius="xl">
+              FH
+            </Avatar>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item>My account</Menu.Item>
+            <Menu.Item>Settings</Menu.Item>
+            <Menu.Item>
+              <LogoutComponent />
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
         <Button onClick={handleDownloadClick} variant="outline" leftIcon={<Download />}>
           Download
         </Button>
