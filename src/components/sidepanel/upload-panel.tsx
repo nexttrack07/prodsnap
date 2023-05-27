@@ -17,7 +17,9 @@ import { addDoc, collection, getDocs } from 'firebase/firestore';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import { Check, CloudUpload, X } from 'tabler-icons-react';
 import { useQuery } from '@tanstack/react-query';
-import { getImages, uploadPhoto } from '@/api/photos';
+import { uploadImage } from '@/api/images';
+import { addTemplate } from '@/api/template';
+// import { getImages, uploadPhoto } from '@/api/photos';
 
 const useStyles = createStyles((theme) => ({
   shape: {
@@ -38,56 +40,90 @@ type ImageFile = {
   url: string;
 };
 
-// async function fetchImages() {
-//   const docRef = collection(firestore, 'images');
-//   const snap = await getDocs(docRef);
-//   let newImages: ImageFile[] = [];
-//   snap.forEach((doc) => {
-//     newImages.push(doc.data() as ImageFile);
-//   });
-//   return newImages;
-// }
+async function fetchImages() {
+  const docRef = collection(firestore, 'images');
+  const snap = await getDocs(docRef);
+  let newImages: ImageFile[] = [];
+  snap.forEach((doc) => {
+    newImages.push(doc.data() as ImageFile);
+  });
+  return newImages;
+}
+
+const metadata = {
+  contentType: 'image/jpeg'
+};
 
 export function UploadPanel() {
   const addElement = useSetAtom(addElementAtom);
   const { classes } = useStyles();
   const [error, setError] = useState<Error | null>(null);
-  const query = useQuery(['images'], getImages);
+  const [loading, setLoading] = useState(false);
+  const query = useQuery(['images'], fetchImages);
 
   const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
     addElement(newEl);
   };
 
-  const handleUploadImage = async (file: File) => {
-    const formData = new FormData();
-    formData.append('image', file);
+  const handleUploadImage = (file: File) => {
+    // Upload file and metadata to the object 'images/mountains.jpg'
+    const storageRef = ref(storage, 'images/' + file.name);
+    const uploadTask = uploadBytesResumable(storageRef, file, metadata);
 
-    try {
-      showNotification({
-        title: 'Uploading Image',
-        message: 'Uploading your image...',
-        loading: true,
-        autoClose: false,
-        disallowClose: false,
-        id: 'uploading-image'
-      });
-      const _ = await uploadPhoto(formData);
-      updateNotification({
-        id: 'uploading-image',
-        title: 'Image Uploaded',
-        message: 'Your image has been uploaded!',
-        icon: <Check />,
-        autoClose: 2000
-      });
-      query.refetch();
-    } catch (error) {
-      updateNotification({
-        id: 'uploading-image',
-        title: 'Image Upload Error',
-        message: 'Error uploading your image. Please try again.',
-        icon: <X />,
-        autoClose: 2000
-      });
+    // Listen for state changes, errors, and completion of the upload.
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log('Upload is ' + progress + '% done');
+        switch (snapshot.state) {
+          case 'paused':
+            console.log('Upload is paused');
+            break;
+          case 'running':
+            console.log('Upload is running');
+            break;
+        }
+      },
+      (error) => {
+        console.log('Error uploading image', error);
+      },
+      () => {
+        // Upload completed successfully, now we can get the download URL
+        getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+          await postSelection(downloadURL);
+        });
+      }
+    );
+
+    async function postSelection(url: string) {
+      try {
+        showNotification({
+          id: 'upload-image',
+          title: 'Uploading image',
+          message: 'Your image is being uploaded',
+          autoClose: false,
+          disallowClose: true
+        });
+        setLoading(true);
+        await uploadImage(file.name, url);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err);
+        }
+      } finally {
+        setLoading(false);
+        updateNotification({
+          id: 'upload-image',
+          title: 'Image uploaded',
+          message: 'Your image has been uploaded',
+          icon: <Check size={18} />,
+          autoClose: 5000,
+          disallowClose: false
+        });
+        query.refetch();
+      }
     }
   };
 
@@ -110,16 +146,15 @@ export function UploadPanel() {
       <Divider my="xl" />
       <LoadingOverlay visible={query.isLoading} />
       <SimpleGrid cols={3}>
-        {query.data?.results.map((image) => (
+        {query.data?.map((image) => (
           <Image
-            key={image.image}
+            key={image.url}
             className={classes.shape}
-            src={import.meta.env.VITE_CLOUDINARY_IMAGE_URL + image.image}
+            src={image.url}
             onClick={() => {
               const el: CanvasElementWithPointAtoms = {
                 ...defaultImage,
-                url: import.meta.env.VITE_CLOUDINARY_IMAGE_URL + image.image,
-                public_id: image.public_id
+                url: image.url
               };
 
               handleAddElement(el);
