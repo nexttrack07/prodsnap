@@ -58,7 +58,6 @@ export function Canvas() {
       {elementAtoms.map((elementAtom) => (
         <Element key={elementAtom.toString()} elementAtom={elementAtom} />
       ))}
-      <RenderGuide />
     </Box>
   );
 }

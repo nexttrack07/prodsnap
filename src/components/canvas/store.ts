@@ -37,13 +37,15 @@ export type SVGCurveWithPointAtoms = Omit<SVGCurveType, 'points'> & {
   points: SVGPointAtom[];
 };
 
+export type MarkerType = 'none' | 'fill-arrow' | 'outline-arrow' | 'outline-circle' | 'fill-circle';
+
 export type SVGCurveType = {
   type: 'svg-curve';
   points: SVGPointType[];
   isQuadratic?: boolean;
 } & Partial<SVGStrokeProps> & {
-  startMarker: 'none' | 'fill-arrow' | 'outline-arrow' | 'outline-circle' | 'fill-circle';
-  endMarker: 'none' | 'fill-arrow' | 'outline-arrow' | 'outline-circle' | 'fill-circle';
+  startMarker: MarkerType;
+  endMarker: MarkerType;
   markerSize: number;
 } & MoveableElement;
 
