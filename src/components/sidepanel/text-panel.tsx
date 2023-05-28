@@ -124,9 +124,7 @@ export function TextPanel() {
         })}
       </SimpleGrid>
       <Divider my="xl" variant="dotted" />
-      <SimpleGrid cols={2}>
-        <LoadingOverlay loaderProps={{ size: 'sm', color: 'pink', variant: 'bars' }} visible />
-      </SimpleGrid>
+      <SimpleGrid cols={2}></SimpleGrid>
     </>
   );
 }

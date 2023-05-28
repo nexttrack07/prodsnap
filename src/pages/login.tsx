@@ -14,7 +14,8 @@ import {
   Divider,
   Checkbox,
   Anchor,
-  Stack
+  Stack,
+  Alert
 } from '@mantine/core';
 import { BrandGoogle } from 'tabler-icons-react';
 import { useNavigate } from 'react-router-dom';
@@ -33,6 +34,7 @@ export function Login(props: PaperProps) {
   const [user, setUser] = useLoginStore((state) => [state.user, state.setUser]);
   const navigate = useNavigate();
   const [type, toggle] = useToggle(['login', 'register']);
+  const [error, setError] = React.useState<string | null>(null);
   const form = useForm({
     initialValues: {
       email: '',
@@ -55,10 +57,14 @@ export function Login(props: PaperProps) {
 
   const handleFormSubmit = () => {
     if (type === 'login') {
-      signInWithEmailAndPassword(form.values.email, form.values.password).then((res) => {
-        setUser(res.data);
-        navigate('/editor');
-      });
+      signInWithEmailAndPassword(form.values.email, form.values.password)
+        .then((res) => {
+          setUser(res.data);
+          navigate('/editor');
+        })
+        .catch((err) => {
+          setError(err.message);
+        });
     }
   };
 
@@ -85,6 +91,10 @@ export function Login(props: PaperProps) {
                 onChange={(event) => form.setFieldValue('name', event.currentTarget.value)}
               />
             )}
+
+            <Alert hidden={!error} color="red">
+              {error}
+            </Alert>
 
             <TextInput
               required
