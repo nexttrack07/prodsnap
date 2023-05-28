@@ -1,5 +1,4 @@
 import { Box, Button, Group, Modal, SegmentedControl } from '@mantine/core';
-import { addTemplate } from '../api/template';
 import { atom, useAtom, useAtomValue } from 'jotai';
 import React, { useState } from 'react';
 import { Check, CloudUpload, X } from 'tabler-icons-react';
@@ -14,8 +13,6 @@ import {
 import { elementCompMap } from '@/components/canvas';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import domToImage from 'dom-to-image-more';
-import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
-import { storage } from '@/utils/firebase';
 import { RenderCurve } from './canvas/render-curve';
 import { uuid } from '@/utils';
 
@@ -75,78 +72,6 @@ export function UploadSelection() {
   const handleTemplateUpload = async () => {
     const dataURL = await domToImage.toBlob(document.getElementById('canvas-selection')!);
     const filename = `template-${Date.now()}.png`;
-    const storageRef = ref(storage, `images/${filename}`);
-    const uploadTask = uploadBytesResumable(storageRef, dataURL);
-
-    uploadTask.on(
-      'state_changed',
-      () => {
-        // const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        // setProgress(progress);
-        showNotification({
-          id: 'upload-selection-photo',
-          loading: true,
-          title: 'Uploading your selection photo',
-          message: 'Your selection-photo is being uploaded...',
-          autoClose: false
-        });
-      },
-      (err) => {
-        // Handle unsuccessful uploads
-        console.error(err);
-        setError(err);
-        updateNotification({
-          id: 'upload-selection-photo',
-          color: 'red',
-          title: 'Upload failed!',
-          message: error!.message,
-          icon: <X size={16} />,
-          autoClose: 2000
-        });
-      },
-      () => {
-        // Handle successful uploads on complete
-        // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-        getDownloadURL(uploadTask.snapshot.ref).then(async (url) => {
-          await postSelection(url);
-        });
-        updateNotification({
-          id: 'upload-selection-photo',
-          color: 'teal',
-          title: 'Selection Photo Uploaded Successfully',
-          message: 'Your photo has been uploaded successfully',
-          icon: <Check size={16} />,
-          autoClose: 2000
-        });
-      }
-    );
-    const id = uuid();
-    async function postSelection(url: string) {
-      try {
-        showNotification({
-          id: 'upload-selection',
-          loading: true,
-          title: 'Uploading your selection',
-          message: 'Your selection is being uploaded...',
-          autoClose: false,
-          disallowClose: true
-        });
-        setLoading(true);
-        await addTemplate({ id, selection, type, url }, 'selections');
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-        updateNotification({
-          id: 'upload-selection',
-          color: 'teal',
-          title: 'Selection Uploaded Successfully',
-          message: 'Your selection has been uploaded successfully',
-          icon: <Check size={16} />,
-          autoClose: 2000
-        });
-      }
-    }
   };
 
   return (

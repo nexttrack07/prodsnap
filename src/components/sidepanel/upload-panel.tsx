@@ -11,15 +11,10 @@ import {
 } from '@mantine/core';
 import { useSetAtom } from 'jotai';
 import { addElementAtom, CanvasElementWithPointAtoms, defaultImage } from '../canvas/store';
-import { firestore, storage } from '../../utils/firebase';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { addDoc, collection, getDocs } from 'firebase/firestore';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import { Check, CloudUpload, X } from 'tabler-icons-react';
 import { useQuery } from '@tanstack/react-query';
-import { uploadImage } from '@/api/images';
-import { addTemplate } from '@/api/template';
-// import { getImages, uploadPhoto } from '@/api/photos';
+import { getImages, uploadPhoto } from '@/api/photos';
 
 const useStyles = createStyles((theme) => ({
   shape: {
@@ -40,16 +35,6 @@ type ImageFile = {
   url: string;
 };
 
-async function fetchImages() {
-  const docRef = collection(firestore, 'images');
-  const snap = await getDocs(docRef);
-  let newImages: ImageFile[] = [];
-  snap.forEach((doc) => {
-    newImages.push(doc.data() as ImageFile);
-  });
-  return newImages;
-}
-
 const metadata = {
   contentType: 'image/jpeg'
 };
@@ -59,43 +44,16 @@ export function UploadPanel() {
   const { classes } = useStyles();
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
-  const query = useQuery(['images'], fetchImages);
+  const query = useQuery(['images'], getImages);
 
   const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
     addElement(newEl);
   };
 
   const handleUploadImage = (file: File) => {
-    // Upload file and metadata to the object 'images/mountains.jpg'
-    const storageRef = ref(storage, 'images/' + file.name);
-    const uploadTask = uploadBytesResumable(storageRef, file, metadata);
-
-    // Listen for state changes, errors, and completion of the upload.
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('Upload is ' + progress + '% done');
-        switch (snapshot.state) {
-          case 'paused':
-            console.log('Upload is paused');
-            break;
-          case 'running':
-            console.log('Upload is running');
-            break;
-        }
-      },
-      (error) => {
-        console.log('Error uploading image', error);
-      },
-      () => {
-        // Upload completed successfully, now we can get the download URL
-        getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-          await postSelection(downloadURL);
-        });
-      }
-    );
+    // formdata and add url to it
+    const formData = new FormData();
+    formData.append('file', file);
 
     async function postSelection(url: string) {
       try {
@@ -107,7 +65,7 @@ export function UploadPanel() {
           disallowClose: true
         });
         setLoading(true);
-        await uploadImage(file.name, url);
+        await uploadPhoto(formData);
       } catch (err) {
         if (err instanceof Error) {
           setError(err);
@@ -146,15 +104,15 @@ export function UploadPanel() {
       <Divider my="xl" />
       <LoadingOverlay visible={query.isLoading} />
       <SimpleGrid cols={3}>
-        {query.data?.map((image) => (
+        {query.data?.results.map((image) => (
           <Image
-            key={image.url}
+            key={image.id}
             className={classes.shape}
-            src={image.url}
+            src={image.image}
             onClick={() => {
               const el: CanvasElementWithPointAtoms = {
                 ...defaultImage,
-                url: image.url
+                url: image.image
               };
 
               handleAddElement(el);

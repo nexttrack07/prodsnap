@@ -19,8 +19,7 @@ import {
 import { BrandGoogle } from 'tabler-icons-react';
 import { useNavigate } from 'react-router-dom';
 import { useLoginStore } from '@/stores';
-import { UserCredential, signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/utils/firebase';
+import { signInWithEmailAndPassword } from '@/api/user';
 
 export function GoogleButton(props: ButtonProps) {
   return (
@@ -28,7 +27,7 @@ export function GoogleButton(props: ButtonProps) {
   );
 }
 
-export type User = UserCredential | null;
+export type User = { key: string } | null;
 
 export function Login(props: PaperProps) {
   const [user, setUser] = useLoginStore((state) => [state.user, state.setUser]);
@@ -56,12 +55,10 @@ export function Login(props: PaperProps) {
 
   const handleFormSubmit = () => {
     if (type === 'login') {
-      signInWithEmailAndPassword(auth, form.values.email, form.values.password).then(
-        (userCredential) => {
-          setUser(userCredential);
-          navigate('/editor');
-        }
-      );
+      signInWithEmailAndPassword(form.values.email, form.values.password).then((res) => {
+        setUser(res.data);
+        navigate('/editor');
+      });
     }
   };
 

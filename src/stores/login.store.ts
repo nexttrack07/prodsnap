@@ -1,11 +1,11 @@
-import { UserCredential } from "firebase/auth";
+import { User } from "@/pages";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export interface LoginState {
   isAuthenticated: boolean;
-  user: UserCredential | null;
-  setUser: (user: UserCredential | null) => void;
+  user: User | null;
+  setUser: (user: User | null) => void;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
 }
 
@@ -14,7 +14,7 @@ export const useLoginStore = create<LoginState>()(
     (set) => ({
       isAuthenticated: false,
       user: null,
-      setUser: (user: UserCredential | null) => set({ user }),
+      setUser: (user: User | null) => set({ user }),
       setIsAuthenticated: (isAuthenticated: boolean) => set({ isAuthenticated }),
     }),
   { name: 'login'}
