@@ -30,15 +30,6 @@ const useStyles = createStyles((theme) => ({
   }
 }));
 
-type ImageFile = {
-  filname: string;
-  url: string;
-};
-
-const metadata = {
-  contentType: 'image/jpeg'
-};
-
 export function UploadPanel() {
   const addElement = useSetAtom(addElementAtom);
   const { classes } = useStyles();
@@ -50,40 +41,41 @@ export function UploadPanel() {
     addElement(newEl);
   };
 
-  const handleUploadImage = (file: File) => {
-    // formdata and add url to it
+  const handleUploadImage = async (file: File) => {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('image', file);
 
-    async function postSelection(url: string) {
-      try {
-        showNotification({
-          id: 'upload-image',
-          title: 'Uploading image',
-          message: 'Your image is being uploaded',
-          autoClose: false,
-          disallowClose: true
-        });
-        setLoading(true);
-        await uploadPhoto(formData);
-      } catch (err) {
-        if (err instanceof Error) {
-          setError(err);
-        }
-      } finally {
-        setLoading(false);
-        updateNotification({
-          id: 'upload-image',
-          title: 'Image uploaded',
-          message: 'Your image has been uploaded',
-          icon: <Check size={18} />,
-          autoClose: 5000,
-          disallowClose: false
-        });
-        query.refetch();
-      }
+    try {
+      showNotification({
+        title: 'Uploading Image',
+        message: 'Uploading your image...',
+        loading: true,
+        autoClose: false,
+        disallowClose: false,
+        id: 'uploading-image'
+      });
+      const _ = await uploadPhoto(formData);
+      updateNotification({
+        id: 'uploading-image',
+        title: 'Image Uploaded',
+        message: 'Your image has been uploaded!',
+        icon: <Check />,
+        autoClose: 2000
+      });
+      query.refetch();
+    } catch (error) {
+      updateNotification({
+        id: 'uploading-image',
+        title: 'Image Upload Error',
+        message: 'Error uploading your image. Please try again.',
+        icon: <X />,
+        autoClose: 2000
+      });
     }
   };
+
+  // cloudinary image url
+  const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_IMAGE_URL;
 
   return (
     <>
@@ -108,11 +100,11 @@ export function UploadPanel() {
           <Image
             key={image.id}
             className={classes.shape}
-            src={image.image}
+            src={CLOUDINARY_URL + image.image}
             onClick={() => {
               const el: CanvasElementWithPointAtoms = {
                 ...defaultImage,
-                url: image.image
+                url: CLOUDINARY_URL + image.image
               };
 
               handleAddElement(el);

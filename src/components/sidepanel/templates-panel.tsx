@@ -25,7 +25,10 @@ export function TemplatesPanel() {
 
   return (
     <SimpleGrid cols={2}>
-      <LoadingOverlay loaderProps={{ size: 'sm', color: 'pink', variant: 'bars' }} visible={true} />
+      <LoadingOverlay
+        loaderProps={{ size: 'sm', color: 'pink', variant: 'bars' }}
+        visible={false}
+      />
     </SimpleGrid>
   );
 }
