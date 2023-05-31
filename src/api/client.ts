@@ -22,8 +22,8 @@ class ApiClient implements IApiClient {
     this.instance.interceptors.request.use(
       (config: AxiosRequestConfig) => {
         const loginObject = JSON.parse(localStorage.getItem('login') || '{}');
-        console.log('interceptor', loginObject.state?.user?.token);
-        const token = loginObject.state?.user?.token;
+        console.log('interceptor', loginObject.state?.user?.key);
+        const token = loginObject.state?.user?.key;
         if (token) {
           config.headers = {
             ...config.headers,

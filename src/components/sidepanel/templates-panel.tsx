@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { getTemplates } from '@/api/template';
 import { useSetAtom } from 'jotai';
 import {
   CanvasElement,
@@ -16,7 +15,6 @@ export function TemplatesPanel() {
   const setElementAtoms = useSetAtom(elementAtomsAtom);
   const setSelectedAtoms = useSetAtom(selectedElementAtomsAtom);
   const addGroup = useSetAtom(addGroupAtom);
-  const query = useQuery(['templates'], getTemplates);
 
   const handleAddTemplate = (newEls: CanvasElement[]) => {
     const newElAtoms = newEls.map((el) => createAtom(el));
@@ -29,13 +27,8 @@ export function TemplatesPanel() {
     <SimpleGrid cols={2}>
       <LoadingOverlay
         loaderProps={{ size: 'sm', color: 'pink', variant: 'bars' }}
-        visible={query.isLoading}
+        visible={false}
       />
-      {query.data?.map((item: any) => (
-        <Box onClick={() => handleAddTemplate(deserialize(item.data.template))} key={item.id}>
-          <Image src={item.data.url} />
-        </Box>
-      ))}
     </SimpleGrid>
   );
 }

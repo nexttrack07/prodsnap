@@ -14,13 +14,13 @@ import {
   Divider,
   Checkbox,
   Anchor,
-  Stack
+  Stack,
+  Alert
 } from '@mantine/core';
 import { BrandGoogle } from 'tabler-icons-react';
 import { useNavigate } from 'react-router-dom';
 import { useLoginStore } from '@/stores';
-import { UserCredential, signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/utils/firebase';
+import { signInWithEmailAndPassword } from '@/api/user';
 
 export function GoogleButton(props: ButtonProps) {
   return (
@@ -28,12 +28,13 @@ export function GoogleButton(props: ButtonProps) {
   );
 }
 
-export type User = UserCredential | null;
+export type User = { key: string } | null;
 
 export function Login(props: PaperProps) {
   const [user, setUser] = useLoginStore((state) => [state.user, state.setUser]);
   const navigate = useNavigate();
   const [type, toggle] = useToggle(['login', 'register']);
+  const [error, setError] = React.useState<string | null>(null);
   const form = useForm({
     initialValues: {
       email: '',
@@ -56,12 +57,14 @@ export function Login(props: PaperProps) {
 
   const handleFormSubmit = () => {
     if (type === 'login') {
-      signInWithEmailAndPassword(auth, form.values.email, form.values.password).then(
-        (userCredential) => {
-          setUser(userCredential);
+      signInWithEmailAndPassword(form.values.email, form.values.password)
+        .then((res) => {
+          setUser(res.data);
           navigate('/editor');
-        }
-      );
+        })
+        .catch((err) => {
+          setError(err.message);
+        });
     }
   };
 
@@ -88,6 +91,10 @@ export function Login(props: PaperProps) {
                 onChange={(event) => form.setFieldValue('name', event.currentTarget.value)}
               />
             )}
+
+            <Alert hidden={!error} color="red">
+              {error}
+            </Alert>
 
             <TextInput
               required

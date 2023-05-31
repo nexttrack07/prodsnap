@@ -19,7 +19,6 @@ import {
   elementAtomsAtom,
   selectedElementAtomsAtom
 } from '../../components/canvas/store';
-import { getSelections } from '@/api/template';
 import { addGroupAtom } from '../toolbar';
 import { deserialize } from '@/utils';
 
@@ -80,7 +79,6 @@ export function TextPanel() {
   const setElementAtoms = useSetAtom(elementAtomsAtom);
   const setSelectedAtoms = useSetAtom(selectedElementAtomsAtom);
   const addGroup = useSetAtom(addGroupAtom);
-  const query = useQuery(['selections'], getSelections);
 
   const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
     addElement(newEl);
@@ -126,22 +124,7 @@ export function TextPanel() {
         })}
       </SimpleGrid>
       <Divider my="xl" variant="dotted" />
-      <SimpleGrid cols={2}>
-        <LoadingOverlay
-          loaderProps={{ size: 'sm', color: 'pink', variant: 'bars' }}
-          visible={query.isLoading}
-        />
-        {query.data &&
-          query.data.map((item: any) => (
-            <Box
-              style={{ cursor: 'pointer' }}
-              onClick={() => handleAddTemplate(deserialize(item.data.selection))}
-              key={item.id}
-            >
-              <Image src={item.data.url} />
-            </Box>
-          ))}
-      </SimpleGrid>
+      <SimpleGrid cols={2}></SimpleGrid>
     </>
   );
 }
