@@ -19,8 +19,8 @@ import {
 } from '@mantine/core';
 import { BrandGoogle } from 'tabler-icons-react';
 import { useNavigate } from 'react-router-dom';
-import { useLoginStore } from '@/stores';
-import { signInWithEmailAndPassword } from '@/api/user';
+import { login } from '@/api/auth';
+import { useAuthStore } from '@/stores';
 
 export function GoogleButton(props: ButtonProps) {
   return (
@@ -28,13 +28,14 @@ export function GoogleButton(props: ButtonProps) {
   );
 }
 
-export type User = { key: string } | null;
+// export type User = { key: string } | null;
 
 export function Login(props: PaperProps) {
-  const [user, setUser] = useLoginStore((state) => [state.user, state.setUser]);
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const navigate = useNavigate();
   const [type, toggle] = useToggle(['login', 'register']);
-  const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(false);
+  // const [error, setError] = React.useState<any>(null);
   const form = useForm({
     initialValues: {
       email: '',
@@ -50,21 +51,24 @@ export function Login(props: PaperProps) {
   });
 
   useEffect(() => {
-    if (user) {
+    if (isLoggedIn()) {
       navigate('/editor');
     }
   }, []);
 
-  const handleFormSubmit = () => {
+  const handleFormSubmit = async () => {
     if (type === 'login') {
-      signInWithEmailAndPassword(form.values.email, form.values.password)
-        .then((res) => {
-          setUser(res.data);
-          navigate('/editor');
-        })
-        .catch((err) => {
-          setError(err.message);
-        });
+      setLoading(true);
+      const { error } = await login(form.values.email, form.values.password);
+      setLoading(false);
+      if (error) {
+        console.log('login error', error);
+        // setError(error as any);
+      } else {
+        console.log('login success');
+        form.reset();
+        navigate('/editor');
+      }
     }
   };
 
@@ -91,10 +95,6 @@ export function Login(props: PaperProps) {
                 onChange={(event) => form.setFieldValue('name', event.currentTarget.value)}
               />
             )}
-
-            <Alert hidden={!error} color="red">
-              {error}
-            </Alert>
 
             <TextInput
               required
@@ -135,7 +135,9 @@ export function Login(props: PaperProps) {
                 ? 'Already have an account? Login'
                 : "Don't have an account? Register"}
             </Anchor>
-            <Button type="submit">{upperFirst(type)}</Button>
+            <Button loading={loading} type="submit">
+              {upperFirst(type)}
+            </Button>
           </Group>
         </form>
       </Paper>

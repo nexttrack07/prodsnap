@@ -1,16 +1,15 @@
+import { useAuthStore } from '@/stores';
 import { Navigate } from 'react-router-dom';
-import { User } from './login';
 
 type Props = {
-  user: User | null;
   redirectPath?: string;
   children: JSX.Element;
 };
 
-export function ProtectedRoute({ user, redirectPath = '/login', children }: Props) {
-  if (!user) {
-    return <Navigate to={redirectPath} replace />;
+export function ProtectedRoute({ redirectPath = '/login', children }: Props) {
+  const loggedIn = useAuthStore((state) => state.isLoggedIn)();
+  if (!loggedIn) {
+    return <Navigate to={redirectPath} />;
   }
-
   return children;
 }
