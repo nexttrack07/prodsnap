@@ -40,6 +40,8 @@ importers:
       font-picker-react: ^3.5.2
       framer-motion: ^10.8.4
       jotai: ^1.8.3
+      js-cookie: ^3.0.5
+      jwt-decode: ^3.1.2
       react: ^18.2.0
       react-beautiful-dnd: ^13.1.1
       react-contenteditable: ^3.3.7
@@ -78,6 +80,8 @@ importers:
       font-picker-react: 3.5.2_w5j4k42lgipnm43s3brx6h3c34
       framer-motion: 10.8.4_biqbaboplfbrettd7655fr4n2y
       jotai: 1.8.3_react@18.2.0
+      js-cookie: 3.0.5
+      jwt-decode: 3.1.2
       react: 18.2.0
       react-beautiful-dnd: 13.1.1_biqbaboplfbrettd7655fr4n2y
       react-contenteditable: 3.3.7_react@18.2.0
@@ -2669,6 +2673,11 @@ packages:
       react: 18.2.0
     dev: false
 
+  /js-cookie/3.0.5:
+    resolution: {integrity: sha512-cEiJEAEoIbWfCZYKWhVwFuvPX1gETRYPw6LlaTKoxD3s2AkXzkCjnp6h0V77ozyqj0jakteJ4YqDJT830+lVGw==}
+    engines: {node: '>=14'}
+    dev: false
+
   /js-sdsl/4.1.4:
     resolution: {integrity: sha512-Y2/yD55y5jteOAmY50JbUZYwk3CP3wnLPEZnlR1w9oKhITrBEtAxwuWKebFf8hMrPMgbYwFoWK/lH2sBkErELw==}
     dev: true
@@ -2721,6 +2730,10 @@ packages:
       array-includes: 3.1.5
       object.assign: 4.1.4
     dev: true
+
+  /jwt-decode/3.1.2:
+    resolution: {integrity: sha512-UfpWE/VZn0iP50d8cz9NrZLM9lSWhcJ+0Gt/nm4by88UL+J1SiKN8/5dkjMmbEzwL2CAe+67GsegCbIKtbp75A==}
+    dev: false
 
   /klona/2.0.5:
     resolution: {integrity: sha512-pJiBpiXMbt7dkzXe8Ghj/u4FfXOOa98fPW+bihOJ4SjnoijweJrNThJfd3ifXpXhREjpoF2mZVH1GfS9LV3kHQ==}
