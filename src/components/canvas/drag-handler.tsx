@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useAtomValue, useAtom, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { Draggable, Resizable, isMovingAtom, isCroppingAtom } from '@/components/canvas/store';
 import { useRef, useState } from 'react';
 import { Center, useMantineTheme } from '@mantine/core';
@@ -123,7 +123,8 @@ export function DragHandler({
             bottom: 0,
             right: 0,
             transform: 'scale(1.02)',
-            borderRadius: 3
+            borderRadius: 3,
+            zIndex: 10
           }}
         ></div>
       )}
