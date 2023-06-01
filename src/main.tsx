@@ -7,13 +7,10 @@ import ReactDOM from 'react-dom/client';
 import { Route, Routes, BrowserRouter as Router } from 'react-router-dom';
 import { Editor, Login, ProtectedRoute } from './pages';
 import './index.css';
-import { useLoginStore } from './stores';
 
 const queryClient = new QueryClient();
 
 function App() {
-  const user = useLoginStore((state) => state.user);
-
   return (
     <Routes>
       <Route path="/" element={<Login />} />
@@ -21,7 +18,7 @@ function App() {
       <Route
         path="/editor"
         element={
-          <ProtectedRoute user={user}>
+          <ProtectedRoute>
             <Editor />
           </ProtectedRoute>
         }
