@@ -32,7 +32,7 @@ export function DragHandler({
   const { width, height } = dimension;
   const [moving, setMoving] = useState(false);
   const setIsMoving = useSetAtom(isMovingAtom);
-  const isCropping = useAtomValue(isCroppingAtom);
+  // const isCropping = useAtomValue(isCroppingAtom);
   const theme = useMantineTheme();
   const lastPos = useRef({ x: 0, y: 0 });
 
