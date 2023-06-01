@@ -51,14 +51,13 @@ export function RenderText({
 
   useEffect(() => {
     if (textRef.current) {
-      console.log('setting width and height: ', element.props.fontFamily);
       setElement((el) => ({
         ...el,
         width: textRef.current!.offsetWidth,
         height: textRef.current!.offsetHeight
       }));
     }
-  }, [element.content, textRef.current, element.props.fontFamily]);
+  }, [textRef.current?.offsetWidth, textRef.current?.offsetHeight]);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
