@@ -1,10 +1,7 @@
 import React, { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
-import { MoveableElement, TextType } from './store';
-import { Box, Center, useMantineTheme } from '@mantine/core';
+import { TextType } from './store';
+import { Box } from '@mantine/core';
 import { useWindowEvent } from '@mantine/hooks';
-import clsx from 'clsx';
-import { ResizeHandler, useResizeStyles } from './resize-handler';
-import { RotateHandler } from './rotate-handler';
 
 type Status =
   | 'none'
@@ -35,8 +32,8 @@ export function RenderText({
   onSelect,
   setElement
 }: {
-  element: MoveableElement & TextType;
-  setElement: (update: SetStateAction<MoveableElement & TextType>) => void;
+  element: TextType;
+  setElement: (update: SetStateAction<TextType>) => void;
   isSelected: boolean;
   onSelect: (e: React.MouseEvent) => void;
 }) {
@@ -45,7 +42,6 @@ export function RenderText({
   const [editable, setEditable] = useState(false);
   const [status, setStatus] = useState<Status>('none');
   const lastPos = useRef({ x: 0, y: 0 });
-  const { classes } = useResizeStyles();
 
   useWindowEvent('keydown', (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
@@ -55,14 +51,14 @@ export function RenderText({
 
   useEffect(() => {
     if (textRef.current) {
-      console.log('setting width and height');
+      console.log('setting width and height: ', element.props.fontFamily);
       setElement((el) => ({
         ...el,
         width: textRef.current!.offsetWidth,
         height: textRef.current!.offsetHeight
       }));
     }
-  }, [element.content, textRef.current]);
+  }, [element.content, textRef.current, element.props.fontFamily]);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
@@ -148,7 +144,7 @@ export function RenderText({
       : 'pointer';
 
   return (
-    <Center
+    <Box
       ref={ref}
       style={{
         left: element.x,
@@ -160,6 +156,8 @@ export function RenderText({
         transform: `rotate(${element.rotation ?? 0}deg)`,
         transformOrigin: 'center center',
         outline: 'none',
+        // width: element.width,
+        // height: element.height,
         cursor,
         ...element.props
       }}
@@ -167,14 +165,14 @@ export function RenderText({
     >
       <div
         tabIndex={0}
-        onMouseDown={handleMouseDown}
-        onBlur={handleBlur}
-        contentEditable={editable}
-        suppressContentEditableWarning={true}
+        // onMouseDown={handleMouseDown}
+        // onBlur={handleBlur}
+        // contentEditable={editable}
+        // suppressContentEditableWarning={true}
         ref={textRef}
       >
         {element.content}
       </div>
-    </Center>
+    </Box>
   );
 }

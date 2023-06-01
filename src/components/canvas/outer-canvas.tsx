@@ -186,7 +186,6 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
 
   if (element.type === 'text' && element.mode === 'editing') {
     hideHandlers = true;
-    console.log('rendering text');
     return (
       <DragHandler
         position={{ x, y }}
