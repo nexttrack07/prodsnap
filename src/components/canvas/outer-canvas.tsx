@@ -20,7 +20,6 @@ import AutosizeInput from 'react-input-autosize';
 export function OuterCanvas() {
   const elementAtoms = useAtomValue(elementAtomsAtom);
   const [{ width, height }, setCanvas] = useAtom(canvasAtom);
-  // const selected = useAtomValue(selectedElementAtomsAtom);
   const unSelectAllElements = useSetAtom(unSelectAllAtom);
 
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
@@ -49,7 +48,6 @@ export function OuterCanvas() {
         sx={{
           height: height,
           width: width,
-          // backgroundColor: 'red',
           position: 'relative'
         }}
       >

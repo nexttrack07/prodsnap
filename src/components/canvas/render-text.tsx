@@ -1,35 +1,9 @@
-import React, { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
+import React, { SetStateAction, useEffect, useRef } from 'react';
 import { TextType } from './store';
 import { Box } from '@mantine/core';
-import { useWindowEvent } from '@mantine/hooks';
-
-type Status =
-  | 'none'
-  | 'rotate'
-  | 'move'
-  | 'resizing-br'
-  | 'resizing-tl'
-  | 'resizing-bl'
-  | 'resizing-tr'
-  | 'resizing-tm'
-  | 'resizing-bm'
-  | 'resizing-lm'
-  | 'resizing-rm';
-
-function selectElementContents(el: HTMLElement) {
-  var range = document.createRange();
-  range.selectNodeContents(el);
-  var sel = window.getSelection();
-  if (sel) {
-    sel.removeAllRanges();
-    sel.addRange(range);
-  }
-}
 
 export function RenderText({
   element,
-  isSelected,
-  onSelect,
   setElement
 }: {
   element: TextType;
@@ -39,15 +13,6 @@ export function RenderText({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
-  const [editable, setEditable] = useState(false);
-  const [status, setStatus] = useState<Status>('none');
-  const lastPos = useRef({ x: 0, y: 0 });
-
-  useWindowEvent('keydown', (e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      setEditable(false);
-    }
-  });
 
   useEffect(() => {
     if (textRef.current) {
@@ -59,88 +24,7 @@ export function RenderText({
     }
   }, [textRef.current?.offsetWidth, textRef.current?.offsetHeight]);
 
-  useEffect(() => {
-    function handleMouseMove(e: MouseEvent) {
-      setEditable(false);
-
-      if (status === 'move') {
-        const deltaX = e.clientX - lastPos.current.x + element.x;
-        const deltaY = e.clientY - lastPos.current.y + element.y;
-        setElement((el) => ({ ...el, x: deltaX, y: deltaY }));
-      } else if (status === 'resizing-br') {
-        const newWidth = e.clientX - lastPos.current.x + element.width;
-        const newFontSize = (newWidth / element.width) * (element.props.fontSize as number);
-        // calculate new height based on new width
-        const newHeight = (newWidth / element.width) * element.height;
-        setElement((el) => ({
-          ...el,
-          width: newWidth,
-          height: newHeight,
-          props: { ...el.props, fontSize: newFontSize }
-        }));
-      }
-    }
-
-    const handleMouseUp = (e: MouseEvent) => {
-      e.stopPropagation();
-      setStatus('none');
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [status]);
-
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      lastPos.current = { x: e.clientX, y: e.clientY };
-      setStatus('move');
-      onSelect(e);
-      if (isSelected) {
-        selectElementContents(ref.current!);
-        setEditable(true);
-      }
-    },
-    [isSelected]
-  );
-
-  const handleResizeMouseDown = (e: React.MouseEvent, stat: Status) => {
-    e.stopPropagation();
-    setStatus(stat);
-    lastPos.current = { x: e.clientX, y: e.clientY };
-  };
-
-  const handleBlur = (e: React.FocusEvent) => {
-    setElement((prev) => ({
-      ...prev,
-      content: (e.target as HTMLDivElement).innerText,
-      width: (e.target as HTMLDivElement).offsetWidth,
-      height: (e.target as HTMLDivElement).offsetHeight
-    }));
-    setEditable(false);
-  };
-
-  const handleRotate = (angle: number) => {
-    setElement((prev) => {
-      return {
-        ...prev,
-        rotation: angle
-      };
-    });
-  };
-
-  const cursor =
-    isSelected && status === 'move'
-      ? 'move'
-      : isSelected && status === 'resizing-br'
-      ? 'se-resize'
-      : isSelected && editable
-      ? 'text'
-      : 'pointer';
+  const cursor = 'pointer';
 
   return (
     <Box
@@ -155,21 +39,11 @@ export function RenderText({
         transform: `rotate(${element.rotation ?? 0}deg)`,
         transformOrigin: 'center center',
         outline: 'none',
-        // width: element.width,
-        // height: element.height,
         cursor,
         ...element.props
       }}
-      // onClick={onSelect}
     >
-      <div
-        tabIndex={0}
-        // onMouseDown={handleMouseDown}
-        // onBlur={handleBlur}
-        // contentEditable={editable}
-        // suppressContentEditableWarning={true}
-        ref={textRef}
-      >
+      <div tabIndex={0} ref={textRef}>
         {element.content}
       </div>
     </Box>
