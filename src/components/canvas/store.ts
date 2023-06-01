@@ -66,6 +66,7 @@ export type SVGGraphicType = {
 export type TextType = {
   type: 'text';
   content: string;
+  mode: 'editing' | 'normal';
   props: React.CSSProperties;
 } & MoveableElement;
 

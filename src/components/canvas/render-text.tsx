@@ -55,13 +55,14 @@ export function RenderText({
 
   useEffect(() => {
     if (textRef.current) {
+      console.log('setting width and height');
       setElement((el) => ({
         ...el,
         width: textRef.current!.offsetWidth,
         height: textRef.current!.offsetHeight
       }));
     }
-  }, []);
+  }, [element.content, textRef.current]);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
@@ -153,6 +154,7 @@ export function RenderText({
         left: element.x,
         top: element.y,
         userSelect: 'none',
+        visibility: element.mode === 'editing' ? 'hidden' : 'visible',
         position: 'absolute',
         whiteSpace: 'pre-wrap',
         transform: `rotate(${element.rotation ?? 0}deg)`,
@@ -161,8 +163,7 @@ export function RenderText({
         cursor,
         ...element.props
       }}
-      onClick={onSelect}
-      className={clsx({ [classes.borders]: isSelected })}
+      // onClick={onSelect}
     >
       <div
         tabIndex={0}
@@ -174,32 +175,6 @@ export function RenderText({
       >
         {element.content}
       </div>
-      {isSelected && (
-        <>
-          <span
-            onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-tl')}
-            className={clsx(classes.resize, classes.resize_tl)}
-          />
-          <span
-            onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-tr')}
-            className={clsx(classes.resize, classes.resize_tr)}
-          />
-          <span
-            onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-bl')}
-            className={clsx(classes.resize, classes.resize_bl)}
-          />
-          <span
-            onMouseDown={(e) => handleResizeMouseDown(e, 'resizing-br')}
-            className={clsx(classes.resize, classes.resize_br)}
-          />
-        </>
-      )}
-      <RotateHandler
-        show={isSelected}
-        dimension={{ width: element.width, height: element.height }}
-        position={{ x: element.x, y: element.y }}
-        onRotate={handleRotate}
-      />
     </Center>
   );
 }

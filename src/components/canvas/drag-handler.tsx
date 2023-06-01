@@ -47,7 +47,7 @@ export function DragHandler({
     lastPos.current = { x: e.clientX, y: e.clientY };
     setMoving(true);
     setIsMoving(true);
-    onClick && onClick(e);
+    // onClick && onClick(e);
   };
 
   useEffect(() => {
@@ -78,6 +78,11 @@ export function DragHandler({
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     // onClick && onClick(e);
+
+    // only fire the onClick if the lastPos.current is same as current e.clientX and e.clientY
+    if (lastPos.current.x === e.clientX && lastPos.current.y === e.clientY) {
+      onClick && onClick(e);
+    }
   };
 
   if (width === 0) return null;
@@ -100,7 +105,6 @@ export function DragHandler({
       onMouseDown={handleMouseDown}
       onClick={handleClick}
     >
-      {children}
       <ResizeHandler
         withBMResize={false}
         withTMResize={false}
@@ -150,6 +154,7 @@ export function DragHandler({
           }}
         ></div>
       )}
+      {children}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { Box } from '@mantine/core';
+import { Box, useMantineTheme } from '@mantine/core';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import {
   activeElementAtomAtom,
@@ -13,8 +13,9 @@ import {
   unSelectAllAtom
 } from './store';
 import { DragHandler } from './drag-handler';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { SNAP_TOLERANCE, calculatePosition, useShiftKeyPressed } from '@/utils';
+import AutosizeInput from 'react-input-autosize';
 
 export function OuterCanvas() {
   const elementAtoms = useAtomValue(elementAtomsAtom);
@@ -30,6 +31,7 @@ export function OuterCanvas() {
 
   return (
     <Box
+      id="outer-canvas-container"
       onMouseDown={handleCanvasMouseDown}
       sx={{
         position: 'absolute',
@@ -43,6 +45,7 @@ export function OuterCanvas() {
       }}
     >
       <Box
+        id="outer-canvas"
         sx={{
           height: height,
           width: width,
@@ -66,6 +69,18 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
   const isGrouped = useAtomValue(isGroupedAtom(element));
   const isShiftPressed = useShiftKeyPressed();
   const setActiveElementAtom = useSetAtom(activeElementAtomAtom);
+  const isSelected = selectedElementAtoms.includes(elementAtom);
+  const theme = useMantineTheme();
+  const textRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isSelected && element.type === 'text') {
+      setElement((el) => ({
+        ...el,
+        mode: 'normal'
+      }));
+    }
+  }, [isSelected, element.type]);
 
   const handleMouseMove = useCallback(
     (p: Draggable) => {
@@ -90,13 +105,22 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
       }
       return isShiftPressed ? selectedItems.concat(elementAtom) : [elementAtom];
     });
+
+    if (element.type === 'text' && isSelected) {
+      setElement((prev) => {
+        return {
+          ...prev,
+          mode: 'editing'
+        };
+      });
+    }
   };
 
   const handleRotate = (angle: number) => {
     setElement((prev) => {
       return {
         ...prev,
-        rotation: angle // + (prev.rotation ?? 0)
+        rotation: angle
       };
     });
   };
@@ -130,17 +154,86 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
         newHeight = canvasProps.height - newY;
       }
 
-      return {
+      let newEl = {
         ...prev,
         x: newX,
         y: newY,
         width: newWidth,
         height: newHeight
       };
+
+      if (element.type === 'text') {
+        const newHeight = (newWidth / element.width) * element.height;
+        const newFontSize = (newWidth / element.width) * (element.props.fontSize as number);
+
+        newEl = {
+          ...newEl,
+          height: newHeight,
+          props: {
+            ...(newEl as any).props,
+            fontSize: newFontSize
+          }
+        } as any;
+      }
+
+      return newEl;
     });
   };
 
   const { x, y, width, height, rotation = 0 } = element;
+
+  let hideHandlers = !isSelected && !isGrouped;
+
+  if (element.type === 'text' && element.mode === 'editing') {
+    hideHandlers = true;
+    console.log('rendering text');
+    return (
+      <DragHandler
+        position={{ x, y }}
+        rotation={rotation}
+        dimension={{ width, height }}
+        onClick={handleSelectElement}
+        onMove={handleMouseMove}
+        hide={hideHandlers}
+        onRotate={handleRotate}
+        onResize={handleResize}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            visibility: 'hidden',
+            width: element.width,
+            height: element.height
+          }}
+          ref={textRef}
+        >
+          {element.content}
+        </div>
+        <AutosizeInput
+          inputStyle={{
+            // remove all input styles
+            border: `1px solid ${theme.colors.gray[9]}`,
+            outline: 'none',
+            background: 'none',
+            padding: 0,
+            resize: 'none',
+            ...element.props
+          }}
+          type="text"
+          value={element.content}
+          onChange={(e) => {
+            setElement((prev) => {
+              return {
+                ...prev,
+                content: e.target.value
+              };
+            });
+          }}
+        />
+      </DragHandler>
+    );
+  }
+
   return (
     <DragHandler
       position={{ x, y }}
@@ -148,7 +241,7 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
       dimension={{ width, height }}
       onClick={handleSelectElement}
       onMove={handleMouseMove}
-      hide={!(selectedElementAtoms.includes(elementAtom) && !isGrouped)}
+      hide={hideHandlers}
       onRotate={handleRotate}
       onResize={handleResize}
     ></DragHandler>
