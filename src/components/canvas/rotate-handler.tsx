@@ -22,8 +22,9 @@ export function RotateHandler({ dimension, position, onRotate, show = true }: Pr
       // it is 0.5 * width of the element
       top: -Math.min(Math.max(40, 0.5 * dimension.width), 80),
       left: '50%',
-      width: 15,
-      height: 15,
+      width: 16,
+      height: 16,
+      color: theme.colors.gray[9],
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -33,7 +34,8 @@ export function RotateHandler({ dimension, position, onRotate, show = true }: Pr
       borderRadius: '50%',
       backgroundColor: theme.colors.gray[0],
       '&:hover': {
-        filter: 'drop-shadow(0 0 3px rgba(0, 0, 0, 0.5))'
+        backgroundColor: theme.colors.gray[9],
+        color: theme.colors.gray[0]
       }
     }
   }));
@@ -100,7 +102,7 @@ export function RotateHandler({ dimension, position, onRotate, show = true }: Pr
       onMouseDown={handleRotateMouseDown}
       className={classes.rotateHandler}
     >
-      <Rotate color={theme.colors.gray[6]} size={12} />
+      <Rotate color="currentColor" size={12} />
     </div>
   );
 }

@@ -12,7 +12,8 @@ export const useResizeStyles = createStyles((theme) => ({
     height: 12,
     position: 'absolute',
     '&:hover': {
-      filter: 'drop-shadow(0 0 3px rgba(0, 0, 0, 0.5))'
+      // filter: 'drop-shadow(0 0 3px rgba(0, 0, 0, 0.5))'
+      backgroundColor: theme.colors.gray[9]
     }
   },
   resize_br: {
@@ -76,7 +77,7 @@ export const useResizeStyles = createStyles((theme) => ({
     transform: `translate(50%, -50%)`
   },
   borders: {
-    border: `1px solid ${theme.colors.gray[5]}`
+    border: `2px solid ${theme.colors.gray[7]}`
   }
 }));
 
