@@ -1,4 +1,5 @@
 import { atom, WritableAtom } from 'jotai';
+import { atomFamily } from 'jotai/utils';
 import React, { SetStateAction, SVGAttributes } from 'react';
 
 export type Action<T> = SetStateAction<T>;
@@ -372,4 +373,20 @@ export const imageBorderAtom = atom(
     console.log('border: ', border);
     set(selectedImageAtom, { ...image, border: { ...image.border, ...border } });
   }
+);
+
+export const groupFromElementAtom = atomFamily((element: CanvasElementWithPointAtoms) =>
+  atom((get) => {
+    if (!element.group) return null;
+
+    const groupsById = get(groupsByIdAtom);
+    return groupsById[element.group];
+  })
+);
+
+export const isGroupedAtom = atomFamily((element: CanvasElementWithPointAtoms) =>
+  atom((get) => {
+    const group = get(groupFromElementAtom(element));
+    return !!group;
+  })
 );

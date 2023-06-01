@@ -93,58 +93,40 @@ export function RenderPath({ element, isGrouped, onSelect, setElement, isSelecte
 
   const pathData = scalePathData(element.path.d!, width, height, strokeWidth);
 
-  const handleRotate = (angle: number) => {
-    setElement((prev) => {
-      return {
-        ...prev,
-        rotation: angle // + (prev.rotation ?? 0)
-      };
-    });
-  };
-
-  const show = isSelected && !isGrouped;
-
   return (
-    <DragHandler
-      onClick={handleClick}
-      position={{ x, y }}
-      rotation={rotation}
-      dimension={{ width, height }}
-      onMove={handleMouseMove}
-      hide={!show}
+    <svg
+      opacity={element.opacity}
+      style={{
+        position: 'absolute',
+        left: x,
+        top: y,
+        width,
+        height,
+        transform: `rotate(${rotation}deg)`,
+        transformOrigin: 'center center'
+      }}
+      viewBox={`${-strokeWidth} ${-strokeWidth} ${width + strokeWidth}, ${height + strokeWidth}`}
     >
-      <svg
-        opacity={element.opacity}
-        viewBox={`${-strokeWidth} ${-strokeWidth} ${width + strokeWidth}, ${height + strokeWidth}`}
-      >
-        <clipPath id={element.strokeProps.clipPathId}>
-          <path
-            d={pathData}
-            vectorEffect="non-scaling-stroke"
-            stroke="transparent"
-            strokeWidth={element.strokeProps.strokeWidth}
-          />
-        </clipPath>
+      <clipPath id={element.strokeProps.clipPathId}>
         <path
           d={pathData}
-          stroke={element.strokeProps.stroke}
-          strokeWidth={element.strokeProps.strokeWidth}
-          strokeLinecap={element.strokeProps.strokeLinecap}
-          strokeDasharray={element.strokeProps.strokeDasharray}
-          strokeMiterlimit={element.strokeProps.strokeWidth * 2}
-          clipPath={element.strokeProps.clipPathId}
-          fill={element.props.fill}
           vectorEffect="non-scaling-stroke"
+          stroke="transparent"
+          strokeWidth={element.strokeProps.strokeWidth}
         />
-      </svg>
-      <ResizeHandler show={show} dimension={{ width, height }} onResize={handleResize} />
-      <RotateHandler
-        show={show}
-        dimension={{ width, height }}
-        position={{ x, y }}
-        onRotate={handleRotate}
+      </clipPath>
+      <path
+        d={pathData}
+        stroke={element.strokeProps.stroke}
+        strokeWidth={element.strokeProps.strokeWidth}
+        strokeLinecap={element.strokeProps.strokeLinecap}
+        strokeDasharray={element.strokeProps.strokeDasharray}
+        strokeMiterlimit={element.strokeProps.strokeWidth * 2}
+        clipPath={element.strokeProps.clipPathId}
+        fill={element.props.fill}
+        vectorEffect="non-scaling-stroke"
       />
-    </DragHandler>
+    </svg>
   );
 }
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Resizable } from './store';
-import { createStyles, useMantineTheme } from '@mantine/core';
+import { createStyles } from '@mantine/core';
 import { Rotate } from 'tabler-icons-react';
 
 type Props = {
@@ -13,14 +13,13 @@ type Props = {
 export function RotateHandler({ dimension, position, onRotate, show = true }: Props) {
   const [isActive, setIsActive] = useState(false);
   const [canvasPosition, setCanvasPosition] = useState({ x: 0, y: 0 });
-  const theme = useMantineTheme();
 
   const useStyles = createStyles((theme) => ({
     rotateHandler: {
       position: 'absolute',
       // position it in the top, the distance should be min of -40px and max of -80px and by default
       // it is 0.5 * width of the element
-      top: -Math.min(Math.max(40, 0.5 * dimension.width), 80),
+      top: -Math.min(Math.max(20, 0.5 * dimension.width), 40),
       left: '50%',
       width: 16,
       height: 16,

@@ -4,6 +4,8 @@ import { Draggable, Resizable, isMovingAtom, isCroppingAtom } from '@/components
 import { useRef, useState } from 'react';
 import { Center, useMantineTheme } from '@mantine/core';
 import { ArrowsMove } from 'tabler-icons-react';
+import { ResizeHandler } from './resize-handler';
+import { RotateHandler } from './rotate-handler';
 
 type Props = {
   dimension: Resizable;
@@ -15,6 +17,8 @@ type Props = {
   withMoveHandle?: boolean;
   withBorders?: boolean;
   hide?: boolean;
+  onResize?: (p: Resizable & Draggable) => void;
+  onRotate?: (p: number) => void;
 };
 
 export function DragHandler({
@@ -26,6 +30,8 @@ export function DragHandler({
   children,
   hide = false,
   withMoveHandle = false,
+  onResize = () => {},
+  onRotate = () => {},
   withBorders = false
 }: Props) {
   const { x, y } = position;
@@ -39,8 +45,9 @@ export function DragHandler({
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
     lastPos.current = { x: e.clientX, y: e.clientY };
-    setMoving(true && !hide);
+    setMoving(true);
     setIsMoving(true);
+    onClick && onClick(e);
   };
 
   useEffect(() => {
@@ -70,7 +77,7 @@ export function DragHandler({
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onClick && onClick(e);
+    // onClick && onClick(e);
   };
 
   if (width === 0) return null;
@@ -94,6 +101,21 @@ export function DragHandler({
       onClick={handleClick}
     >
       {children}
+      <ResizeHandler
+        withBMResize={false}
+        withTMResize={false}
+        withLMResize={false}
+        withRMResize={false}
+        show={!hide}
+        dimension={dimension}
+        onResize={onResize}
+      />
+      <RotateHandler
+        show={!hide}
+        dimension={{ width, height }}
+        onRotate={onRotate}
+        position={{ x, y }}
+      />
       {withMoveHandle && (
         <Center
           onMouseDown={handleMouseDown}
