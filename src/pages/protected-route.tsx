@@ -1,5 +1,9 @@
+import { getRefreshToken, setAuthUser } from '@/api/auth';
 import { useAuthStore } from '@/stores';
-import { Navigate } from 'react-router-dom';
+import { LoadingOverlay } from '@mantine/core';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 type Props = {
   redirectPath?: string;
@@ -8,8 +12,30 @@ type Props = {
 
 export function ProtectedRoute({ redirectPath = '/login', children }: Props) {
   const loggedIn = useAuthStore((state) => state.isLoggedIn)();
-  if (!loggedIn) {
-    return <Navigate to={redirectPath} />;
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    async function checkLogin() {
+      try {
+        const { refresh, access } = await getRefreshToken();
+        setAuthUser(access, refresh);
+        navigate('/editor');
+      } catch (e) {
+        console.log('refresh error', e);
+      }
+    }
+
+    if (!loggedIn) {
+      const refreshToken = Cookies.get('refresh_token');
+      refreshToken && checkLogin();
+    } else {
+      navigate('/editor');
+    }
+  }, []);
+
+  if (loading) {
+    return <LoadingOverlay visible />;
   }
   return children;
 }

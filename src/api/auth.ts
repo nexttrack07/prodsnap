@@ -69,7 +69,7 @@ export const getRefreshToken = async (refresh_token?: string) => {
   if (!refresh_token) {
     refresh_token = Cookies.get('refresh_token') ?? '';
   }
-  const response = await axios.post<LoginResponse>(BASE_URL + 'token/refresh/', {
+  const response = await axios.post<LoginResponse>(BASE_URL + '/auth/token/refresh/', {
       refresh: refresh_token,
   });
   return response.data;
