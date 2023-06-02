@@ -28,14 +28,11 @@ export function GoogleButton(props: ButtonProps) {
   );
 }
 
-// export type User = { key: string } | null;
-
 export function Login(props: PaperProps) {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const navigate = useNavigate();
   const [type, toggle] = useToggle(['login', 'register']);
   const [loading, setLoading] = React.useState(false);
-  // const [error, setError] = React.useState<any>(null);
   const form = useForm({
     initialValues: {
       email: '',
