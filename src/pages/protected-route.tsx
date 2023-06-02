@@ -18,11 +18,14 @@ export function ProtectedRoute({ redirectPath = '/login', children }: Props) {
   useEffect(() => {
     async function checkLogin() {
       try {
+        setLoading(true);
         const { refresh, access } = await getRefreshToken();
         setAuthUser(access, refresh);
         navigate('/editor');
       } catch (e) {
         console.log('refresh error', e);
+      } finally {
+        setLoading(false);
       }
     }
 

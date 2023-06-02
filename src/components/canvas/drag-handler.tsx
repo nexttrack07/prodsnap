@@ -4,6 +4,8 @@ import { Draggable, Resizable, isMovingAtom, isCroppingAtom } from '@/components
 import { useRef, useState } from 'react';
 import { Center, useMantineTheme } from '@mantine/core';
 import { ArrowsMove } from 'tabler-icons-react';
+import { ResizeHandler } from './resize-handler';
+import { RotateHandler } from './rotate-handler';
 
 type Props = {
   dimension: Resizable;
@@ -15,6 +17,8 @@ type Props = {
   withMoveHandle?: boolean;
   withBorders?: boolean;
   hide?: boolean;
+  onResize?: (p: Resizable & Draggable) => void;
+  onRotate?: (p: number) => void;
 };
 
 export function DragHandler({
@@ -26,21 +30,24 @@ export function DragHandler({
   children,
   hide = false,
   withMoveHandle = false,
+  onResize = () => {},
+  onRotate = () => {},
   withBorders = false
 }: Props) {
   const { x, y } = position;
   const { width, height } = dimension;
   const [moving, setMoving] = useState(false);
   const setIsMoving = useSetAtom(isMovingAtom);
-  const isCropping = useAtomValue(isCroppingAtom);
+  // const isCropping = useAtomValue(isCroppingAtom);
   const theme = useMantineTheme();
   const lastPos = useRef({ x: 0, y: 0 });
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
     lastPos.current = { x: e.clientX, y: e.clientY };
-    setMoving(true && !hide);
+    setMoving(true);
     setIsMoving(true);
+    // onClick && onClick(e);
   };
 
   useEffect(() => {
@@ -70,7 +77,12 @@ export function DragHandler({
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onClick && onClick(e);
+    // onClick && onClick(e);
+
+    // only fire the onClick if the lastPos.current is same as current e.clientX and e.clientY
+    if (lastPos.current.x === e.clientX && lastPos.current.y === e.clientY) {
+      onClick && onClick(e);
+    }
   };
 
   if (width === 0) return null;
@@ -93,7 +105,21 @@ export function DragHandler({
       onMouseDown={handleMouseDown}
       onClick={handleClick}
     >
-      {children}
+      <ResizeHandler
+        withBMResize={false}
+        withTMResize={false}
+        withLMResize={false}
+        withRMResize={false}
+        show={!hide}
+        dimension={dimension}
+        onResize={onResize}
+      />
+      <RotateHandler
+        show={!hide}
+        dimension={{ width, height }}
+        onRotate={onRotate}
+        position={{ x, y }}
+      />
       {withMoveHandle && (
         <Center
           onMouseDown={handleMouseDown}
@@ -128,6 +154,7 @@ export function DragHandler({
           }}
         ></div>
       )}
+      {children}
     </div>
   );
 }

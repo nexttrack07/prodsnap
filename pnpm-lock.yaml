@@ -21,6 +21,7 @@ importers:
       '@types/react': ^18.0.17
       '@types/react-beautiful-dnd': ^13.1.4
       '@types/react-dom': ^18.0.6
+      '@types/react-input-autosize': ^2.2.1
       '@types/react-textfit': ^1.1.0
       '@typescript-eslint/eslint-plugin': ^5.37.0
       '@typescript-eslint/parser': ^5.37.0
@@ -50,6 +51,7 @@ importers:
       react-dom: ^18.2.0
       react-icons: ^4.8.0
       react-image-crop: ^10.0.7
+      react-input-autosize: ^3.0.0
       react-router-dom: ^6.4.0
       recoil: ^0.7.6
       simple-zustand-devtools: ^1.1.0
@@ -91,6 +93,7 @@ importers:
       react-dom: 18.2.0_react@18.2.0
       react-icons: 4.8.0_react@18.2.0
       react-image-crop: 10.0.7_react@18.2.0
+      react-input-autosize: 3.0.0_react@18.2.0
       react-router-dom: 6.4.0_biqbaboplfbrettd7655fr4n2y
       recoil: 0.7.6_biqbaboplfbrettd7655fr4n2y
       tabler-icons-react: 1.56.0_react@18.2.0
@@ -101,6 +104,7 @@ importers:
       '@types/js-cookie': 3.0.3
       '@types/react': 18.0.20
       '@types/react-dom': 18.0.6
+      '@types/react-input-autosize': 2.2.1
       '@types/react-textfit': 1.1.0
       '@typescript-eslint/eslint-plugin': 5.37.0_22c5fnooleyfkzrkkgdmel5kmi
       '@typescript-eslint/parser': 5.37.0_irgkl5vooow2ydyo6aokmferha
@@ -1040,6 +1044,12 @@ packages:
 
   /@types/react-dom/18.0.6:
     resolution: {integrity: sha512-/5OFZgfIPSwy+YuIBP/FgJnQnsxhZhjjrnxudMddeblOouIodEQ75X14Rr4wGSG/bknL+Omy9iWlLo1u/9GzAA==}
+    dependencies:
+      '@types/react': 18.0.20
+    dev: true
+
+  /@types/react-input-autosize/2.2.1:
+    resolution: {integrity: sha512-RxzEjd4gbLAAdLQ92Q68/AC+TfsAKTc4evsArUH1aIShIMqQMIMjsxoSnwyjtbFTO/AGIW/RQI94XSdvOxCz/w==}
     dependencies:
       '@types/react': 18.0.20
     dev: true
@@ -3125,6 +3135,15 @@ packages:
       react: '>=16.13.1'
     dependencies:
       clsx: 1.2.1
+      react: 18.2.0
+    dev: false
+
+  /react-input-autosize/3.0.0_react@18.2.0:
+    resolution: {integrity: sha512-nL9uS7jEs/zu8sqwFE5MAPx6pPkNAriACQ2rGLlqmKr2sPGtN7TXTyDdQt4lbNXVx7Uzadb40x8qotIuru6Rhg==}
+    peerDependencies:
+      react: ^16.3.0 || ^17.0.0
+    dependencies:
+      prop-types: 15.8.1
       react: 18.2.0
     dev: false
 

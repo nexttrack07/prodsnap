@@ -32,7 +32,13 @@ class ApiClient implements IApiClient {
         const accessToken = Cookies.get('access_token');
         const refreshToken = Cookies.get('refresh_token');
 
-        if (accessToken && !isAccessTokenExpired(accessToken)) return config;
+        if (accessToken && !isAccessTokenExpired(accessToken)) return {
+          ...config,
+          headers: {
+            ...config.headers,
+            Authorization: `Bearer ${accessToken}`
+          }
+        };
 
         const res = await getRefreshToken(refreshToken);
         setAuthUser(res.access, res.refresh);

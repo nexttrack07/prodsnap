@@ -1,16 +1,5 @@
-import {
-  Text,
-  Space,
-  SimpleGrid,
-  Divider,
-  useMantineTheme,
-  LoadingOverlay,
-  Box,
-  Image
-} from '@mantine/core';
-import { useQuery } from '@tanstack/react-query';
+import { Text, Space, SimpleGrid, Divider, useMantineTheme } from '@mantine/core';
 import { useSetAtom } from 'jotai';
-import React from 'react';
 import {
   addElementAtom,
   CanvasElement,
@@ -20,7 +9,6 @@ import {
   selectedElementAtomsAtom
 } from '../../components/canvas/store';
 import { addGroupAtom } from '../toolbar';
-import { deserialize } from '@/utils';
 
 const elementData: {
   id: number;
@@ -34,9 +22,11 @@ const elementData: {
       type: 'text' as const,
       width: 300,
       height: 50,
+      mode: 'normal',
       content: 'Heading',
       props: {
         fontSize: 50,
+        fontFamily: 'Open Sans',
         color: '#000'
       }
     }
@@ -46,12 +36,14 @@ const elementData: {
     data: {
       x: 200,
       y: 100,
+      mode: 'normal',
       type: 'text' as const,
       width: 300,
       height: 50,
       content: 'Subheading',
       props: {
         fontSize: 30,
+        fontFamily: 'Open Sans',
         color: '#000'
       }
     }
@@ -60,6 +52,7 @@ const elementData: {
     id: 2,
     data: {
       x: 200,
+      mode: 'normal',
       y: 100,
       type: 'text' as const,
       width: 300,
@@ -67,6 +60,7 @@ const elementData: {
       content: 'A little bit of text',
       props: {
         fontSize: 20,
+        fontFamily: 'Open Sans',
         color: '#000'
       }
     }

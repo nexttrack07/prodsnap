@@ -187,6 +187,7 @@ export function ResizeHandler({
 
   return (
     <div
+      id="resize-handler"
       style={{
         position: 'absolute',
         top: 0,

@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 import { atom, SetStateAction, useAtomValue, useSetAtom } from 'jotai';
@@ -7,42 +7,36 @@ import {
   ImageState,
   ImageType,
   MoveableElement,
-  Resizable,
-  Draggable,
   canvasAtom,
   circleCropAtom
 } from '../store';
-import { calculatePosition, getImageDimensions, SNAP_TOLERANCE, uuid } from '../../../utils';
+import { getImageDimensions, uuid } from '../../../utils';
 import { Box, LoadingOverlay } from '@mantine/core';
 import 'react-image-crop/dist/ReactCrop.css';
-import { ResizeHandler } from '../resize-handler';
-import { DragHandler } from '../drag-handler';
 import { RenderBorder } from './render-border';
-import { RotateHandler } from '../rotate-handler';
 
 export const cropperAtom = atom<Cropper | null>(null);
 
-type Status = 'none' | 'rotate' | 'move' | 'resize-br' | 'resize-tl' | 'resize-bl' | 'resize-tr';
-
 export function RenderImage({
   element,
-  setElement,
-  onSelect,
-  isSelected
+  setElement
 }: {
-  element: MoveableElement & ImageType;
+  element: ImageType;
   setElement: (update: SetStateAction<CanvasElement>) => void;
   isSelected: boolean;
   onSelect: (e: React.MouseEvent) => void;
 }) {
   const canvasProps = useAtomValue(canvasAtom);
-
   useEffect(() => {
     async function setImageDimensions(src: string) {
       setElement((el) => ({ ...el, state: ImageState.Loading }));
 
       try {
-        const { width, height } = await getImageDimensions(src);
+        const { width, height } = await getImageDimensions(
+          src,
+          canvasProps.width - 200,
+          canvasProps.height - 200
+        );
         setElement((el) => ({
           ...el,
           width,
@@ -59,56 +53,12 @@ export function RenderImage({
     }
   }, [element.type]);
 
-  const handleResize = ({ x, y, width, height }: Draggable & Resizable) => {
-    setElement((prev) => {
-      let newX = prev.x + x;
-      let newY = prev.y + y;
-      let newWidth = prev.width + width;
-      let newHeight = prev.height + height;
-
-      return {
-        ...prev,
-        x: newX,
-        y: newY,
-        width: newWidth,
-        height: newHeight
-      };
-    });
-  };
-
-  const handleMouseMove = useCallback(
-    (p: Draggable) => {
-      setElement((el) => {
-        return {
-          ...el,
-          x: calculatePosition(el.x, p.x, el.width, canvasProps.width, SNAP_TOLERANCE),
-          y: calculatePosition(el.y, p.y, el.height, canvasProps.height, SNAP_TOLERANCE)
-        };
-      });
-    },
-    [setElement]
-  );
-
-  const handleClick = (e: React.MouseEvent) => {
-    onSelect(e);
-  };
-
-  const handleRotate = (rotation: number) => {
-    setElement((el) => ({ ...el, rotation }));
-  };
-
   const { width, height, rotation, x, y } = element;
   const id = uuid();
   const s = element.border.strokeWidth;
 
   return (
-    <DragHandler
-      position={{ x, y }}
-      dimension={{ width, height }}
-      rotation={rotation}
-      onMove={handleMouseMove}
-      onClick={handleClick}
-    >
+    <>
       {element.state === ImageState.Loading && (
         <div style={{ width, height, border: '1px solid rgba(0,0,0,.2)', borderRadius: 5 }}>
           <LoadingOverlay visible overlayOpacity={0.1} overlayColor="black" />
@@ -120,7 +70,15 @@ export function RenderImage({
             x="0"
             y="0"
             xmlSpace="preserve"
-            style={{ position: 'absolute' }}
+            style={{
+              position: 'absolute',
+              left: x,
+              top: y,
+              width,
+              height,
+              transform: `rotate(${rotation}deg)`,
+              transformOrigin: 'center center'
+            }}
             enableBackground={`new ${-s} ${-s} ${width + s * 2} ${height + s * 2}`}
           >
             <defs>
@@ -129,7 +87,18 @@ export function RenderImage({
               </clipPath>
             </defs>
           </svg>
-          <svg viewBox={`${-s} ${-s} ${width + s * 2} ${height + s * 2}`}>
+          <svg
+            style={{
+              position: 'absolute',
+              left: x,
+              top: y,
+              width,
+              height,
+              transform: `rotate(${rotation}deg)`,
+              transformOrigin: 'center center'
+            }}
+            viewBox={`${-s} ${-s} ${width + s * 2} ${height + s * 2}`}
+          >
             <image
               clipPath={id}
               preserveAspectRatio="xMidYMid slice"
@@ -139,25 +108,10 @@ export function RenderImage({
             />
             <use href={`#${element.border.id}-${id}`} />
           </svg>
-          <ResizeHandler
-            withBMResize={false}
-            withTMResize={false}
-            withLMResize={false}
-            withRMResize={false}
-            show={isSelected}
-            dimension={{ width, height }}
-            onResize={handleResize}
-          />
-          <RotateHandler
-            show={isSelected}
-            dimension={{ width, height }}
-            onRotate={handleRotate}
-            position={{ x, y }}
-          />
         </>
       )}
       {element.state === ImageState.Cropping && <CropImage element={element} />}
-    </DragHandler>
+    </>
   );
 }
 

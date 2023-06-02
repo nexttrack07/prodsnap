@@ -1,4 +1,5 @@
 import { atom, WritableAtom } from 'jotai';
+import { atomFamily } from 'jotai/utils';
 import React, { SetStateAction, SVGAttributes } from 'react';
 
 export type Action<T> = SetStateAction<T>;
@@ -65,6 +66,7 @@ export type SVGGraphicType = {
 export type TextType = {
   type: 'text';
   content: string;
+  mode: 'editing' | 'normal';
   props: React.CSSProperties;
 } & MoveableElement;
 
@@ -111,8 +113,8 @@ export function getDefaultMoveable(props?: Partial<MoveableElement>) {
 export const defaultImage: ImageType & MoveableElement = {
   type: 'image',
   url: '',
-  x: 100,
-  y: 200,
+  x: 10,
+  y: 20,
   state: ImageState.Normal,
   width: 400,
   height: 400,
@@ -372,4 +374,20 @@ export const imageBorderAtom = atom(
     console.log('border: ', border);
     set(selectedImageAtom, { ...image, border: { ...image.border, ...border } });
   }
+);
+
+export const groupFromElementAtom = atomFamily((element: CanvasElementWithPointAtoms) =>
+  atom((get) => {
+    if (!element.group) return null;
+
+    const groupsById = get(groupsByIdAtom);
+    return groupsById[element.group];
+  })
+);
+
+export const isGroupedAtom = atomFamily((element: CanvasElementWithPointAtoms) =>
+  atom((get) => {
+    const group = get(groupFromElementAtom(element));
+    return !!group;
+  })
 );

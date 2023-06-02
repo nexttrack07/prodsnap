@@ -7,19 +7,18 @@ import {
   CanvasElementWithPointAtoms,
   elementAtomsAtom,
   ElementType,
+  groupFromElementAtom,
   groupsByIdAtom,
-  isMovingAtom,
+  isGroupedAtom,
   selectedElementAtomsAtom,
-  unSelectAllAtom,
-  activeElementAtom
+  unSelectAllAtom
 } from './store';
 import { RenderImage } from './render-image/render-image';
 import { RenderText } from './render-text';
 import { RenderPath } from './render-path';
 import { RenderCurve } from './render-curve';
-import { RenderGuide } from './render-guides';
+// import { RenderGuide } from './render-guides';
 import { useShiftKeyPressed } from '../../utils';
-import { atomFamily } from 'jotai/utils';
 import { MultipleSelect } from './multiple-select';
 import { RenderGraphic } from './render-graphic';
 
@@ -28,8 +27,6 @@ export function Canvas() {
   const unSelectAllElements = useSetAtom(unSelectAllAtom);
   const [{ width, height, backgroundColor }, setCanvas] = useAtom(canvasAtom);
   const selected = useAtomValue(selectedElementAtomsAtom);
-
-  console.log('Elements: ', elementAtoms);
 
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -69,22 +66,6 @@ export const elementCompMap: Record<CanvasElementWithPointAtoms['type'], React.F
   'svg-curve': RenderCurve,
   'svg-graphic': RenderGraphic
 };
-
-const groupFromElementAtom = atomFamily((element: CanvasElementWithPointAtoms) =>
-  atom((get) => {
-    if (!element.group) return null;
-
-    const groupsById = get(groupsByIdAtom);
-    return groupsById[element.group];
-  })
-);
-
-const isGroupedAtom = atomFamily((element: CanvasElementWithPointAtoms) =>
-  atom((get) => {
-    const group = get(groupFromElementAtom(element));
-    return !!group;
-  })
-);
 
 export function Element({ elementAtom }: { elementAtom: ElementType }) {
   const [element, setElement] = useAtom(elementAtom);

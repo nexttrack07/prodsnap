@@ -1,17 +1,6 @@
-import React, { useCallback } from 'react';
-import { SetStateAction, useAtomValue } from 'jotai';
-import {
-  canvasAtom,
-  CanvasElement,
-  Draggable,
-  MoveableElement,
-  Resizable,
-  SVGPathType
-} from '@/components/canvas/store';
-import { DragHandler } from './drag-handler';
-import { ResizeHandler } from './resize-handler';
-import { calculatePosition, SNAP_TOLERANCE } from '@/utils';
-import { RotateHandler } from './rotate-handler';
+import React from 'react';
+import { SetStateAction } from 'jotai';
+import { CanvasElement, MoveableElement, SVGPathType } from '@/components/canvas/store';
 
 type SVGCanvasElement = MoveableElement & SVGPathType;
 
@@ -23,7 +12,7 @@ type Props = {
   setElement: (update: SetStateAction<CanvasElement>) => void;
 };
 
-export function RenderPath({ element, isGrouped, onSelect, setElement, isSelected }: Props) {
+export function RenderPath({ element }: Props) {
   const {
     x,
     y,
@@ -32,119 +21,42 @@ export function RenderPath({ element, isGrouped, onSelect, setElement, isSelecte
     strokeProps: { strokeWidth },
     rotation = 0
   } = element;
-  const canvasProps = useAtomValue(canvasAtom);
-
-  const handleMouseMove = useCallback(
-    (p: Draggable) => {
-      setElement((el) => {
-        return {
-          ...el,
-          x: calculatePosition(el.x, p.x, el.width, canvasProps.width, SNAP_TOLERANCE),
-          y: calculatePosition(el.y, p.y, el.height, canvasProps.height, SNAP_TOLERANCE)
-        };
-      });
-    },
-    [setElement]
-  );
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onSelect(e);
-  };
-
-  const handleResize = ({ x, y, width, height }: Draggable & Resizable) => {
-    setElement((prev) => {
-      let newX = prev.x + x;
-      let newY = prev.y + y;
-      let newWidth = prev.width + width;
-      let newHeight = prev.height + height;
-
-      if (newX > -SNAP_TOLERANCE && newX < SNAP_TOLERANCE) {
-        newX = 0;
-      }
-
-      if (newY > -SNAP_TOLERANCE && newY < SNAP_TOLERANCE) {
-        newY = 0;
-      }
-
-      if (
-        newX + newWidth > canvasProps.width - SNAP_TOLERANCE &&
-        newX + newWidth < canvasProps.width + SNAP_TOLERANCE
-      ) {
-        newWidth = canvasProps.width - newX;
-      }
-
-      if (
-        newY + newHeight > canvasProps.height - SNAP_TOLERANCE &&
-        newY + newHeight < canvasProps.height + SNAP_TOLERANCE
-      ) {
-        newHeight = canvasProps.height - newY;
-      }
-
-      return {
-        ...prev,
-        x: newX,
-        y: newY,
-        width: newWidth,
-        height: newHeight
-      };
-    });
-  };
-
   const pathData = scalePathData(element.path.d!, width, height, strokeWidth);
 
-  const handleRotate = (angle: number) => {
-    setElement((prev) => {
-      return {
-        ...prev,
-        rotation: angle // + (prev.rotation ?? 0)
-      };
-    });
-  };
-
-  const show = isSelected && !isGrouped;
-
   return (
-    <DragHandler
-      onClick={handleClick}
-      position={{ x, y }}
-      rotation={rotation}
-      dimension={{ width, height }}
-      onMove={handleMouseMove}
-      hide={!show}
+    <svg
+      opacity={element.opacity}
+      style={{
+        position: 'absolute',
+        left: x,
+        top: y,
+        width,
+        height,
+        transform: `rotate(${rotation}deg)`,
+        transformOrigin: 'center center'
+      }}
+      viewBox={`${-strokeWidth} ${-strokeWidth} ${width + strokeWidth}, ${height + strokeWidth}`}
     >
-      <svg
-        opacity={element.opacity}
-        viewBox={`${-strokeWidth} ${-strokeWidth} ${width + strokeWidth}, ${height + strokeWidth}`}
-      >
-        <clipPath id={element.strokeProps.clipPathId}>
-          <path
-            d={pathData}
-            vectorEffect="non-scaling-stroke"
-            stroke="transparent"
-            strokeWidth={element.strokeProps.strokeWidth}
-          />
-        </clipPath>
+      <clipPath id={element.strokeProps.clipPathId}>
         <path
           d={pathData}
-          stroke={element.strokeProps.stroke}
-          strokeWidth={element.strokeProps.strokeWidth}
-          strokeLinecap={element.strokeProps.strokeLinecap}
-          strokeDasharray={element.strokeProps.strokeDasharray}
-          strokeMiterlimit={element.strokeProps.strokeWidth * 2}
-          clipPath={element.strokeProps.clipPathId}
-          fill={element.props.fill}
           vectorEffect="non-scaling-stroke"
+          stroke="transparent"
+          strokeWidth={element.strokeProps.strokeWidth}
         />
-      </svg>
-      <ResizeHandler show={show} dimension={{ width, height }} onResize={handleResize} />
-      <RotateHandler
-        show={show}
-        dimension={{ width, height }}
-        position={{ x, y }}
-        onRotate={handleRotate}
+      </clipPath>
+      <path
+        d={pathData}
+        stroke={element.strokeProps.stroke}
+        strokeWidth={element.strokeProps.strokeWidth}
+        strokeLinecap={element.strokeProps.strokeLinecap}
+        strokeDasharray={element.strokeProps.strokeDasharray}
+        strokeMiterlimit={element.strokeProps.strokeWidth * 2}
+        clipPath={element.strokeProps.clipPathId}
+        fill={element.props.fill}
+        vectorEffect="non-scaling-stroke"
       />
-    </DragHandler>
+    </svg>
   );
 }
 

@@ -87,8 +87,8 @@ export function PhotosPanel() {
                       handleAddElement({
                         type: 'image',
                         state: ImageState.Normal,
-                        x: 200,
-                        y: 200,
+                        x: 10,
+                        y: 10,
                         width: 300,
                         height: 200,
                         border: { id: 'none', stroke: 'black', strokeWidth: 1 },
@@ -126,8 +126,8 @@ export function PhotosPanel() {
                       handleAddElement({
                         type: 'image',
                         state: ImageState.Normal,
-                        x: 200,
-                        y: 200,
+                        x: 10,
+                        y: 10,
                         width: 300,
                         height: 200,
                         border: { id: 'none', stroke: 'black', strokeWidth: 1 },
