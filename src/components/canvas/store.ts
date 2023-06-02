@@ -113,8 +113,8 @@ export function getDefaultMoveable(props?: Partial<MoveableElement>) {
 export const defaultImage: ImageType & MoveableElement = {
   type: 'image',
   url: '',
-  x: 100,
-  y: 200,
+  x: 10,
+  y: 20,
   state: ImageState.Normal,
   width: 400,
   height: 400,

@@ -2,7 +2,14 @@ import React, { useEffect, useRef } from 'react';
 import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 import { atom, SetStateAction, useAtomValue, useSetAtom } from 'jotai';
-import { CanvasElement, ImageState, ImageType, MoveableElement, circleCropAtom } from '../store';
+import {
+  CanvasElement,
+  ImageState,
+  ImageType,
+  MoveableElement,
+  canvasAtom,
+  circleCropAtom
+} from '../store';
 import { getImageDimensions, uuid } from '../../../utils';
 import { Box, LoadingOverlay } from '@mantine/core';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -19,12 +26,17 @@ export function RenderImage({
   isSelected: boolean;
   onSelect: (e: React.MouseEvent) => void;
 }) {
+  const canvasProps = useAtomValue(canvasAtom);
   useEffect(() => {
     async function setImageDimensions(src: string) {
       setElement((el) => ({ ...el, state: ImageState.Loading }));
 
       try {
-        const { width, height } = await getImageDimensions(src);
+        const { width, height } = await getImageDimensions(
+          src,
+          canvasProps.width - 200,
+          canvasProps.height - 200
+        );
         setElement((el) => ({
           ...el,
           width,
@@ -75,7 +87,18 @@ export function RenderImage({
               </clipPath>
             </defs>
           </svg>
-          <svg viewBox={`${-s} ${-s} ${width + s * 2} ${height + s * 2}`}>
+          <svg
+            style={{
+              position: 'absolute',
+              left: x,
+              top: y,
+              width,
+              height,
+              transform: `rotate(${rotation}deg)`,
+              transformOrigin: 'center center'
+            }}
+            viewBox={`${-s} ${-s} ${width + s * 2} ${height + s * 2}`}
+          >
             <image
               clipPath={id}
               preserveAspectRatio="xMidYMid slice"
