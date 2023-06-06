@@ -2,7 +2,7 @@ import React from 'react';
 import { SetStateAction } from 'jotai';
 import { CanvasElement, MoveableElement, SVGPathType } from '@/components/canvas/store';
 
-type SVGCanvasElement = MoveableElement & SVGPathType;
+type SVGCanvasElement = SVGPathType;
 
 type Props = {
   element: SVGCanvasElement;

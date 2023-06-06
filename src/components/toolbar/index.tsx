@@ -6,7 +6,9 @@ import {
   selectedElementAtomsAtom,
   groupsByIdAtom,
   sidepanelAtom,
-  activeElementAtomAtom
+  activeElementAtomAtom,
+  GroupedElementType,
+  addElementAtom
 } from '../canvas/store';
 import { SvgPathToolbar } from './svg-path-toolbar';
 import { ImageToolbar } from './image-toolbar';
@@ -49,17 +51,17 @@ const isGroupedAtom = atom((get) => {
 
 export const addGroupAtom = atom(null, (get, set) => {
   const selectedElementAtoms = get(selectedElementAtomsAtom);
-  const newId = selectedElementAtoms.reduce((acc, item) => acc + item.toString(), '');
-  set(groupsByIdAtom, (obj) => ({
-    ...obj,
-    [newId]: [...selectedElementAtoms]
-  }));
-  selectedElementAtoms.forEach((elAtom) => {
-    set(elAtom, (el) => ({
-      ...el,
-      group: newId
-    }));
-  });
+
+  const newGroup: GroupedElementType = {
+    type: 'group',
+    elements: [...selectedElementAtoms],
+    x: 10,
+    y: 10,
+    width: 100,
+    height: 100
+  };
+  set(elementAtomsAtom, (els) => [...els.filter((el) => !selectedElementAtoms.includes(el))]);
+  set(addElementAtom, newGroup);
 });
 
 const removeGroupAtom = atom(null, (get, set) => {

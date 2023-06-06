@@ -10,12 +10,16 @@ import {
   isGroupedAtom,
   Resizable,
   selectedElementAtomsAtom,
-  unSelectAllAtom
+  unSelectAllAtom,
+  GroupedElementType,
+  Action,
+  CanvasElementWithPointAtoms
 } from './store';
 import { DragHandler } from './drag-handler';
 import { useCallback, useEffect, useRef } from 'react';
 import { SNAP_TOLERANCE, calculatePosition, useShiftKeyPressed } from '@/utils';
 import AutosizeInput from 'react-input-autosize';
+import { dimensionAtom, positionAtom } from './render-group';
 
 export function OuterCanvas() {
   const elementAtoms = useAtomValue(elementAtomsAtom);
@@ -80,27 +84,14 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
     }
   }, [isSelected, element.type]);
 
-  const handleMouseMove = useCallback(
-    (p: Draggable) => {
-      setElement((el) => {
-        return {
-          ...el,
-          x: calculatePosition(el.x, p.x, el.width, canvasProps.width, SNAP_TOLERANCE),
-          y: calculatePosition(el.y, p.y, el.height, canvasProps.height, SNAP_TOLERANCE)
-        };
-      });
-    },
-    [setElement]
-  );
-
   const handleSelectElement = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (element.type !== 'group') setActiveElementAtom(elementAtom);
     setSelectedElementAtoms((selectedItems) => {
-      setActiveElementAtom(elementAtom);
       if (selectedItems.includes(elementAtom)) return selectedItems;
-      if (atomGroup) {
-        return isShiftPressed ? selectedItems.concat(atomGroup) : atomGroup;
-      }
+      // if (element.type === 'group') {
+      //   return isShiftPressed ? selectedItems.concat(atomGroup) : atomGroup;
+      // }
       return isShiftPressed ? selectedItems.concat(elementAtom) : [elementAtom];
     });
 
@@ -113,6 +104,30 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
       });
     }
   };
+
+  if (element.type === 'group') {
+    return (
+      <GroupRenderer
+        onSelect={handleSelectElement}
+        isSelected={isSelected}
+        group={element}
+        setGroupElement={setElement}
+      />
+    );
+  }
+
+  const handleMouseMove = useCallback(
+    (p: Draggable) => {
+      setElement((el) => {
+        return {
+          ...el,
+          x: calculatePosition(el.x, p.x, el.width, canvasProps.width, SNAP_TOLERANCE),
+          y: calculatePosition(el.y, p.y, el.height, canvasProps.height, SNAP_TOLERANCE)
+        };
+      });
+    },
+    [setElement]
+  );
 
   const handleRotate = (angle: number) => {
     setElement((prev) => {
@@ -242,5 +257,118 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
       onRotate={handleRotate}
       onResize={handleResize}
     ></DragHandler>
+  );
+}
+
+type GroupRendererProps = {
+  group: GroupedElementType;
+  setGroupElement: (element: Action<CanvasElementWithPointAtoms>) => void;
+  isSelected: boolean;
+  onSelect: (e: React.MouseEvent) => void;
+};
+
+export function GroupRenderer({
+  group,
+  setGroupElement,
+  isSelected,
+  onSelect
+}: GroupRendererProps) {
+  const [position, setPosition] = useAtom(positionAtom(group.elements));
+  const [dimension, setDimension] = useAtom(dimensionAtom(group.elements));
+  // const [selecctedElementAtoms, setSelectedElementAtoms] = useAtom(selectedElementAtomsAtom);
+  // const isShiftPressed = useShiftKeyPressed();
+
+  const handleMove = (p: Draggable) => {
+    setPosition({
+      x: p.x,
+      y: p.y
+    });
+  };
+
+  const handleRotate = (angle: number) => {
+    setGroupElement((prev) => {
+      return {
+        ...prev,
+        rotation: angle
+      };
+    });
+  };
+
+  // const handleSelectElement = (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //   setSelectedElementAtoms((selectedItems) => {
+  //     setActiveElementAtom(elementAtom);
+  //     if (selectedItems.includes(elementAtom)) return selectedItems;
+
+  //     return isShiftPressed ? selectedItems.concat(elementAtom) : [elementAtom];
+  //   });
+
+  //   if (element.type === 'text' && isSelected) {
+  //     setElement((prev) => {
+  //       return {
+  //         ...prev,
+  //         mode: 'editing'
+  //       };
+  //     });
+  //   }
+  // };
+
+  return (
+    <DragHandler
+      position={position}
+      dimension={dimension}
+      rotation={group.rotation}
+      onMove={handleMove}
+      onClick={onSelect}
+      onRotate={handleRotate}
+      hide={!isSelected}
+    >
+      {group.elements.map((elementAtom) => {
+        return (
+          <GroupedElementRenderer
+            onGroupSelect={onSelect}
+            key={`${elementAtom}`}
+            elementAtom={elementAtom}
+            position={position}
+          />
+        );
+      })}
+    </DragHandler>
+  );
+}
+
+type GroupedElementRendererProps = {
+  elementAtom: ElementType;
+  position: Draggable;
+  onGroupSelect: (e: React.MouseEvent) => void;
+};
+
+export function GroupedElementRenderer({
+  elementAtom,
+  position,
+  onGroupSelect
+}: GroupedElementRendererProps) {
+  const element = useAtomValue(elementAtom);
+  const [activeElementAtom, setActiveElementAtom] = useAtom(activeElementAtomAtom);
+  const theme = useMantineTheme();
+
+  const handleSelectElement = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActiveElementAtom(elementAtom);
+    onGroupSelect(e);
+  };
+
+  return (
+    <div
+      onClick={handleSelectElement}
+      style={{
+        position: 'absolute',
+        top: element.y - position.y,
+        left: element.x - position.x,
+        width: element.width,
+        height: element.height,
+        border: activeElementAtom === elementAtom ? `2px solid ${theme.colors.blue[9]}` : 'none'
+      }}
+    />
   );
 }

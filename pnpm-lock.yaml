@@ -22,6 +22,7 @@ importers:
       '@types/react-beautiful-dnd': ^13.1.4
       '@types/react-dom': ^18.0.6
       '@types/react-input-autosize': ^2.2.1
+      '@types/react-responsive-masonry': ^2.1.0
       '@types/react-textfit': ^1.1.0
       '@typescript-eslint/eslint-plugin': ^5.37.0
       '@typescript-eslint/parser': ^5.37.0
@@ -74,6 +75,7 @@ importers:
       '@tanstack/react-query': 4.28.0_biqbaboplfbrettd7655fr4n2y
       '@types/dom-to-image': 2.6.4
       '@types/react-beautiful-dnd': 13.1.4
+      '@types/react-responsive-masonry': 2.1.0
       axios: 0.27.2
       clsx: 1.2.1
       cropperjs: 1.5.12
@@ -1061,6 +1063,12 @@ packages:
       '@types/react': 18.0.20
       hoist-non-react-statics: 3.3.2
       redux: 4.2.1
+    dev: false
+
+  /@types/react-responsive-masonry/2.1.0:
+    resolution: {integrity: sha512-gbo9TMKGsgkER/AKycuTtpUJA4Rmzfm5ol7jBzNOdgjpZFBS/SmaNTVAa0qDDRu3xKEuCOcip+RtbC7TaXllnA==}
+    dependencies:
+      '@types/react': 18.0.20
     dev: false
 
   /@types/react-textfit/1.1.0:
