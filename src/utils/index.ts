@@ -123,3 +123,11 @@ export function getFileNameFromUrl(url: string): string {
 
   return fileName;
 }
+
+export function sortArrayBasedOnAnother<T>(baseArray: T[], targetArray: T[]): T[] {
+  let indexMap = new Map<T, number>();
+  baseArray.forEach((element, index) => indexMap.set(element, index));
+
+  targetArray.sort((a, b) => indexMap.get(a)! - indexMap.get(b)!);
+  return targetArray;
+}

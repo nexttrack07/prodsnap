@@ -199,6 +199,19 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
 
   if (element.type === 'text' && element.mode === 'editing') {
     hideHandlers = true;
+
+    const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+      setElement((prev) => {
+        return {
+          ...prev,
+          mode: 'normal',
+          content: event.target.innerText || '',
+          width: event.target.offsetWidth ?? 0,
+          height: event.target.offsetHeight ?? 0
+        };
+      });
+    };
+
     return (
       <DragHandler
         position={{ x, y }}
@@ -213,35 +226,21 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
         <div
           style={{
             position: 'absolute',
-            visibility: 'hidden',
-            width: element.width,
-            height: element.height
+            userSelect: 'none',
+            whiteSpace: 'pre-wrap',
+            outline: 'none',
+            border: `1px solid ${theme.colors.blue[5]}`,
+            // width: element.width,
+            // height: element.height,
+            ...element.props
           }}
           ref={textRef}
+          contentEditable={true}
+          suppressContentEditableWarning={true}
+          onBlur={handleBlur}
         >
           {element.content}
         </div>
-        <AutosizeInput
-          inputStyle={{
-            // remove all input styles
-            border: `1px solid ${theme.colors.gray[9]}`,
-            outline: 'none',
-            background: 'none',
-            padding: 0,
-            resize: 'none',
-            ...element.props
-          }}
-          type="text"
-          value={element.content}
-          onChange={(e) => {
-            setElement((prev) => {
-              return {
-                ...prev,
-                content: e.target.value
-              };
-            });
-          }}
-        />
       </DragHandler>
     );
   }
@@ -348,15 +347,68 @@ export function GroupedElementRenderer({
   position,
   onGroupSelect
 }: GroupedElementRendererProps) {
-  const element = useAtomValue(elementAtom);
+  const [element, setElement] = useAtom(elementAtom);
   const [activeElementAtom, setActiveElementAtom] = useAtom(activeElementAtomAtom);
   const theme = useMantineTheme();
+  const textRef = useRef<HTMLDivElement>(null);
+  const isSelected = activeElementAtom === elementAtom;
 
   const handleSelectElement = (e: React.MouseEvent) => {
     e.stopPropagation();
     setActiveElementAtom(elementAtom);
     onGroupSelect(e);
+
+    if (element.type === 'text' && isSelected) {
+      setElement((prev) => {
+        return {
+          ...prev,
+          mode: 'editing'
+        };
+      });
+    }
   };
+
+  if (element.type === 'text' && element.mode === 'editing') {
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          top: element.y - position.y,
+          left: element.x - position.x,
+          width: element.width,
+          height: element.height,
+          border: isSelected ? `2px solid ${theme.colors.blue[9]}` : 'none'
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            userSelect: 'none',
+            whiteSpace: 'pre-wrap',
+            outline: 'none',
+            border: `1px solid ${theme.colors.blue[5]}`,
+            // width: element.width,
+            // height: element.height,
+            ...element.props
+          }}
+          ref={textRef}
+          contentEditable={true}
+          suppressContentEditableWarning={true}
+          onBlur={() => {
+            setElement((prev) => {
+              return {
+                ...prev,
+                mode: 'normal',
+                content: textRef.current?.innerText || ''
+              };
+            });
+          }}
+        >
+          {element.content}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -367,7 +419,7 @@ export function GroupedElementRenderer({
         left: element.x - position.x,
         width: element.width,
         height: element.height,
-        border: activeElementAtom === elementAtom ? `2px solid ${theme.colors.blue[9]}` : 'none'
+        border: isSelected ? `2px solid ${theme.colors.blue[9]}` : 'none'
       }}
     />
   );

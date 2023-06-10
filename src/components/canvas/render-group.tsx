@@ -55,10 +55,15 @@ export function RenderGroupedElement({
   elementAtom: ElementType;
   position: { x: number; y: number };
 }) {
-  const [element] = useAtom(elementAtom);
+  const [element, setElement] = useAtom(elementAtom);
   const Comp = elementCompMap[element.type];
 
-  return <Comp element={{ ...element, x: element.x - position.x, y: element.y - position.y }} />;
+  return (
+    <Comp
+      element={{ ...element, x: element.x - position.x, y: element.y - position.y }}
+      setElement={setElement}
+    />
+  );
 }
 
 export const positionAtom = atomFamily((atoms: ElementType[]) =>

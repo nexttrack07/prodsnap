@@ -8,7 +8,8 @@ import {
   sidepanelAtom,
   activeElementAtomAtom,
   GroupedElementType,
-  addElementAtom
+  addElementAtom,
+  CanvasElementWithPointAtoms
 } from '../canvas/store';
 import { SvgPathToolbar } from './svg-path-toolbar';
 import { ImageToolbar } from './image-toolbar';
@@ -27,6 +28,7 @@ import {
   Trash
 } from 'tabler-icons-react';
 import { SvgCurveToolbar } from './svg-curve-toolbar';
+import { sortArrayBasedOnAnother } from '@/utils';
 
 const deleteSelectedAtom = atom(null, (get, set) => {
   const selectedElementAtoms = get(selectedElementAtomsAtom);
@@ -51,10 +53,26 @@ const isGroupedAtom = atom((get) => {
 
 export const addGroupAtom = atom(null, (get, set) => {
   const selectedElementAtoms = get(selectedElementAtomsAtom);
+  const allElementAtoms = get(elementAtomsAtom);
+  const sortedSelectedElementAtoms = sortArrayBasedOnAnother(allElementAtoms, selectedElementAtoms);
+
+  // if any of the sortedSelectedElements is already a group, then need to grab the elements inside the group
+  // and add it to the sortedSelectedElements
+  const newSortedSelectedElements = sortedSelectedElementAtoms
+    .map((a) => get(a))
+    .reduce((acc, el) => {
+      if (el.type === 'group') {
+        return [...acc, ...el.elements.map((a) => get(a))];
+      } else {
+        return [...acc, el];
+      }
+    }, [] as CanvasElementWithPointAtoms[]);
+
+  const sortedSelectedElements = newSortedSelectedElements.map((el) => atom(el));
 
   const newGroup: GroupedElementType = {
     type: 'group',
-    elements: [...selectedElementAtoms],
+    elements: [...sortedSelectedElements],
     x: 10,
     y: 10,
     width: 100,
@@ -66,19 +84,22 @@ export const addGroupAtom = atom(null, (get, set) => {
 
 const removeGroupAtom = atom(null, (get, set) => {
   const selectedElementAtoms = get(selectedElementAtomsAtom);
-  const selectedElements = selectedElementAtoms.map((a) => get(a));
-  const id = selectedElements[0].group;
-  set(groupsByIdAtom, (obj) => {
-    if (id) {
-      delete obj[id];
-    }
-    return obj;
-  });
-  selectedElementAtoms.forEach((elAtom) => {
-    set(elAtom, (el) => ({
-      ...el,
-      group: undefined
-    }));
+
+  if (selectedElementAtoms.length !== 1) return;
+
+  const selectedElement = get(selectedElementAtoms[0]);
+  if (selectedElement.type !== 'group') return;
+
+  // selectedElement.elements contains the atoms that we need to insert into elementAtomsAtom
+  // we need to insert it in the index that the activeElementAtom is in elementAtomsAtom
+  // first remove the activeElementAtom from elementAtomsAtom then insert the elements in the right index
+  set(elementAtomsAtom, (els) => {
+    const activeElementAtomIndex = els.indexOf(selectedElementAtoms[0]);
+    return [
+      ...els.slice(0, activeElementAtomIndex),
+      ...selectedElement.elements,
+      ...els.slice(activeElementAtomIndex + 1)
+    ];
   });
 });
 
@@ -156,6 +177,16 @@ const alignElementsAtom = atom(
   }
 );
 
+const showRemoveGroupAtom = atom((get) => {
+  const selectedElementAtoms = get(selectedElementAtomsAtom);
+
+  if (selectedElementAtoms.length !== 1) return false;
+
+  const selectedElement = get(selectedElementAtoms[0]);
+
+  return selectedElement.type === 'group';
+});
+
 export function Toolbar() {
   const deletedSelectedElements = useSetAtom(deleteSelectedAtom);
   const selectedElements = useAtomValue(selectedElementAtomsAtom);
@@ -166,6 +197,7 @@ export function Toolbar() {
   const copySelected = useSetAtom(copySelectedAtom);
   const alignElements = useSetAtom(alignElementsAtom);
   const [position, setPosition] = useAtom(sidepanelAtom);
+  const showRemoveGroup = useAtomValue(showRemoveGroupAtom);
 
   const handleDeleteClick = () => {
     deletedSelectedElements();
@@ -265,7 +297,8 @@ export function Toolbar() {
           <Button onClick={handleGroupElements} variant="default" size="xs">
             Group
           </Button>
-        ) : selectedElements.length > 1 ? (
+        ) : null}
+        {showRemoveGroup ? (
           <Button onClick={handleUngroupElements} variant="light" size="xs">
             Ungroup
           </Button>
