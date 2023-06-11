@@ -21,6 +21,7 @@ import { RenderCurve } from './render-curve';
 import { useShiftKeyPressed } from '../../utils';
 import { MultipleSelect } from './multiple-select';
 import { RenderGraphic } from './render-graphic';
+import { RenderGroup } from './render-group';
 
 export function Canvas() {
   const elementAtoms = useAtomValue(elementAtomsAtom);
@@ -51,7 +52,6 @@ export function Canvas() {
       })}
       onMouseDown={handleCanvasMouseDown}
     >
-      <MultipleSelect show={selected.length > 1} />
       {elementAtoms.map((elementAtom) => (
         <Element key={elementAtom.toString()} elementAtom={elementAtom} />
       ))}
@@ -62,6 +62,7 @@ export function Canvas() {
 export const elementCompMap: Record<CanvasElementWithPointAtoms['type'], React.FC<any>> = {
   image: RenderImage,
   text: RenderText,
+  group: RenderGroup,
   'svg-path': RenderPath,
   'svg-curve': RenderCurve,
   'svg-graphic': RenderGraphic
@@ -77,8 +78,8 @@ export function Element({ elementAtom }: { elementAtom: ElementType }) {
 
   const handleSelectElement = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setActiveElementAtom(elementAtom);
     setSelectedElementAtoms((selectedItems) => {
-      setActiveElementAtom(elementAtom);
       if (selectedItems.includes(elementAtom)) return selectedItems;
       if (atomGroup) {
         return isShiftPressed ? selectedItems.concat(atomGroup) : atomGroup;

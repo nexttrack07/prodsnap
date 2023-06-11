@@ -91,7 +91,12 @@ export type ImageType = {
   }
 } & MoveableElement;
 
-export type CanvasElement = ImageType | TextType | SVGPathType | SVGCurveType | SVGGraphicType;
+export type GroupedElementType = {
+  type: 'group';
+  elements: ElementType[];
+} & MoveableElement;
+
+export type CanvasElement = GroupedElementType | ImageType | TextType | SVGPathType | SVGCurveType | SVGGraphicType;
 export type CanvasElementWithPointAtoms = Exclude<CanvasElement, SVGCurveType> | SVGCurveWithPointAtoms;
 export type ElementType = Atom<CanvasElementWithPointAtoms>;
 export type GroupType = Atom<ElementType[]>;

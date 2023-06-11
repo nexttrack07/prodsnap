@@ -1,5 +1,5 @@
 import { Box, useMantineTheme } from '@mantine/core';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import {
   activeElementAtomAtom,
   canvasAtom,
@@ -10,12 +10,20 @@ import {
   isGroupedAtom,
   Resizable,
   selectedElementAtomsAtom,
-  unSelectAllAtom
+  unSelectAllAtom,
+  GroupedElementType,
+  Action,
+  CanvasElementWithPointAtoms,
+  SVGPointAtom,
+  SVGCurveWithPointAtoms
 } from './store';
 import { DragHandler } from './drag-handler';
-import { useCallback, useEffect, useRef } from 'react';
+import { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 import { SNAP_TOLERANCE, calculatePosition, useShiftKeyPressed } from '@/utils';
 import AutosizeInput from 'react-input-autosize';
+import { dimensionAtom, positionAtom } from './render-group';
+import { atomFamily } from 'jotai/utils';
+import { RenderPoint } from './render-point';
 
 export function OuterCanvas() {
   const elementAtoms = useAtomValue(elementAtomsAtom);
@@ -80,27 +88,14 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
     }
   }, [isSelected, element.type]);
 
-  const handleMouseMove = useCallback(
-    (p: Draggable) => {
-      setElement((el) => {
-        return {
-          ...el,
-          x: calculatePosition(el.x, p.x, el.width, canvasProps.width, SNAP_TOLERANCE),
-          y: calculatePosition(el.y, p.y, el.height, canvasProps.height, SNAP_TOLERANCE)
-        };
-      });
-    },
-    [setElement]
-  );
-
   const handleSelectElement = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (element.type !== 'group') setActiveElementAtom(elementAtom);
     setSelectedElementAtoms((selectedItems) => {
-      setActiveElementAtom(elementAtom);
       if (selectedItems.includes(elementAtom)) return selectedItems;
-      if (atomGroup) {
-        return isShiftPressed ? selectedItems.concat(atomGroup) : atomGroup;
-      }
+      // if (element.type === 'group') {
+      //   return isShiftPressed ? selectedItems.concat(atomGroup) : atomGroup;
+      // }
       return isShiftPressed ? selectedItems.concat(elementAtom) : [elementAtom];
     });
 
@@ -113,6 +108,30 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
       });
     }
   };
+
+  if (element.type === 'group') {
+    return (
+      <GroupRenderer
+        onSelect={handleSelectElement}
+        isSelected={isSelected}
+        group={element}
+        setGroupElement={setElement}
+      />
+    );
+  }
+
+  const handleMouseMove = useCallback(
+    (p: Draggable) => {
+      setElement((el) => {
+        return {
+          ...el,
+          x: calculatePosition(el.x, p.x, el.width, canvasProps.width, SNAP_TOLERANCE),
+          y: calculatePosition(el.y, p.y, el.height, canvasProps.height, SNAP_TOLERANCE)
+        };
+      });
+    },
+    [setElement]
+  );
 
   const handleRotate = (angle: number) => {
     setElement((prev) => {
@@ -184,6 +203,19 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
 
   if (element.type === 'text' && element.mode === 'editing') {
     hideHandlers = true;
+
+    const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+      setElement((prev) => {
+        return {
+          ...prev,
+          mode: 'normal',
+          content: event.target.innerText || '',
+          width: event.target.offsetWidth ?? 0,
+          height: event.target.offsetHeight ?? 0
+        };
+      });
+    };
+
     return (
       <DragHandler
         position={{ x, y }}
@@ -198,36 +230,33 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
         <div
           style={{
             position: 'absolute',
-            visibility: 'hidden',
-            width: element.width,
-            height: element.height
+            userSelect: 'none',
+            whiteSpace: 'pre-wrap',
+            outline: 'none',
+            border: `1px solid ${theme.colors.blue[5]}`,
+            // width: element.width,
+            // height: element.height,
+            ...element.props
           }}
           ref={textRef}
+          contentEditable={true}
+          suppressContentEditableWarning={true}
+          onBlur={handleBlur}
         >
           {element.content}
         </div>
-        <AutosizeInput
-          inputStyle={{
-            // remove all input styles
-            border: `1px solid ${theme.colors.gray[9]}`,
-            outline: 'none',
-            background: 'none',
-            padding: 0,
-            resize: 'none',
-            ...element.props
-          }}
-          type="text"
-          value={element.content}
-          onChange={(e) => {
-            setElement((prev) => {
-              return {
-                ...prev,
-                content: e.target.value
-              };
-            });
-          }}
-        />
       </DragHandler>
+    );
+  }
+
+  if (element.type === 'svg-curve') {
+    return (
+      <CurvePointsRenderer
+        curve={element}
+        isSelected={isSelected}
+        onSelect={handleSelectElement}
+        setElement={setElement}
+      />
     );
   }
 
@@ -242,5 +271,299 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
       onRotate={handleRotate}
       onResize={handleResize}
     ></DragHandler>
+  );
+}
+
+type Point = { x: number; y: number };
+
+type Result = { x: number; y: number; width: number; height: number };
+
+function getBoundingBox(points: Point[]): Result {
+  let minX = points[0].x;
+  let minY = points[0].y;
+  let maxX = points[0].x;
+  let maxY = points[0].y;
+
+  for (const point of points) {
+    minX = Math.min(minX, point.x);
+    minY = Math.min(minY, point.y);
+    maxX = Math.max(maxX, point.x);
+    maxY = Math.max(maxY, point.y);
+  }
+
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY
+  };
+}
+
+const getPointsAtom = atomFamily((atoms: SVGPointAtom[]) =>
+  atom((get) => {
+    return atoms.map((atom) => get(atom));
+  })
+);
+
+export function CurvePointsRenderer({
+  curve,
+  isSelected,
+  onSelect,
+  setElement
+}: {
+  curve: SVGCurveWithPointAtoms;
+  isSelected: boolean;
+  onSelect: (e: React.MouseEvent) => void;
+  setElement: (update: SetStateAction<CanvasElementWithPointAtoms>) => void;
+}) {
+  const points = useAtomValue(getPointsAtom(curve.points));
+  const theme = useMantineTheme();
+  const { x, y, width, height } = getBoundingBox(points);
+  const [moving, setMoving] = useState(false);
+  const lastPos = useRef({ x: 0, y: 0 });
+
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onSelect(e);
+      if (isSelected) {
+        setMoving(true);
+        lastPos.current = { x: e.clientX, y: e.clientY };
+      }
+    },
+    [isSelected, onSelect]
+  );
+
+  const handleMouseUp = useCallback((e: MouseEvent) => {
+    e.stopPropagation();
+    setMoving(false);
+  }, []);
+
+  useEffect(() => {
+    function handleMouseMove(e: MouseEvent) {
+      e.stopPropagation();
+      if (moving) {
+        const deltaX = e.clientX - lastPos.current.x;
+        const deltaY = e.clientY - lastPos.current.y;
+        setElement((prev) => {
+          return {
+            ...prev,
+            points: points.map((point) =>
+              atom({ ...point, x: point.x + deltaX, y: point.y + deltaY })
+            )
+          };
+        });
+      }
+    }
+
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [moving]);
+
+  return (
+    <div
+      onMouseDown={handleMouseDown}
+      style={{
+        position: 'absolute',
+        border: isSelected ? `1px solid ${theme.colors.gray[5]}` : 'none',
+        left: x,
+        top: y,
+        cursor: 'pointer',
+        width: Math.max(width, 10),
+        height: Math.max(height, 10)
+      }}
+    >
+      {isSelected &&
+        curve.points.map((pointAtom) => (
+          <RenderPoint
+            pointAtom={pointAtom}
+            position={{ x, y }}
+            key={`${pointAtom}`}
+            width={curve.strokeWidth ?? 0}
+          />
+        ))}
+    </div>
+  );
+}
+
+type GroupRendererProps = {
+  group: GroupedElementType;
+  setGroupElement: (element: Action<CanvasElementWithPointAtoms>) => void;
+  isSelected: boolean;
+  onSelect: (e: React.MouseEvent) => void;
+};
+
+export function GroupRenderer({
+  group,
+  setGroupElement,
+  isSelected,
+  onSelect
+}: GroupRendererProps) {
+  const [position, setPosition] = useAtom(positionAtom(group.elements));
+  const [dimension, setDimension] = useAtom(dimensionAtom(group.elements));
+  // const [selecctedElementAtoms, setSelectedElementAtoms] = useAtom(selectedElementAtomsAtom);
+  // const isShiftPressed = useShiftKeyPressed();
+
+  const handleMove = (p: Draggable) => {
+    setPosition({
+      x: p.x,
+      y: p.y
+    });
+  };
+
+  const handleRotate = (angle: number) => {
+    setGroupElement((prev) => {
+      return {
+        ...prev,
+        rotation: angle
+      };
+    });
+  };
+
+  // const handleSelectElement = (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //   setSelectedElementAtoms((selectedItems) => {
+  //     setActiveElementAtom(elementAtom);
+  //     if (selectedItems.includes(elementAtom)) return selectedItems;
+
+  //     return isShiftPressed ? selectedItems.concat(elementAtom) : [elementAtom];
+  //   });
+
+  //   if (element.type === 'text' && isSelected) {
+  //     setElement((prev) => {
+  //       return {
+  //         ...prev,
+  //         mode: 'editing'
+  //       };
+  //     });
+  //   }
+  // };
+
+  return (
+    <DragHandler
+      position={position}
+      dimension={dimension}
+      rotation={group.rotation}
+      onMove={handleMove}
+      onClick={onSelect}
+      onRotate={handleRotate}
+      hide={!isSelected}
+    >
+      {group.elements.map((elementAtom) => {
+        return (
+          <GroupedElementRenderer
+            onGroupSelect={onSelect}
+            key={`${elementAtom}`}
+            elementAtom={elementAtom}
+            position={position}
+          />
+        );
+      })}
+    </DragHandler>
+  );
+}
+
+type GroupedElementRendererProps = {
+  elementAtom: ElementType;
+  position: Draggable;
+  onGroupSelect: (e: React.MouseEvent) => void;
+};
+
+export function GroupedElementRenderer({
+  elementAtom,
+  position,
+  onGroupSelect
+}: GroupedElementRendererProps) {
+  const [element, setElement] = useAtom(elementAtom);
+  const [activeElementAtom, setActiveElementAtom] = useAtom(activeElementAtomAtom);
+  const theme = useMantineTheme();
+  const textRef = useRef<HTMLDivElement>(null);
+  const isSelected = activeElementAtom === elementAtom;
+
+  const handleSelectElement = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActiveElementAtom(elementAtom);
+    onGroupSelect(e);
+
+    if (element.type === 'text' && isSelected) {
+      setElement((prev) => {
+        return {
+          ...prev,
+          mode: 'editing'
+        };
+      });
+    }
+  };
+
+  if (element.type === 'text' && element.mode === 'editing') {
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          top: element.y - position.y,
+          left: element.x - position.x,
+          width: element.width,
+          height: element.height,
+          border: isSelected ? `2px solid ${theme.colors.blue[9]}` : 'none'
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            userSelect: 'none',
+            whiteSpace: 'pre-wrap',
+            outline: 'none',
+            border: `1px solid ${theme.colors.blue[5]}`,
+            // width: element.width,
+            // height: element.height,
+            ...element.props
+          }}
+          ref={textRef}
+          contentEditable={true}
+          suppressContentEditableWarning={true}
+          onBlur={() => {
+            setElement((prev) => {
+              return {
+                ...prev,
+                mode: 'normal',
+                content: textRef.current?.innerText || ''
+              };
+            });
+          }}
+        >
+          {element.content}
+        </div>
+      </div>
+    );
+  }
+
+  if (element.type === 'svg-curve') {
+    return (
+      <CurvePointsRenderer
+        curve={element}
+        isSelected={isSelected}
+        onSelect={handleSelectElement}
+        setElement={setElement}
+      />
+    );
+  }
+
+  return (
+    <div
+      onClick={handleSelectElement}
+      style={{
+        position: 'absolute',
+        top: element.y - position.y,
+        left: element.x - position.x,
+        width: element.width,
+        height: element.height,
+        border: isSelected ? `2px solid ${theme.colors.blue[9]}` : 'none'
+      }}
+    />
   );
 }

@@ -128,15 +128,6 @@ export function RenderCurve({
         element={{ points, ...rest }}
         position={position}
       />
-      {isSelected &&
-        element.points.map((pointAtom) => (
-          <RenderPoint
-            position={position}
-            key={`${pointAtom}`}
-            width={element.strokeWidth ?? 0}
-            pointAtom={pointAtom}
-          />
-        ))}
     </>
   );
 }
