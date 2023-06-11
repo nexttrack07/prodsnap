@@ -58,6 +58,18 @@ export function RenderGroupedElement({
   const [element, setElement] = useAtom(elementAtom);
   const Comp = elementCompMap[element.type];
 
+  if (element.type === 'svg-curve') {
+    return (
+      <RenderCurve
+        element={element}
+        setElement={setElement}
+        onSelect={() => {}}
+        position={position}
+        isSelected
+      />
+    );
+  }
+
   return (
     <Comp
       element={{ ...element, x: element.x - position.x, y: element.y - position.y }}

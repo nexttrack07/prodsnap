@@ -1,5 +1,5 @@
 import { Box, useMantineTheme } from '@mantine/core';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import {
   activeElementAtomAtom,
   canvasAtom,
@@ -13,13 +13,17 @@ import {
   unSelectAllAtom,
   GroupedElementType,
   Action,
-  CanvasElementWithPointAtoms
+  CanvasElementWithPointAtoms,
+  SVGPointAtom,
+  SVGCurveWithPointAtoms
 } from './store';
 import { DragHandler } from './drag-handler';
-import { useCallback, useEffect, useRef } from 'react';
+import { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 import { SNAP_TOLERANCE, calculatePosition, useShiftKeyPressed } from '@/utils';
 import AutosizeInput from 'react-input-autosize';
 import { dimensionAtom, positionAtom } from './render-group';
+import { atomFamily } from 'jotai/utils';
+import { RenderPoint } from './render-point';
 
 export function OuterCanvas() {
   const elementAtoms = useAtomValue(elementAtomsAtom);
@@ -245,6 +249,17 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
     );
   }
 
+  if (element.type === 'svg-curve') {
+    return (
+      <CurvePointsRenderer
+        curve={element}
+        isSelected={isSelected}
+        onSelect={handleSelectElement}
+        setElement={setElement}
+      />
+    );
+  }
+
   return (
     <DragHandler
       position={{ x, y }}
@@ -256,6 +271,123 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
       onRotate={handleRotate}
       onResize={handleResize}
     ></DragHandler>
+  );
+}
+
+type Point = { x: number; y: number };
+
+type Result = { x: number; y: number; width: number; height: number };
+
+function getBoundingBox(points: Point[]): Result {
+  let minX = points[0].x;
+  let minY = points[0].y;
+  let maxX = points[0].x;
+  let maxY = points[0].y;
+
+  for (const point of points) {
+    minX = Math.min(minX, point.x);
+    minY = Math.min(minY, point.y);
+    maxX = Math.max(maxX, point.x);
+    maxY = Math.max(maxY, point.y);
+  }
+
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY
+  };
+}
+
+const getPointsAtom = atomFamily((atoms: SVGPointAtom[]) =>
+  atom((get) => {
+    return atoms.map((atom) => get(atom));
+  })
+);
+
+export function CurvePointsRenderer({
+  curve,
+  isSelected,
+  onSelect,
+  setElement
+}: {
+  curve: SVGCurveWithPointAtoms;
+  isSelected: boolean;
+  onSelect: (e: React.MouseEvent) => void;
+  setElement: (update: SetStateAction<CanvasElementWithPointAtoms>) => void;
+}) {
+  const points = useAtomValue(getPointsAtom(curve.points));
+  const theme = useMantineTheme();
+  const { x, y, width, height } = getBoundingBox(points);
+  const [moving, setMoving] = useState(false);
+  const lastPos = useRef({ x: 0, y: 0 });
+
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onSelect(e);
+      if (isSelected) {
+        setMoving(true);
+        lastPos.current = { x: e.clientX, y: e.clientY };
+      }
+    },
+    [isSelected, onSelect]
+  );
+
+  const handleMouseUp = useCallback((e: MouseEvent) => {
+    e.stopPropagation();
+    setMoving(false);
+  }, []);
+
+  useEffect(() => {
+    function handleMouseMove(e: MouseEvent) {
+      e.stopPropagation();
+      if (moving) {
+        const deltaX = e.clientX - lastPos.current.x;
+        const deltaY = e.clientY - lastPos.current.y;
+        setElement((prev) => {
+          return {
+            ...prev,
+            points: points.map((point) =>
+              atom({ ...point, x: point.x + deltaX, y: point.y + deltaY })
+            )
+          };
+        });
+      }
+    }
+
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [moving]);
+
+  return (
+    <div
+      onMouseDown={handleMouseDown}
+      style={{
+        position: 'absolute',
+        border: isSelected ? `1px solid ${theme.colors.gray[5]}` : 'none',
+        left: x,
+        top: y,
+        cursor: 'pointer',
+        width: Math.max(width, 10),
+        height: Math.max(height, 10)
+      }}
+    >
+      {isSelected &&
+        curve.points.map((pointAtom) => (
+          <RenderPoint
+            pointAtom={pointAtom}
+            position={{ x, y }}
+            key={`${pointAtom}`}
+            width={curve.strokeWidth ?? 0}
+          />
+        ))}
+    </div>
   );
 }
 
@@ -407,6 +539,17 @@ export function GroupedElementRenderer({
           {element.content}
         </div>
       </div>
+    );
+  }
+
+  if (element.type === 'svg-curve') {
+    return (
+      <CurvePointsRenderer
+        curve={element}
+        isSelected={isSelected}
+        onSelect={handleSelectElement}
+        setElement={setElement}
+      />
     );
   }
 
