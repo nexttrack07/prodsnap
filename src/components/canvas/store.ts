@@ -1,9 +1,9 @@
-import { atom, WritableAtom } from 'jotai';
+import { atom, PrimitiveAtom, WritableAtom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
 import React, { SetStateAction, SVGAttributes } from 'react';
 
 export type Action<T> = SetStateAction<T>;
-export type Atom<T> = WritableAtom<T, Action<T>>;
+export type Atom<T> = PrimitiveAtom<T>;
 
 
 export type Draggable = {
@@ -141,7 +141,6 @@ export const selectedItemsAtom = atom((get) => {
 });
 
 export const addElementAtom = atom(null, (_, set, newEl: CanvasElementWithPointAtoms) => {
-  // newEl = { ...newEl, rotation: -90 }
   set(elementAtomsAtom, (elementAtoms) => [...elementAtoms, atom(newEl)]);
 });
 
