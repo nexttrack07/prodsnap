@@ -20,7 +20,7 @@
     "@mantine/hooks": "^5.10.5",
     "@mantine/modals": "^5.10.5",
     "@mantine/notifications": "^5.10.5",
-    "@supabase/supabase-js": "^2.0.0-rc.10",
+    "@supabase/supabase-js": "2.0.0-rc.10",
     "@tanstack/react-query": "^4.28.0",
     "@types/dom-to-image": "^2.6.4",
     "@types/react-beautiful-dnd": "^13.1.4",

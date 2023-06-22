@@ -19,8 +19,8 @@ import {
 } from '@mantine/core';
 import { BrandGoogle } from 'tabler-icons-react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '@/api/auth';
 import { useAuthStore } from '@/stores';
+import { useAuth } from '@/components/auth-provider';
 
 export function GoogleButton(props: ButtonProps) {
   return (
@@ -33,6 +33,7 @@ export function Login(props: PaperProps) {
   const navigate = useNavigate();
   const [type, toggle] = useToggle(['login', 'register']);
   const [loading, setLoading] = React.useState(false);
+  const { login } = useAuth();
   const form = useForm({
     initialValues: {
       email: '',
