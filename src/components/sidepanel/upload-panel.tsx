@@ -11,10 +11,12 @@ import {
 } from '@mantine/core';
 import { useSetAtom } from 'jotai';
 import { addElementAtom, CanvasElementWithPointAtoms, defaultImage } from '../canvas/store';
+import { firestore, storage } from '../../utils/firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { addDoc, collection, getDocs } from 'firebase/firestore';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import { Check, CloudUpload, X } from 'tabler-icons-react';
 import { useQuery } from '@tanstack/react-query';
-import { getImages, uploadPhoto } from '@/api/photos';
 
 const useStyles = createStyles((theme) => ({
   shape: {
@@ -30,52 +32,80 @@ const useStyles = createStyles((theme) => ({
   }
 }));
 
+type ImageFile = {
+  filname: string;
+  url: string;
+};
+
+async function fetchImages() {
+  const docRef = collection(firestore, 'images');
+  const snap = await getDocs(docRef);
+  let newImages: ImageFile[] = [];
+  snap.forEach((doc) => {
+    newImages.push(doc.data() as ImageFile);
+  });
+  return newImages;
+}
+
 export function UploadPanel() {
   const addElement = useSetAtom(addElementAtom);
   const { classes } = useStyles();
   const [error, setError] = useState<Error | null>(null);
-  const [loading, setLoading] = useState(false);
-  const query = useQuery(['images'], getImages);
+  const query = useQuery(['images'], fetchImages);
 
   const handleAddElement = (newEl: CanvasElementWithPointAtoms) => {
     addElement(newEl);
   };
 
-  const handleUploadImage = async (file: File) => {
-    const formData = new FormData();
-    formData.append('image', file);
+  const handleUploadImage = (file: File) => {
+    const storageRef = ref(storage, `images/${file.name}`);
+    const collectionRef = collection(firestore, 'images');
+    const uploadTask = uploadBytesResumable(storageRef, file);
 
-    try {
-      showNotification({
-        title: 'Uploading Image',
-        message: 'Uploading your image...',
-        loading: true,
-        autoClose: false,
-        disallowClose: false,
-        id: 'uploading-image'
-      });
-      const _ = await uploadPhoto(formData);
-      updateNotification({
-        id: 'uploading-image',
-        title: 'Image Uploaded',
-        message: 'Your image has been uploaded!',
-        icon: <Check />,
-        autoClose: 2000
-      });
-      query.refetch();
-    } catch (error) {
-      updateNotification({
-        id: 'uploading-image',
-        title: 'Image Upload Error',
-        message: 'Error uploading your image. Please try again.',
-        icon: <X />,
-        autoClose: 2000
-      });
-    }
+    uploadTask.on(
+      'state_changed',
+      () => {
+        // const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        // setProgress(progress);
+        showNotification({
+          id: 'upload-photo',
+          loading: true,
+          title: 'Uploading your photo',
+          message: 'Your photo is being uploaded...',
+          autoClose: false,
+          disallowClose: true
+        });
+      },
+      (err) => {
+        // Handle unsuccessful uploads
+        console.error(err);
+        setError(err);
+        updateNotification({
+          id: 'upload-photo',
+          color: 'red',
+          title: 'Upload failed!',
+          message: error!.message,
+          icon: <X size={16} />,
+          autoClose: 2000
+        });
+      },
+      () => {
+        // Handle successful uploads on complete
+        // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+        getDownloadURL(uploadTask.snapshot.ref).then(async (url) => {
+          await addDoc(collectionRef, { filename: file.name, url });
+        });
+        updateNotification({
+          id: 'upload-photo',
+          color: 'teal',
+          title: 'Photo Uploaded Successfully',
+          message: 'Your photo has been uploaded successfully',
+          icon: <Check size={16} />,
+          autoClose: 2000
+        });
+      }
+    );
   };
-
-  // cloudinary image url
-  const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_IMAGE_URL;
 
   return (
     <>
@@ -84,7 +114,7 @@ export function UploadPanel() {
           <Button
             size="md"
             leftIcon={<CloudUpload />}
-            variant="gradient"
+            variant="filled"
             uppercase
             fullWidth
             {...props}
@@ -96,15 +126,15 @@ export function UploadPanel() {
       <Divider my="xl" />
       <LoadingOverlay visible={query.isLoading} />
       <SimpleGrid cols={3}>
-        {query.data?.results.map((image) => (
+        {query.data?.map((image) => (
           <Image
-            key={image.id}
+            key={image.url}
             className={classes.shape}
-            src={CLOUDINARY_URL + image.image}
+            src={image.url}
             onClick={() => {
               const el: CanvasElementWithPointAtoms = {
                 ...defaultImage,
-                url: CLOUDINARY_URL + image.image
+                url: image.url
               };
 
               handleAddElement(el);

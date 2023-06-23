@@ -1,9 +1,9 @@
-import { getRefreshToken, setAuthUser } from '@/api/auth';
 import { useAuthStore } from '@/stores';
 import { LoadingOverlay } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { app } from '@/utils/firebase';
 
 type Props = {
   redirectPath?: string;
@@ -11,30 +11,25 @@ type Props = {
 };
 
 export function ProtectedRoute({ redirectPath = '/login', children }: Props) {
-  const loggedIn = useAuthStore((state) => state.isLoggedIn)();
-  const [loading, setLoading] = useState(false);
+  const setUser = useAuthStore((state) => state.setUser);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function checkLogin() {
-      try {
-        setLoading(true);
-        const { refresh, access } = await getRefreshToken();
-        setAuthUser(access, refresh);
-        navigate('/editor');
-      } catch (e) {
-        console.log('refresh error', e);
-      } finally {
-        setLoading(false);
+    setLoading(true);
+    const auth = getAuth(app);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setLoading(false);
+      if (!user) {
+        console.log('user not found');
+        setUser(null);
+        navigate(redirectPath); // redirect to login page
       }
-    }
+    });
 
-    if (!loggedIn) {
-      const refreshToken = Cookies.get('refresh_token');
-      refreshToken && checkLogin();
-    } else {
-      navigate('/editor');
-    }
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   if (loading) {

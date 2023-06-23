@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
-import { getRefreshToken, isAccessTokenExpired, setAuthUser } from './auth';
+// import { getRefreshToken, isAccessTokenExpired, setAuthUser } from './auth';
 
 interface IApiClient {
   get<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>>;
@@ -22,38 +22,38 @@ class ApiClient implements IApiClient {
       }
     });
 
-    this.setupInterceptors();
+    // this.setupInterceptors();
   }
 
-  private setupInterceptors() {
-    this.instance.interceptors.request.use(
-      async (config: AxiosRequestConfig) => {
-        console.log('config', config)
-        const accessToken = Cookies.get('access_token');
-        const refreshToken = Cookies.get('refresh_token');
+  // private setupInterceptors() {
+  //   this.instance.interceptors.request.use(
+  //     async (config: AxiosRequestConfig) => {
+  //       console.log('config', config)
+  //       const accessToken = Cookies.get('access_token');
+  //       const refreshToken = Cookies.get('refresh_token');
 
-        if (accessToken && !isAccessTokenExpired(accessToken)) return {
-          ...config,
-          headers: {
-            ...config.headers,
-            Authorization: `Bearer ${accessToken}`
-          }
-        };
+  //       if (accessToken && !isAccessTokenExpired(accessToken)) return {
+  //         ...config,
+  //         headers: {
+  //           ...config.headers,
+  //           Authorization: `Bearer ${accessToken}`
+  //         }
+  //       };
 
-        const res = await getRefreshToken(refreshToken);
-        setAuthUser(res.access, res.refresh);
+  //       const res = await getRefreshToken(refreshToken);
+  //       setAuthUser(res.access, res.refresh);
 
-        return {
-          ...config,
-          headers: {
-            ...config.headers,
-            Authorization: `Bearer ${res.access}`
-          }
-        };
-      },
-      (error) => Promise.reject(error)
-    );
-  }
+  //       return {
+  //         ...config,
+  //         headers: {
+  //           ...config.headers,
+  //           Authorization: `Bearer ${res.access}`
+  //         }
+  //       };
+  //     },
+  //     (error) => Promise.reject(error)
+  //   );
+  // }
 
   async get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
     return this.instance.get<T>(url, config);
