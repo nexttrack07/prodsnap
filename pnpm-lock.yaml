@@ -59,6 +59,7 @@ importers:
       simple-zustand-devtools: ^1.1.0
       tabler-icons-react: ^1.56.0
       typescript: ^4.6.4
+      typesense: ^1.5.4
       use-fit-text: ^2.4.0
       vite: ^3.1.0
       zustand: ^4.3.7
@@ -101,6 +102,7 @@ importers:
       react-router-dom: 6.4.0_biqbaboplfbrettd7655fr4n2y
       recoil: 0.7.6_biqbaboplfbrettd7655fr4n2y
       tabler-icons-react: 1.56.0_react@18.2.0
+      typesense: 1.5.4
       use-fit-text: 2.4.0_react@18.2.0
       zustand: 4.3.7_react@18.2.0
     devDependencies:
@@ -1878,6 +1880,14 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
+  /axios/0.26.1:
+    resolution: {integrity: sha512-fPwcX4EvnSHuInCMItEhAGnaSEXRBjtzh9fOtsE6E1G6p7vl7edEeZe11QHf18+6+9gR5PbKV/sGKNaD8YaMeA==}
+    dependencies:
+      follow-redirects: 1.15.2
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
   /axios/0.27.2:
     resolution: {integrity: sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==}
     dependencies:
@@ -3415,6 +3425,11 @@ packages:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
     dev: true
 
+  /loglevel/1.8.1:
+    resolution: {integrity: sha512-tCRIJM51SHjAayKwC+QAg8hT8vg6z7GSgLJKGvzuPb1Wc+hLzqtuVLxp6/HzSPOozuK+8ErAhy7U/sVzw8Dgfg==}
+    engines: {node: '>= 0.6.0'}
+    dev: false
+
   /long/4.0.0:
     resolution: {integrity: sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==}
     dev: false
@@ -4253,6 +4268,17 @@ packages:
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
+
+  /typesense/1.5.4:
+    resolution: {integrity: sha512-51/lyTWbn4NmH4oe3dXv4xSi9eqZwOB7/hXnzyGl84pgFn2MdeeMKb4Lr7z8fUNFmS0TNl7rujaIHRmNR1f2ZA==}
+    peerDependencies:
+      '@babel/runtime': ^7.17.2
+    dependencies:
+      axios: 0.26.1
+      loglevel: 1.8.1
+    transitivePeerDependencies:
+      - debug
+    dev: false
 
   /unbox-primitive/1.0.2:
     resolution: {integrity: sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw==}

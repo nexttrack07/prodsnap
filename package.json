@@ -49,6 +49,7 @@
     "react-router-dom": "^6.4.0",
     "recoil": "^0.7.6",
     "tabler-icons-react": "^1.56.0",
+    "typesense": "^1.5.4",
     "use-fit-text": "^2.4.0",
     "zustand": "^4.3.7"
   },

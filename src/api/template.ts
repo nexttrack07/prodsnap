@@ -1,6 +1,7 @@
 import { collection, endAt, getDocs, limit, orderBy, query, startAfter, startAt } from 'firebase/firestore';
 import { client } from './client';
 import { firestore } from '@/utils/firebase';
+import { typesense } from '@/utils/typesense';
 
 type GraphicResponse = {
   id: number;
@@ -44,6 +45,17 @@ export async function getGraphics(n: number) {
   };
 }
 
+// export async function searchGraphics(query: string = 'nature') {
+//   return client.get<ResWithPagination<GraphicResponse>>("/search/graphics/" + query).then(res => res.data);
+// }
+
 export async function searchGraphics(query: string = 'nature') {
-  return client.get<ResWithPagination<GraphicResponse>>("/search/graphics/" + query).then(res => res.data);
+  const search = {
+    q: query,
+    query_by: "desc",
+  }
+
+  const res = await typesense.collections('icons').documents().search(search);
+
+  console.log(res);
 }
