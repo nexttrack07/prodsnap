@@ -1,4 +1,4 @@
-import { ActionIcon, Button, SimpleGrid, Stack, Text, Title } from '@mantine/core';
+import { ActionIcon, Flex, Image, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { WashDrycleanOff } from 'tabler-icons-react';
 import {
   imageBorderAtom,
@@ -8,8 +8,8 @@ import {
 } from '@/components/canvas/store';
 import { useAtom, useAtomValue } from 'jotai';
 import { removeBackground } from '@/api/photos';
-import { ImageCropper } from './crop-image';
 import { BORDERS } from './image-borders';
+import remove_bg from '@/assets/remove_bg.png';
 
 export function ImageOptions() {
   const [selectedImage, setSelectedImage] = useAtom(selectedImageAtom);
@@ -39,34 +39,50 @@ export function ImageOptions() {
 
   return (
     <Stack>
-      <Button
-        size="md"
-        leftIcon={<WashDrycleanOff />}
-        fullWidth
-        variant="outline"
+      <Flex
+        sx={(theme) => ({
+          border: `1px solid ${theme.colors.gray[4]}`,
+          borderRadius: 2,
+          cursor: 'pointer',
+          '&:hover': {
+            border: `1px solid ${theme.colors.gray[9]}`,
+            boxShadow: `0 0 0 1px ${theme.colors.gray[9]}`
+          }
+        })}
         onClick={handleRemoveBg}
       >
-        Remove Background
-      </Button>
-      <ImageCropper />
-      <br />
-      <Title order={6}>Image Borders</Title>
-      <Text size="sm" color="gray">
-        Make sure to crop the image to a circle before using circle border
-      </Text>
+        <Image src={remove_bg} width={70} />
+        <Flex direction="column" justify="center" sx={{ marginLeft: 10 }}>
+          <Title order={6}>Remove Background</Title>
+          <Text size="xs" color="gray">
+            Remove the background of your image with one click.
+          </Text>
+        </Flex>
+      </Flex>
+      <div>
+        <Title order={6}>Crop Image</Title>
+        <Text size="sm" color="gray">
+          Make a selection to crop your image to its shape.
+        </Text>
+      </div>
       <SimpleGrid cols={4}>
         {BORDERS.map((b) => (
-          <ActionIcon
-            color="dark"
-            variant={border?.id === b.id ? 'light' : 'default'}
-            size={70}
-            key={b.id}
-            onClick={() => {
-              setBorder({ id: b.id });
-            }}
-          >
-            {b.icon}
-          </ActionIcon>
+          <Flex direction="column" gap={5} align="center" key={b.id}>
+            <ActionIcon
+              color="dark"
+              variant={border?.id === b.id ? 'light' : 'default'}
+              size={70}
+              key={b.id}
+              onClick={() => {
+                setBorder({ id: b.id });
+              }}
+            >
+              {b.icon}
+            </ActionIcon>
+            <Text size="xs" color="gray">
+              {b.desc}
+            </Text>
+          </Flex>
         ))}
       </SimpleGrid>
     </Stack>
