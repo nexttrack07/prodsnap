@@ -34,8 +34,7 @@ export function GraphicsPanel() {
     useInfiniteQuery({
       queryKey: ['graphics'],
       queryFn: (page) => getGraphics(page.pageParam || 1),
-      getNextPageParam: (lastPage) =>
-        lastPage.next ? Number(lastPage.next.split('=')[1]) : undefined,
+      getNextPageParam: (lastPage) => lastPage.next,
       keepPreviousData: true
     });
   const addElement = useSetAtom(addElementAtom);
@@ -66,12 +65,12 @@ export function GraphicsPanel() {
       <SearchInput value={search} onChange={handleSearchInput} placeholder="Search Graphics" />
       <br />
       <LoadingOverlay
-        visible={status === 'loading' || (searchQuery.isFetching && !!search)}
+        visible={isFetching || (searchQuery.isFetching && !!search)}
         overlayBlur={2}
       />
       <ScrollArea.Autosize maxHeight={`calc(100vh - 250px)`}>
         {search.length > 0 ? (
-          <SimpleGrid cols={5} spacing="md">
+          <SimpleGrid cols={4} spacing="md">
             {searchQuery.data?.results.map((graphic, i) => (
               <React.Fragment key={i}>
                 <Image

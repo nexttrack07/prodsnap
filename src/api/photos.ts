@@ -32,7 +32,10 @@ type ImageResponse = {
 };
 
 export async function getPopularPhotos(page = 1) {
-  return client.get<PhotoResponse>('/popular-photos?page=' + page).then((res) => res.data);
+  const getPopularPhotosFunc = httpsCallable(functions, 'getPopularImages');
+  const res = await getPopularPhotosFunc({ page });
+
+  return res.data as { page: number; images: Photo[]};
 }
 
 export async function searchPhotos(query = 'bag', page = 1) {
@@ -61,8 +64,6 @@ export const removeBackground = async ({ url }: { url: string }) => {
   const removeBgFunc = httpsCallable(functions, 'removeBackground');
 
   const res: any = await removeBgFunc({ url });
-
-  console.log('REMOVE BG: ', res);
 
   const collectionRef = collection(firestore, 'images');
   await addDoc(collectionRef, { filename: res.data.filename, url: res.data.url });
