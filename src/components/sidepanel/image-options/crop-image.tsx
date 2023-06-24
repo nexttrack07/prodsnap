@@ -51,7 +51,10 @@ export const ImageCropper = () => {
   };
 
   const handleCropImage = () => {
-    setSelectedImage({ state: ImageState.Cropping });
+    setSelectedImage({
+      state: ImageState.Cropping,
+      mask: selectedImage.mask ? selectedImage.mask : { id: 'circle', x: 200, y: 200 }
+    });
     setIsCropping(true);
   };
 

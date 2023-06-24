@@ -88,6 +88,11 @@ export type ImageType = {
     id: 'none' | 'circle' | 'rectangle';
     stroke: string;
     strokeWidth: number;
+  };
+  mask?: {
+    id: 'none' | 'circle' | 'rectangle';
+    x: number;
+    y: number;
   }
 } & MoveableElement;
 

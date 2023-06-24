@@ -15,15 +15,17 @@ import {
   Action,
   CanvasElementWithPointAtoms,
   SVGPointAtom,
-  SVGCurveWithPointAtoms
+  SVGCurveWithPointAtoms,
+  ImageState
 } from './store';
 import { DragHandler } from './drag-handler';
 import { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
-import { SNAP_TOLERANCE, calculatePosition, useShiftKeyPressed } from '@/utils';
+import { SNAP_TOLERANCE, calculatePosition, useShiftKeyPressed, uuid } from '@/utils';
 import AutosizeInput from 'react-input-autosize';
 import { dimensionAtom, positionAtom } from './render-group';
 import { atomFamily } from 'jotai/utils';
 import { RenderPoint } from './render-point';
+import { RenderBorder } from './render-image/render-border';
 
 export function OuterCanvas() {
   const elementAtoms = useAtomValue(elementAtomsAtom);
@@ -257,6 +259,121 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
         onSelect={handleSelectElement}
         setElement={setElement}
       />
+    );
+  }
+
+  if (element.type === 'image' && element.state === ImageState.Cropping && element.mask) {
+    const id = uuid();
+    const s = element.border.strokeWidth;
+
+    const handleMaskMove = (pos: Draggable) => {
+      setElement((prev) => {
+        if (prev.type === 'image' && prev.mask) {
+          return {
+            ...prev,
+            mask: {
+              ...prev.mask,
+              x: prev.mask.x + pos.x,
+              y: prev.mask.y + pos.y
+            }
+          };
+        } else return prev;
+      });
+    };
+    return (
+      <>
+        <svg
+          x="0"
+          y="0"
+          xmlSpace="preserve"
+          style={{
+            position: 'absolute',
+            left: x,
+            top: y,
+            width,
+            height,
+            transform: `rotate(${rotation}deg)`,
+            transformOrigin: 'center center'
+          }}
+          enableBackground={`new ${-s} ${-s} ${width + s * 2} ${height + s * 2}`}
+        >
+          <defs>
+            <clipPath id={id}>
+              <RenderBorder width={width} height={height} border={element.border} uid={id} />
+            </clipPath>
+          </defs>
+        </svg>
+        <svg
+          style={{
+            position: 'absolute',
+            left: x,
+            top: y,
+            width,
+            height,
+            transform: `rotate(${rotation}deg)`,
+            transformOrigin: 'center center'
+          }}
+          viewBox={`${-s} ${-s} ${width + s * 2} ${height + s * 2}`}
+        >
+          <image
+            clipPath={id}
+            preserveAspectRatio="xMidYMid slice"
+            href={element.currentUrl ?? element.url}
+            width={width}
+            height={height}
+            mask="url(#svgmask1)"
+          />
+          <use href={`#${element.border.id}-${id}`} />
+          {element.mask && (
+            <mask id="svgmask1">
+              <circle
+                style={{ cursor: 'pointer' }}
+                fill="#ffffff"
+                cx={element.mask.x}
+                cy={element.mask.y}
+                r="175"
+                stroke="black"
+                strokeWidth={4}
+              ></circle>
+              <rect
+                opacity={0.5}
+                x="0"
+                y="0"
+                width={element.width}
+                height={element.height}
+                fill="white"
+              />
+            </mask>
+          )}
+        </svg>
+        {/* <div
+          style={{
+            position: 'absolute',
+            left: element.mask.x + element.x - 175,
+            top: element.mask.y + element.y - 175,
+            // backgroundColor: 'red',
+            borderRadius: 2,
+            border: '2px dashed black',
+            width: 175 * 2,
+            height: 175 * 2,
+            cursor: 'move'
+          }}
+        ></div> */}
+        <DragHandler
+          position={{
+            x: element.mask.x + element.x - 175,
+            y: element.mask.y + element.y - 175
+          }}
+          onMove={handleMaskMove}
+          onRotate={() => {}}
+          onResize={() => {}}
+          hide={false}
+          dimension={{
+            width: 175 * 2,
+            height: 175 * 2
+          }}
+        ></DragHandler>
+      </>
     );
   }
 

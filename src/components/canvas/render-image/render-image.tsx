@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 import { atom, SetStateAction, useAtomValue, useSetAtom } from 'jotai';
@@ -99,18 +99,25 @@ export function RenderImage({
             }}
             viewBox={`${-s} ${-s} ${width + s * 2} ${height + s * 2}`}
           >
+            {element.mask && (
+              <mask id="svgmask1">
+                <circle fill="#ffffff" cx={element.mask.x} cy={element.mask.y} r="175"></circle>
+              </mask>
+            )}
+
             <image
               clipPath={id}
               preserveAspectRatio="xMidYMid slice"
               href={element.currentUrl ?? element.url}
               width={width}
               height={height}
+              mask="url(#svgmask1)"
             />
             <use href={`#${element.border.id}-${id}`} />
           </svg>
         </>
       )}
-      {element.state === ImageState.Cropping && <CropImage element={element} />}
+      {element.state === ImageState.Cropping && null}
     </>
   );
 }
