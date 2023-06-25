@@ -31,14 +31,15 @@ export function MaskedImageControls({ element, setElement }: Props) {
   };
 
   const handleMaskResize = ({ x, y, width, height }: Draggable & Resizable) => {
+    console.log('handleMaskResize: ', x, y, width, height);
     setElement((prev) => ({
       ...prev,
       mask: {
         ...prev.mask,
         x: prev.mask.x + x,
         y: prev.mask.y + y,
-        width: prev.mask.width + width,
-        height: prev.mask.height + height
+        width: prev.mask.width + width * 2,
+        height: prev.mask.height + height * 2
       }
     }));
   };
@@ -69,7 +70,6 @@ export function MaskedImageControls({ element, setElement }: Props) {
         {element.mask && (
           <mask id="svgmask1">
             <circle
-              style={{ cursor: 'pointer' }}
               fill="#ffffff"
               cx={element.mask.x}
               cy={element.mask.y}

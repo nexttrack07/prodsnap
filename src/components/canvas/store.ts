@@ -364,7 +364,6 @@ export const selectedImageAtom = atom(
   (get, set, update: Partial<ImageType>) => {
     const activeElementAtom = get(activeElementAtomAtom);
     if (activeElementAtom) {
-      console.log('activeElementAtom', activeElementAtom, update);
       set(activeElementAtom, (el) =>
         el.type === 'image'
           ? ({
@@ -386,7 +385,6 @@ export const imageBorderAtom = atom(
   (get, set, border: Partial<ImageType['border']>) => {
     const image = get(selectedImageAtom);
     if (!image) return;
-    console.log('border: ', border);
     set(selectedImageAtom, { ...image, border: { ...image.border, ...border } });
   }
 );

@@ -33,8 +33,8 @@ export function NormalImageControls({ element, setElement, onSelect, isSelected 
         ...prev.mask,
         x: prev.mask.x + x,
         y: prev.mask.y + y,
-        width: prev.mask.width + width,
-        height: prev.mask.height + height
+        width: prev.mask.width + width * 2,
+        height: prev.mask.height + height * 2
       }
     }));
   };
