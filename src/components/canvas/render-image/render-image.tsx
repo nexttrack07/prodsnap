@@ -105,7 +105,7 @@ export function RenderImage({
                   fill="#ffffff"
                   cx={element.mask.x}
                   cy={element.mask.y}
-                  r={element.mask.width}
+                  r={element.mask.width / 2}
                 ></circle>
               </mask>
             )}

@@ -5,29 +5,30 @@ import { DragHandler } from '../canvas/drag-handler';
 export type NormalImageType = ImageType & { state: ImageState.Normal; mask: MaskType };
 
 type Props = {
+  isSelected: boolean;
   element: NormalImageType;
+  onSelect: (e: React.MouseEvent) => void;
   setElement: (update: SetStateAction<NormalImageType>) => void;
 };
 
-export function MaskedImageControls({ element, setElement }: Props) {
+export function NormalImageControls({ element, setElement, onSelect, isSelected }: Props) {
   const handleMaskMove = (pos: Draggable) => {
     setElement((prev) => {
-      if (prev.type === 'image' && prev.mask) {
-        return {
-          ...prev,
-          mask: {
-            ...prev.mask,
-            x: prev.mask.x + pos.x,
-            y: prev.mask.y + pos.y
-          }
-        };
-      } else return prev;
+      return {
+        ...prev,
+        x: pos.x + prev.x,
+        y: pos.y + prev.y
+      };
     });
   };
 
   const handleMaskResize = ({ x, y, width, height }: Draggable & Resizable) => {
     setElement((prev) => ({
       ...prev,
+      x: prev.x + x,
+      y: prev.y + y,
+      width: prev.width + width,
+      height: prev.height + height,
       mask: {
         ...prev.mask,
         x: prev.mask.x + x,
@@ -41,15 +42,16 @@ export function MaskedImageControls({ element, setElement }: Props) {
   return (
     <DragHandler
       position={{
-        x: element.mask.x + element.x - element.mask.width,
-        y: element.mask.y + element.y - element.mask.height
+        x: element.mask.x + element.x - element.mask.width / 2,
+        y: element.mask.y + element.y - element.mask.height / 2
       }}
       onMove={handleMaskMove}
       onResize={handleMaskResize}
-      hide={false}
+      onClick={onSelect}
+      hide={!isSelected}
       dimension={{
-        width: element.mask.width * 2,
-        height: element.mask.height * 2
+        width: element.mask.width,
+        height: element.mask.height
       }}
     ></DragHandler>
   );

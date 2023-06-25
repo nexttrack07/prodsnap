@@ -73,7 +73,7 @@ export function MaskedImageControls({ element, setElement }: Props) {
               fill="#ffffff"
               cx={element.mask.x}
               cy={element.mask.y}
-              r={element.mask.width}
+              r={element.mask.width / 2}
             ></circle>
             <rect
               opacity={0.4}
@@ -88,15 +88,15 @@ export function MaskedImageControls({ element, setElement }: Props) {
       </svg>
       <DragHandler
         position={{
-          x: element.mask.x + element.x - element.mask.width,
-          y: element.mask.y + element.y - element.mask.height
+          x: element.mask.x + element.x - element.mask.width / 2,
+          y: element.mask.y + element.y - element.mask.height / 2
         }}
         onMove={handleMaskMove}
         onResize={handleMaskResize}
         hide={false}
         dimension={{
-          width: element.mask.width * 2,
-          height: element.mask.height * 2
+          width: element.mask.width,
+          height: element.mask.height
         }}
       ></DragHandler>
     </>

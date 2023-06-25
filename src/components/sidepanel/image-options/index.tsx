@@ -47,15 +47,18 @@ export function ImageOptions() {
     } else {
       setSelectedImage({
         state: ImageState.Cropping,
-        mask: {
-          type,
-          x: 200,
-          y: 200,
-          width: 200,
-          height: 200,
-          stroke: 'none',
-          strokeWidth: 0
-        }
+        mask:
+          selectedImage.mask?.type === type
+            ? selectedImage.mask
+            : {
+                type,
+                x: 200,
+                y: 200,
+                width: 200,
+                height: 200,
+                stroke: 'none',
+                strokeWidth: 0
+              }
       });
     }
   };
@@ -123,7 +126,7 @@ export function ImageOptions() {
             padding: 8
           })}
         >
-          <Text size="sm" color="gray.8">
+          <Text size="xs" weight="bold" color="gray.7">
             Adjust the crop area to your liking then click Done.
           </Text>
           <Button onClick={handleCropDone} variant="filled" size="xs">

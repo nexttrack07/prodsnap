@@ -26,6 +26,7 @@ import { atomFamily } from 'jotai/utils';
 import { RenderPoint } from '@/components/canvas/render-point';
 import { RenderBorder } from '@/components/canvas/render-image/render-border';
 import { MaskedImageControls, MaskedImageType } from './cropping-image-controls';
+import { NormalImageControls, NormalImageType } from './normal-image-controls';
 
 export function ControlsCanvas() {
   const elementAtoms = useAtomValue(elementAtomsAtom);
@@ -267,6 +268,15 @@ export function ElementBox({ elementAtom }: { elementAtom: ElementType }) {
       <MaskedImageControls
         element={element as MaskedImageType}
         setElement={setElement as (update: SetStateAction<MaskedImageType>) => void}
+      />
+    );
+  } else if (element.type === 'image' && element.state === ImageState.Normal && element.mask) {
+    return (
+      <NormalImageControls
+        element={element as NormalImageType}
+        setElement={setElement as (update: SetStateAction<NormalImageType>) => void}
+        onSelect={handleSelectElement}
+        isSelected={isSelected}
       />
     );
   }
