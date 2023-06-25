@@ -3,7 +3,7 @@ import { Center, AppShell, Footer, Text, Navbar, Box } from '@mantine/core';
 import { useSetAtom } from 'jotai';
 import React from 'react';
 import { Canvas, Toolbar, Sidepanel, SIDEPANEL_SIZE, HeaderComponent } from '../components';
-import { OuterCanvas } from '@/components/canvas/outer-canvas';
+import { ControlsCanvas } from '@/components/controls-canvas';
 
 export const HEADER_SIZE = 60;
 export const FOOTER_SIZE = 60;
@@ -53,7 +53,7 @@ export function Editor() {
           sx={(theme) => ({ flex: 1, backgroundColor: theme.colors.gray[1], position: 'relative' })}
         >
           <Canvas />
-          <OuterCanvas />
+          <ControlsCanvas />
         </Center>
       </div>
     </AppShell>

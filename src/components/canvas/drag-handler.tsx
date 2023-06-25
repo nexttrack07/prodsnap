@@ -30,8 +30,8 @@ export function DragHandler({
   children,
   hide = false,
   withMoveHandle = false,
+  onRotate,
   onResize = () => {},
-  onRotate = () => {},
   withBorders = false
 }: Props) {
   const { x, y } = position;
@@ -114,12 +114,15 @@ export function DragHandler({
         dimension={dimension}
         onResize={onResize}
       />
-      <RotateHandler
-        show={!hide}
-        dimension={{ width, height }}
-        onRotate={onRotate}
-        position={{ x, y }}
-      />
+      {onRotate && (
+        <RotateHandler
+          show={!hide}
+          dimension={{ width, height }}
+          onRotate={onRotate}
+          position={{ x, y }}
+        />
+      )}
+
       {withMoveHandle && (
         <Center
           onMouseDown={handleMouseDown}

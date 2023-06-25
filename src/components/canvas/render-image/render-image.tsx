@@ -101,10 +101,14 @@ export function RenderImage({
           >
             {element.mask && (
               <mask id="svgmask1">
-                <circle fill="#ffffff" cx={element.mask.x} cy={element.mask.y} r="175"></circle>
+                <circle
+                  fill="#ffffff"
+                  cx={element.mask.x}
+                  cy={element.mask.y}
+                  r={element.mask.width}
+                ></circle>
               </mask>
             )}
-
             <image
               clipPath={id}
               preserveAspectRatio="xMidYMid slice"

@@ -1,8 +1,8 @@
-import { ImageType } from '@/components/canvas/store';
+import { ImageType, MaskType } from '@/components/canvas/store';
 import React from 'react';
 import { Circle, Pentagon, Star, Rectangle, WashDrycleanOff } from 'tabler-icons-react';
 
-export const BORDERS: { id: ImageType['border']['id']; icon: React.ReactNode; desc: string }[] = [
+export const BORDERS: { id: MaskType['type'] | 'none'; icon: React.ReactNode; desc: string }[] = [
   {
     id: 'none',
     icon: <WashDrycleanOff />,

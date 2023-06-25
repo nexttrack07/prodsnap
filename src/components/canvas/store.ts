@@ -5,7 +5,6 @@ import React, { SetStateAction, SVGAttributes } from 'react';
 export type Action<T> = SetStateAction<T>;
 export type Atom<T> = PrimitiveAtom<T>;
 
-
 export type Draggable = {
   x: number;
   y: number;
@@ -16,11 +15,12 @@ export type Resizable = {
   height: number;
 };
 
-export type MoveableElement = Draggable & Resizable & {
-  rotation?: number;
-  group?: string;
-  opacity?: number;
-};
+export type MoveableElement = Draggable &
+  Resizable & {
+    rotation?: number;
+    group?: string;
+    opacity?: number;
+  };
 
 export type SVGStrokeProps = {
   clipPathId: string;
@@ -45,10 +45,10 @@ export type SVGCurveType = {
   points: SVGPointType[];
   isQuadratic?: boolean;
 } & Partial<SVGStrokeProps> & {
-  startMarker: MarkerType;
-  endMarker: MarkerType;
-  markerSize: number;
-} & MoveableElement;
+    startMarker: MarkerType;
+    endMarker: MarkerType;
+    markerSize: number;
+  } & MoveableElement;
 
 export type SVGPathType = {
   type: 'svg-path';
@@ -58,9 +58,9 @@ export type SVGPathType = {
 } & MoveableElement;
 
 export type SVGGraphicType = {
- type: 'svg-graphic';
- url: string;
- alt?: string;
+  type: 'svg-graphic';
+  url: string;
+  alt?: string;
 } & MoveableElement;
 
 export type TextType = {
@@ -73,8 +73,15 @@ export type TextType = {
 export enum ImageState {
   Loading,
   Normal,
-  Cropping,
+  Cropping
 }
+
+export type MaskType = (
+  | { type: 'circle' }
+  | { type: 'rectangle' }
+  | { type: 'polygon' }
+  | { type: 'star' }
+) & { x: number; y: number; width: number; height: number; stroke: string; strokeWidth: number };
 
 export type ImageType = {
   type: 'image';
@@ -89,11 +96,7 @@ export type ImageType = {
     stroke: string;
     strokeWidth: number;
   };
-  mask?: {
-    id: 'none' | 'circle' | 'rectangle';
-    x: number;
-    y: number;
-  }
+  mask?: MaskType;
 } & MoveableElement;
 
 export type GroupedElementType = {
@@ -101,8 +104,16 @@ export type GroupedElementType = {
   elements: ElementType[];
 } & MoveableElement;
 
-export type CanvasElement = GroupedElementType | ImageType | TextType | SVGPathType | SVGCurveType | SVGGraphicType;
-export type CanvasElementWithPointAtoms = Exclude<CanvasElement, SVGCurveType> | SVGCurveWithPointAtoms;
+export type CanvasElement =
+  | GroupedElementType
+  | ImageType
+  | TextType
+  | SVGPathType
+  | SVGCurveType
+  | SVGGraphicType;
+export type CanvasElementWithPointAtoms =
+  | Exclude<CanvasElement, SVGCurveType>
+  | SVGCurveWithPointAtoms;
 export type ElementType = Atom<CanvasElementWithPointAtoms>;
 export type GroupType = Atom<ElementType[]>;
 
@@ -152,7 +163,6 @@ export const addElementAtom = atom(null, (_, set, newEl: CanvasElementWithPointA
 export const addElementsAtom = atom(null, (_, set, newEls: CanvasElementWithPointAtoms[]) => {
   set(elementAtomsAtom, (elementAtoms) => [...elementAtoms, ...newEls.map((newEl) => atom(newEl))]);
 });
-
 
 export const activeElementAtom = atom(
   (get) => {
@@ -266,21 +276,19 @@ export const dimensionAtom = atom(
 );
 
 // rotate atom that rotates the selected elements
-export const rotateAtom = atom(null, 
-  (get, set, angle: number) => {
-    // get the selected elements
-    const selected = get(selectedItemsAtom);
-    // apply the rotation to each element
-    selected.atoms.forEach((elementAtom) => {
-      set(elementAtom, (el) => {
-        return {
-          ...el,
-          rotation: angle
-        }
-      });
+export const rotateAtom = atom(null, (get, set, angle: number) => {
+  // get the selected elements
+  const selected = get(selectedItemsAtom);
+  // apply the rotation to each element
+  selected.atoms.forEach((elementAtom) => {
+    set(elementAtom, (el) => {
+      return {
+        ...el,
+        rotation: angle
+      };
     });
-  }
-  )
+  });
+});
 
 export const createAtom = (element: CanvasElement): ElementType => {
   if (element.type === 'svg-curve') {
@@ -308,7 +316,6 @@ export const unSelectAllAtom = atom(null, (_get, set) => {
   set(selectedElementAtomsAtom, []);
   set(activeElementAtomAtom, null);
 });
-
 
 export type NavState =
   | 'templates'
@@ -357,7 +364,7 @@ export const selectedImageAtom = atom(
   (get, set, update: Partial<ImageType>) => {
     const activeElementAtom = get(activeElementAtomAtom);
     if (activeElementAtom) {
-      console.log('activeElementAtom', activeElementAtom, update)
+      console.log('activeElementAtom', activeElementAtom, update);
       set(activeElementAtom, (el) =>
         el.type === 'image'
           ? ({
@@ -369,7 +376,6 @@ export const selectedImageAtom = atom(
     }
   }
 );
-
 
 export const imageBorderAtom = atom(
   (get) => {

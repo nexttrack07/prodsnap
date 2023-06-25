@@ -1,9 +1,10 @@
-import { ActionIcon, Flex, Image, SimpleGrid, Stack, Text, Title } from '@mantine/core';
+import { ActionIcon, Button, Flex, Image, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { WashDrycleanOff } from 'tabler-icons-react';
 import {
   imageBorderAtom,
   ImageState,
   imageUrlAtom,
+  MaskType,
   selectedImageAtom
 } from '@/components/canvas/store';
 import { useAtom, useAtomValue } from 'jotai';
@@ -35,6 +36,34 @@ export function ImageOptions() {
           setSelectedImage({ state: ImageState.Normal });
         });
     }
+  };
+
+  const handleCropImage = (type: MaskType['type'] | 'none') => {
+    if (type === 'none') {
+      setSelectedImage({
+        state: ImageState.Normal,
+        mask: undefined
+      });
+    } else {
+      setSelectedImage({
+        state: ImageState.Cropping,
+        mask: {
+          type,
+          x: 200,
+          y: 200,
+          width: 200,
+          height: 200,
+          stroke: 'none',
+          strokeWidth: 0
+        }
+      });
+    }
+  };
+
+  const handleCropDone = () => {
+    setSelectedImage({
+      state: ImageState.Normal
+    });
   };
 
   return (
@@ -70,12 +99,10 @@ export function ImageOptions() {
           <Flex direction="column" gap={5} align="center" key={b.id}>
             <ActionIcon
               color="dark"
-              variant={border?.id === b.id ? 'light' : 'default'}
+              variant={selectedImage.mask?.type === b.id ? 'light' : 'default'}
               size={70}
               key={b.id}
-              onClick={() => {
-                setBorder({ id: b.id });
-              }}
+              onClick={() => handleCropImage(b.id)}
             >
               {b.icon}
             </ActionIcon>
@@ -85,6 +112,25 @@ export function ImageOptions() {
           </Flex>
         ))}
       </SimpleGrid>
+
+      {selectedImage.state === ImageState.Cropping && (
+        <Flex
+          gap="lg"
+          align="center"
+          sx={(theme) => ({
+            border: `1px solid ${theme.colors.gray[4]}`,
+            borderRadius: 2,
+            padding: 8
+          })}
+        >
+          <Text size="sm" color="gray.8">
+            Adjust the crop area to your liking then click Done.
+          </Text>
+          <Button onClick={handleCropDone} variant="filled" size="xs">
+            Done
+          </Button>
+        </Flex>
+      )}
     </Stack>
   );
 }
